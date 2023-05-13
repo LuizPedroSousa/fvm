@@ -1,0 +1,23 @@
+# CMake-generated files
+build/*
+!build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Compiled binary files
+*.o
+*.obj
+*.exe
+*.out
+
+# Compiled library files
+*.so
+*.dylib
+*.dll
+*.a
+
+# Other generated files
+*.user
+*.swp
