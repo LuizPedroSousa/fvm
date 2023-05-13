@@ -10,7 +10,7 @@ ShaderRenderer::ShaderRenderer()
   this->id = glCreateProgram();
 }
 
-void ShaderRenderer::use()
+void ShaderRenderer::start()
 {
   glUseProgram(this->id);
 }
@@ -58,4 +58,14 @@ Either<BaseException, Unit> ShaderRenderer::attach(Shader shader)
   this->shaders.push_back(shader);
 
   return Unit();
+}
+
+Either<BaseException, Unit> ShaderRenderer::attach(Either<BaseException, Shader> shader)
+{
+  if (shader.isLeft())
+  {
+    return shader.left();
+  }
+
+  return attach(shader.right());
 }

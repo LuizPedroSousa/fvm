@@ -10,9 +10,10 @@ class ShaderRenderer
 public:
   ShaderRenderer();
   unsigned int id;
-  void use();
+  void start();
   std::vector<Shader> shaders;
 
   Either<BaseException, Unit> attachMany(Shader *shaders, size_t size);
   Either<BaseException, Unit> attach(Shader shaders);
+  Either<BaseException, Unit> attach(Either<BaseException, Shader> shader);
 };
