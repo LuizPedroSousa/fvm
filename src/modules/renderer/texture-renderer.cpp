@@ -2,6 +2,7 @@
 #include "either.hpp"
 #include "exceptions/base-exception.hpp"
 #include "glad/glad.h"
+#include "uniform.hpp"
 
 void TextureRenderer::attach(Texture texture)
 {
@@ -16,7 +17,28 @@ void TextureRenderer::attachMany(size_t size, Texture *textures)
   }
 }
 
-void TextureRenderer::use()
+Either<BaseException, Unit> TextureRenderer::attachMany(size_t size, Either<BaseException, Texture *> textures)
+{
+  if (textures.isLeft())
+  {
+    return textures.left();
+  }
+
+  attachMany(size, textures.right());
+
+  return Unit();
+};
+
+void TextureRenderer::start()
+{
+  for (int i = 0; i < textures.size(); ++i)
+  {
+    Uniform uniform(&textures[i].shader);
+    uniform.setInt(textures[i].name, i);
+  }
+}
+
+void TextureRenderer::render()
 {
   for (int i = 0; i < textures.size(); ++i)
   {

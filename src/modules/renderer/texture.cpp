@@ -5,7 +5,7 @@
 #include <cstdarg>
 #include <cstring>
 
-Texture::Texture(unsigned int id, int width, int height) : id(id), width(width), height(height){};
+Texture::Texture(unsigned int id, const char *name, int width, int height, Shader shader) : id(id), name(name), width(width), height(height), shader(shader){};
 Texture::Texture(){};
 
 std::filesystem::path Texture::getPath(const char *filename)
@@ -15,7 +15,7 @@ std::filesystem::path Texture::getPath(const char *filename)
   return base_path;
 };
 
-Either<BaseException, Texture> Texture::create(const char *filename, int color_type)
+Either<BaseException, Texture> Texture::create(const char *name, const char *filename, int color_type, Shader shader)
 {
   int width, height, nrChannels;
 
@@ -45,18 +45,18 @@ Either<BaseException, Texture> Texture::create(const char *filename, int color_t
   glGenerateMipmap(GL_TEXTURE_2D);
   stbi_image_free(data);
 
-  return Texture(texture_id, width, height);
+  return Texture(texture_id, name, width, height, shader);
 };
 
-Either<BaseException, Texture *> Texture::createMany(size_t size, std::initializer_list<std::pair<const char *, int>> texturesData)
+Either<BaseException, Texture *> Texture::createMany(size_t size, std::initializer_list<std::tuple<const char *, const char *, int, Shader>> texturesData)
 {
-  Texture *result = new Texture[2];
+  Texture *result = new Texture[size];
 
   size_t i = 0;
 
   for (const auto &textureData : texturesData)
   {
-    auto texture = create(textureData.first, textureData.second);
+    auto texture = create(std::get<0>(textureData), std::get<1>(textureData), std::get<2>(textureData), std::get<3>(textureData));
 
     if (texture.isLeft())
     {

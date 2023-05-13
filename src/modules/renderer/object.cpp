@@ -87,7 +87,6 @@ void Object::draw()
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-  std::cout << vertices_size * 8 * sizeof(float) << std::endl;
   glBufferData(GL_ARRAY_BUFFER, vertices_size * 8 * sizeof(float), vertices, GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
@@ -112,12 +111,8 @@ void Object::draw()
 void Object::start()
 {
   this->draw();
-  shader_render.use();
-
-  Uniform uniform(&shader_render.shaders[0]);
-
-  uniform.setInt("_texture", 0);
-  uniform.setInt("_2texture", 1);
+  shader_render.start();
+  texture_render.start();
 
   this->init_transform = glm::translate(this->init_transform, this->position);
   this->init_transform = glm::scale(this->init_transform, glm::vec3(0.5, 0.5, 0.5));
@@ -143,7 +138,7 @@ void Object::render()
   uniform.setMatrix("view", view);
   uniform.setMatrix("projection", projection);
 
-  texture_render.use();
+  texture_render.render();
   glBindVertexArray(buffers.VAO);
   glDrawArrays(GL_TRIANGLES, 0, this->vertices_size);
 };
