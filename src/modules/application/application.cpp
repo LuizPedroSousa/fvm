@@ -36,13 +36,13 @@ void Application::run() {
   Window *window = Window::get();
 
   while (window->is_open()) {
+    on_update();
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     window->on_update();
-
-    on_update();
 
     m_game.update();
 

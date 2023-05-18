@@ -8,7 +8,7 @@
 Uniform::Uniform() {}
 
 Uniform::Uniform(unsigned int render_id) {
-  m_render_id = m_render_id;
+  m_render_id = render_id;
 }
 
 void Uniform::setBool(const char *name, bool value) const {

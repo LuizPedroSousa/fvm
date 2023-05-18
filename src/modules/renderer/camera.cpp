@@ -116,7 +116,7 @@ void Camera::render() {
   m_transform = glm::lookAt(
       s_position, s_position + s_front, s_up);
 
-  glm::mat4 projection = glm::perspective(45.0f, (float)Window::get()->get_width() / (float)Window::get()->get_height(), 0.1f, 100.0f);
+  glm::mat4 projection = glm::perspective(45.0f, (float)Window::get_width() / (float)Window::get_height(), 0.1f, 100.0f);
 
   m_uniform.setMatrix("view", m_transform);
   m_uniform.setMatrix("projection", projection);
