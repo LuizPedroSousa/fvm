@@ -1,22 +1,20 @@
 #include "./texture.hpp"
+#include "filesystem"
 #include "glad/glad.h"
 #include "stb_image/stb_image.h"
-#include "filesystem"
 #include <cstdarg>
 #include <cstring>
 
 Texture::Texture(unsigned int id, const char *name, int width, int height, Shader shader) : id(id), name(name), width(width), height(height), shader(shader){};
 Texture::Texture(){};
 
-std::filesystem::path Texture::getPath(const char *filename)
-{
+std::filesystem::path Texture::getPath(const char *filename) {
   auto base_path = std::filesystem::current_path().parent_path().append("src/assets/textures").append(filename);
 
   return base_path;
 };
 
-Either<BaseException, Texture> Texture::create(const char *name, const char *filename, int color_type, Shader shader)
-{
+Either<BaseException, Texture> Texture::create(const char *name, const char *filename, int color_type, Shader shader) {
   int width, height, nrChannels;
 
   auto path = getPath(filename);
@@ -24,8 +22,7 @@ Either<BaseException, Texture> Texture::create(const char *name, const char *fil
   stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
-  if (!data)
-  {
+  if (!data) {
     return BaseException("Error loading assets");
   }
 
@@ -48,18 +45,15 @@ Either<BaseException, Texture> Texture::create(const char *name, const char *fil
   return Texture(texture_id, name, width, height, shader);
 };
 
-Either<BaseException, Texture *> Texture::createMany(size_t size, std::initializer_list<std::tuple<const char *, const char *, int, Shader>> texturesData)
-{
+Either<BaseException, Texture *> Texture::createMany(size_t size, std::initializer_list<std::tuple<const char *, const char *, int, Shader>> texturesData) {
   Texture *result = new Texture[size];
 
   size_t i = 0;
 
-  for (const auto &textureData : texturesData)
-  {
+  for (const auto &textureData : texturesData) {
     auto texture = create(std::get<0>(textureData), std::get<1>(textureData), std::get<2>(textureData), std::get<3>(textureData));
 
-    if (texture.isLeft())
-    {
+    if (texture.isLeft()) {
       return texture.left();
     }
 
