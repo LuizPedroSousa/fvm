@@ -1,17 +1,18 @@
 #pragma once
-#include "string"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "string"
 
 class Shader;
 
-class Uniform
-{
-public:
-  Shader *shader;
+class Uniform {
+  private:
+  unsigned int m_render_id;
+
+  public:
   Uniform();
-  Uniform(Shader *shader);
+  Uniform(unsigned int render_id);
   void setBool(const char *name, bool value) const;
   void setInt(const char *name, int value) const;
   void setMatrix(const char *name, glm::mat4 trans) const;
