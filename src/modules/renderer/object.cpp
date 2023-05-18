@@ -1,24 +1,23 @@
 #include "./object.hpp"
-#include "./uniform.hpp"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "GLFW/glfw3.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "window.hpp"
 
-Object::Object(glm::vec3 position, float *vertices, size_t vertices_size, ShaderRenderer shader_render, TextureRenderer texture_render)
-{
+Object::Object(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation, float angle, float *vertices, size_t vertices_size, ShaderRenderer shader_render, TextureRenderer texture_render) {
   this->vertices = vertices;
   this->vertices_size = vertices_size;
   this->shader_render = shader_render;
   this->texture_render = texture_render;
-  this->init_transform = glm::mat4(1.0f);
   this->position = position;
+  this->scale = scale;
+  this->rotation = rotation;
+  this->rotation_angle = angle;
+  m_initial_position = position;
+  m_initial_transform = glm::mat4(1.0f);
+  m_uniform = Uniform(shader_render.id);
 }
 
-Object Object::cube(glm::vec3 position, ShaderRenderer shader_render, TextureRenderer texture_render)
-{
-
+Object Object::cube(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation, float angle, ShaderRenderer shader_render, TextureRenderer texture_render) {
   float *vertices = new float[288]{
       // Positions      //Colors           //Texture
 
@@ -72,11 +71,10 @@ Object Object::cube(glm::vec3 position, ShaderRenderer shader_render, TextureRen
 
   };
 
-  return Object(position, vertices, 36, shader_render, texture_render);
+  return Object(position, scale, rotation, angle, vertices, 36, shader_render, texture_render);
 }
 
-void Object::draw()
-{
+void Object::create_buffers() {
   GLuint VAO, VBO;
 
   glGenVertexArrays(1, &VAO);
@@ -102,43 +100,37 @@ void Object::draw()
 
   glBindVertexArray(0);
 
-  buffers = {
+  m_buffers = {
       .VAO = VAO,
       .VBO = VBO,
   };
 }
 
-void Object::start()
-{
-  this->draw();
+void Object::draw() {
+  glBindVertexArray(m_buffers.VAO);
+  glDrawArrays(GL_TRIANGLES, 0, this->vertices_size);
+}
+
+void Object::start() {
+  this->create_buffers();
   shader_render.start();
   texture_render.start();
 
-  this->init_transform = glm::translate(this->init_transform, this->position);
-  this->init_transform = glm::scale(this->init_transform, glm::vec3(0.5, 0.5, 0.5));
+  m_initial_transform = glm::translate(m_initial_transform, m_initial_position);
+  m_initial_transform = glm::scale(m_initial_transform, scale);
 }
 
-void Object::render()
-{
-  Uniform uniform(&shader_render.shaders[0]);
+void Object::render() {
+  // m_initial_transform = glm::translate(m_initial_transform, m_initial_position);
 
-  render_transform = init_transform;
+  render_transform = m_initial_transform;
 
-  this->render_transform = glm::rotate(this->render_transform, ((float)glfwGetTime() * 2.0f), glm::vec3(1.0f, 0, 0));
+  render_transform = glm::translate(render_transform, position);
+  render_transform = glm::scale(render_transform, scale);
+  render_transform = glm::rotate(render_transform, glm::radians(this->rotation_angle), rotation);
 
-  glm::mat4 view(1.0f);
-
-  view = glm::translate(view, glm::vec3(0, 0, -2.0f));
-
-  glm::mat4 projection;
-
-  projection = glm::perspective(45.0f, (float)800 / (float)600, 0.1f, 100.0f);
-
-  uniform.setMatrix("model", render_transform);
-  uniform.setMatrix("view", view);
-  uniform.setMatrix("projection", projection);
+  m_uniform.setMatrix("model", render_transform);
 
   texture_render.render();
-  glBindVertexArray(buffers.VAO);
-  glDrawArrays(GL_TRIANGLES, 0, this->vertices_size);
+  this->draw();
 };
