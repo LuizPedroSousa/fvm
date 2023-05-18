@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build using Make",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build"
+    }
+  ]
+}

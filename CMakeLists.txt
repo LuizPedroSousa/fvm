@@ -5,21 +5,12 @@ project(fvm)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
-# Adiciona opção de compilação -fPIC
-add_compile_options(-fPIC)
-
-
-
 find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 
-if(APPLE)
-  find_package(Freetype REQUIRED)
-  message(STATUS "Found Freetype in ${FREETYPE_INCLUDE_DIRS}")
-endif(APPLE)
 
 if(WIN32)
-  set(LIBS glfw3 opengl32 assimp freetype irrKlang)
+  set(LIBS glfw3 opengl32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 elseif(UNIX AND NOT APPLE)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
@@ -44,23 +35,26 @@ else()
   set(LIBS )
 endif(WIN32)
 
+add_compile_options(-fPIC)
 
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
 
 add_executable(fvm src/main.cpp)
 
-add_library(GLAD "src/glad.c")
-add_library(glm "includes/glm/detail/glm.cpp")
-add_library(stb_image "src/stb_image.cpp")
+add_library(glad "external/glad/glad.c")
+add_library(glm "external/glm/detail/glm.cpp")
+add_library(stb_image "external/stb_image/stb_image.cpp")
+
+set(LIBS ${LIBS} glad)
 
 add_subdirectory(src/shared)
 add_subdirectory(src/modules/window)
 add_subdirectory(src/modules/renderer)
+add_subdirectory(src/modules/application)
+add_subdirectory(src/modules/game)
+add_subdirectory(external/imgui)
+add_subdirectory(external/imgui/impl)
 
-set(LIBS ${LIBS} GLAD)
+include_directories(${CMAKE_SOURCE_DIR}/external)
 
-
-message("${CMAKE_SOURCE_DIR}")
-include_directories(${CMAKE_SOURCE_DIR}/includes)
-
-target_link_libraries(fvm ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} glm stb_image glfw GLAD shared window renderer)
+target_link_libraries(fvm PRIVATE imgui imgui_impl application)
