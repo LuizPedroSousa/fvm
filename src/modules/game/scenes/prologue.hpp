@@ -1,18 +1,21 @@
-#include "camera.hpp"
-#include "object-renderer.hpp"
+#pragma once
+
+#include "managers/component-manager.hpp"
+#include "managers/entity-manager.hpp"
+#include "managers/system-manager.hpp"
+#include "resources/shader-renderer.hpp"
+#include "resources/texture-renderer.hpp"
 #include "scene.hpp"
-#include "shader-renderer.hpp"
-#include "texture-renderer.hpp"
+#include "utils/guid.hpp"
 
-class Prologue : public Scene {
-
+class Prologue : public Entity<Prologue>, public Scene {
   public:
-  void start() override;
+  Prologue(ENTITY_INIT_PARAMS);
+  Prologue() {}
+
+  Either<BaseException, Unit> start() override;
   void update() override;
 
-  private:
-  ShaderRenderer m_shader_renderer;
-  ObjectRenderer m_object_renderer;
-  TextureRenderer m_texture_renderer;
-  Camera m_camera;
+  void on_enable(){};
+  void on_disable(){};
 };

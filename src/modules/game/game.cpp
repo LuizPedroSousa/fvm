@@ -1,15 +1,31 @@
 #include "game.hpp"
-#include "scenes/prologue.hpp"
+#include "application.hpp"
+#include "scene-system.hpp"
+#include "systems/layer-system.hpp"
+#include "systems/render-system.hpp"
 
-Game::Game() {
+Game *Game::m_instance = nullptr;
+
+void Game::init() {
+  m_instance = new Game;
 }
 
-void Game::start() {
-  m_scenes.push_back(std::make_unique<Prologue>(Prologue()));
+Game::Game() : m_component_manager(new ComponentManager()), m_system_manager(new SystemManager()) {
+  m_entity_manager = new EntityManager(m_component_manager);
+}
 
-  m_scenes[m_current_scene]->start();
+Either<BaseException, Unit> Game::start() {
+  auto scene_system = m_system_manager->add_system<SceneSystem>();
+  m_system_manager->add_system<RenderSystem>(scene_system);
+  m_system_manager->add_system<LayerSystem>();
+
+  auto has_started = m_system_manager->start();
+
+  ASSERT_COMPARE(has_started);
+
+  return Unit();
 }
 
 void Game::update() {
-  m_scenes[m_current_scene]->update();
+  m_system_manager->update(Application::get_deltatime());
 }

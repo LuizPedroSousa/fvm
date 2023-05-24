@@ -1,34 +1,45 @@
 #include "prologue.hpp"
-#include "imgui/imgui.h"
-#include "iostream"
+#include "components/camera-component.hpp"
+#include "components/light-component.hpp"
+#include "components/material-component.hpp"
+#include "components/resource-component.hpp"
+#include "components/transform-component.hpp"
+#include "game.hpp"
 #include <glm/gtx/string_cast.hpp>
 
-void Prologue::start() {
-  auto s_attached = m_shader_renderer.attach(Shader::create("shaders/vertex/triangle.glsl", "shaders/fragment/triangle.glsl"));
+#include "glad/glad.h"
 
-  if (s_attached.isLeft()) {
-    throw s_attached.left();
-  };
+Prologue::Prologue(ENTITY_INIT_PARAMS) : Entity(id, component_manager) {
+}
 
-  auto t_attached = m_texture_renderer.attach(
-      Texture::create("block_texture", "block.png", GL_RGBA, m_shader_renderer.shaders[0]));
+Either<BaseException, Unit> Prologue::start() {
 
-  if (t_attached.isLeft()) {
-    throw t_attached.left();
-  }
+  auto object = Game::get()->get_entity_manager()->add_entity<Object>(Object::cube(), glm::vec3(0.0f, 0.0f, 0.0));
 
-  m_camera = Camera(m_shader_renderer.id, glm::vec3(0.0f, 0.0f, 3.0f));
+  // load shaders
+  auto resource_component = object.get_component<ResourceComponent>();
+  auto shader_loaded = resource_component->load_shader(Shader::create("vertex/triangle.glsl", "fragment/triangle.glsl"));
+  ASSERT_COMPARE(shader_loaded);
+  // --------------
 
-  for (int j = 0; j < 10; j++) {
-    for (int i = 1; i < 10; i++) {
-      m_object_renderer.spawn(Object::cube(glm::vec3(0.5f * i, 0.0f, 0.5f * j), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 0.0f, m_shader_renderer, m_texture_renderer));
-    }
-  }
+  // load maps
+  auto material = object.add_component<MaterialComponent>();
+  auto maps_loaded = material->load_maps(
+      Texture::create("material.diffuse", "box.png", GL_RGBA),
+      Texture::create("material.specular", "box-specular.png", GL_RGBA),
+      0.6f);
+  ASSERT_COMPARE(maps_loaded);
+  // --------------
 
-  m_object_renderer.start_all();
+  auto camera = add_component<CameraComponent>(glm::vec3(0, 0, 3.0f));
+
+  auto light_object = Game::get()->get_entity_manager()->add_entity<Object>(
+      Object::cube(), glm::vec3(1.2f, 1.0f, 2.0f));
+
+  light_object.add_component<LightComponent>(camera);
+
+  return Unit();
 }
 
 void Prologue::update() {
-  m_camera.render();
-  m_object_renderer.render_all();
 }
