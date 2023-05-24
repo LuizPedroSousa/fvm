@@ -5,14 +5,11 @@
 #include "events/key-event.hpp"
 #include "events/mouse-event.hpp"
 #include "exceptions/base-exception.hpp"
-#include "glm/glm.hpp"
 #include "imgui/imgui.h"
 #include "stdio.h"
 #include "window.hpp"
 
 Window *Window::m_instance = nullptr;
-
-static glm::vec4 clear_color = glm::vec4(0.5f, 0.5f, 1.0f, 0.0f);
 
 void Window::handle_errors(int, const char *description) {
   std::cout << description << std::endl;
@@ -26,7 +23,7 @@ Window *Window::get() {
   return m_instance;
 }
 
-Window::Window() {
+Window::Window() : m_clear_color(glm::vec4(0.5f, 0.5f, 1.0f, 0.0f)) {
   glfwSetErrorCallback(handle_errors);
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -39,7 +36,7 @@ GLFWwindow *Window::get_value() {
 }
 
 void Window::clear_buffers() {
-  glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+  glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z, m_clear_color.w);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -60,14 +57,12 @@ Either<BaseException, Unit> Window::open(int width, int height) {
   if (window == NULL) {
     glfwTerminate();
 
-    return BaseException("Couldn't create window for OpenGL");
+    ASSERT(true, "Couldn't create window for OpenGL");
   }
 
   glfwMakeContextCurrent(m_value);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    return BaseException("Couldn't load GLAD");
-  }
+  ASSERT(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Couldn't load GLAD");
 
   glViewport(0, 0, m_width, m_height);
 
@@ -105,7 +100,7 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
   };
 }
 
-void Window::on_update() {
+void Window::update() {
   glfwPollEvents();
 
   for (int i = 0; i < KeyPressedDispatcher::get()->m_listeners.size(); i++) {
@@ -114,22 +109,10 @@ void Window::on_update() {
     }
   };
 
-  ImGui::Begin("Background");
-
-  ImGui::Text("Edit the bellow background");
-
-  ImGui::ColorEdit3("Background Color", (float *)&clear_color);
-
-  float frameTime = 1000.0f / ImGui::GetIO().Framerate;
-  float fps = ImGui::GetIO().Framerate;
-  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", frameTime, fps);
-
-  ImGui::End();
-
   clear_buffers();
 }
 
-void Window::on_next() {
+void Window::post_update() {
   glfwSwapBuffers(m_value);
 }
 

@@ -12,6 +12,7 @@ class Application {
   static Application *get() { return m_instance; }
 
   static float get_deltatime() { return get()->m_deltatime; }
+  static float get_current_time() { return get()->m_current_frame; }
 
   private:
   Application(){};
@@ -19,7 +20,7 @@ class Application {
 
   void on_update();
 
-  Game m_game;
+  Game *m_game;
 
   float m_deltatime;
   float m_current_frame;

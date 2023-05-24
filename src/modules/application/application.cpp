@@ -12,22 +12,17 @@ Application *Application::m_instance = nullptr;
 Either<BaseException, Unit> Application::init() {
   m_instance = new Application;
 
-  auto hasOpened = Window::get()->open(800, 600);
+  auto has_opened = Window::get()->open(800, 600);
 
-  if (hasOpened.isLeft()) {
-    return hasOpened.left();
-  }
+  ASSERT_COMPARE(has_opened);
 
-  Application::get()->m_game = Game();
+  Game::init();
 
-  Application::get()->m_game.start();
+  Application::get()->m_game = Game::get();
 
-  // Initialize ImGui
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
-  ImGui_ImplGlfw_InitForOpenGL(Window::get_value(), true);
-  ImGui_ImplOpenGL3_Init("#version 330");
+  auto has_started = Application::get()->m_game->start();
+
+  ASSERT_COMPARE(has_started);
 
   return Unit();
 }
@@ -38,19 +33,11 @@ void Application::run() {
   while (window->is_open()) {
     on_update();
 
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    window->update();
 
-    window->on_update();
+    m_game->update();
 
-    m_game.update();
-
-    ImGui::End();
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    window->on_next();
+    window->post_update();
   }
 }
 

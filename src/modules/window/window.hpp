@@ -3,6 +3,7 @@
 #include "either.hpp"
 #include "exceptions/base-exception.hpp"
 #include "functional"
+#include "glm/glm.hpp"
 
 class Window {
 
@@ -14,8 +15,12 @@ class Window {
   static int get_width() { return get()->m_width; }
   static int get_height() { return get()->m_height; }
 
-  void on_update();
-  void on_next();
+  static glm::vec4 *get_clear_color() {
+    return &(get()->m_clear_color);
+  };
+
+  void update();
+  void post_update();
 
   static GLFWwindow *get_value();
 
@@ -33,6 +38,8 @@ class Window {
   void clear_buffers();
   GLFWwindow *m_value;
   static Window *m_instance;
+
+  glm::vec4 m_clear_color;
 
   int m_height;
   int m_width;
