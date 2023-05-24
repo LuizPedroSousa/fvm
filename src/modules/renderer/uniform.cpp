@@ -1,5 +1,6 @@
 #include "./uniform.hpp"
-#include "./shader.hpp"
+#include "glad/glad.h"
+#include "iostream"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -24,5 +25,9 @@ void Uniform::setMatrix(const char *name, glm::mat4 trans) const {
 };
 
 void Uniform::setFloat(const char *name, float value) const {
-  glUniform1i(glGetUniformLocation(m_render_id, name), value);
+  glUniform1f(glGetUniformLocation(m_render_id, name), value);
+};
+
+void Uniform::setVec3(const char *name, glm::vec3 value) const {
+  glUniform3f(glGetUniformLocation(m_render_id, name), value.x, value.y, value.z);
 };

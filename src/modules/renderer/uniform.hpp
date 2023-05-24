@@ -17,4 +17,5 @@ class Uniform {
   void setInt(const char *name, int value) const;
   void setMatrix(const char *name, glm::mat4 trans) const;
   void setFloat(const char *name, float value) const;
+  void setVec3(const char *name, glm::vec3 value) const;
 };
