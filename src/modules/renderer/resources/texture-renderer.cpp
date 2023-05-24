@@ -36,8 +36,7 @@ Either<BaseException, Unit> TextureRenderer::attachMany(size_t size, Either<Base
 
 void TextureRenderer::start() {
   for (int i = 0; i < textures.size(); ++i) {
-    Uniform uniform(textures[i].shader.signed_to);
-    uniform.setInt(textures[i].name, i);
+    textures[i].uniform.setInt(textures[i].name, i);
   }
 }
 

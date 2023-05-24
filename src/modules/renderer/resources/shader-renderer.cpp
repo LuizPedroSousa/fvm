@@ -1,37 +1,32 @@
-#include "glad/glad.h"
 #include "./shader-renderer.hpp"
+#include "./shader.hpp"
 #include "either.hpp"
 #include "exceptions/base-exception.hpp"
+#include "iostream"
 #include <vector>
-#include "./shader.hpp"
 
-ShaderRenderer::ShaderRenderer()
-{
+#include "glad/glad.h"
+
+ShaderRenderer::ShaderRenderer() {
   this->id = glCreateProgram();
+  m_uniform = Uniform(id);
 }
 
-void ShaderRenderer::start()
-{
+void ShaderRenderer::use() {
   glUseProgram(this->id);
 }
 
-Either<BaseException, Unit> ShaderRenderer::attachMany(Shader *shaders, size_t size)
-{
-  for (int i = 0; i < size; i++)
-  {
+Either<BaseException, Unit> ShaderRenderer::attach_many(Shader *shaders, size_t size) {
+  for (int i = 0; i < size; i++) {
     auto attached = this->attach(shaders[i]);
-
-    if (attached.isLeft())
-    {
-      return attached.left();
-    }
+    ASSERT_COMPARE(attached);
   }
 
   return Unit();
 }
 
-Either<BaseException, Unit> ShaderRenderer::attach(Shader shader)
-{
+Either<BaseException, Unit> ShaderRenderer::attach(Shader shader) {
+
   glAttachShader(this->id, shader.vertex);
   glAttachShader(this->id, shader.fragment);
 
@@ -41,13 +36,12 @@ Either<BaseException, Unit> ShaderRenderer::attach(Shader shader)
 
   glGetProgramiv(this->id, GL_LINK_STATUS, &success);
 
-  if (!success)
-  {
-    char infoLog[512];
+  if (!success) {
+    char *infoLog = new char[512];
 
     glGetProgramInfoLog(this->id, 512, NULL, infoLog);
 
-    return BaseException(infoLog);
+    ASSERT(true, infoLog);
   };
 
   glDeleteShader(shader.fragment);
@@ -60,12 +54,8 @@ Either<BaseException, Unit> ShaderRenderer::attach(Shader shader)
   return Unit();
 }
 
-Either<BaseException, Unit> ShaderRenderer::attach(Either<BaseException, Shader> shader)
-{
-  if (shader.isLeft())
-  {
-    return shader.left();
-  }
+Either<BaseException, Unit> ShaderRenderer::attach(Either<BaseException, Shader> shader) {
+  ASSERT_COMPARE(shader);
 
   return attach(shader.right());
 }
