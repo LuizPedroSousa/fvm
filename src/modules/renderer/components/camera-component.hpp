@@ -15,6 +15,7 @@ class CameraComponent : public Component<CameraComponent> {
   void use_orthographic();
 
   glm::vec3 get_position() { return m_position; };
+  glm::vec3 get_front() { return m_front; };
 
   private:
   glm::mat4 get_projection();

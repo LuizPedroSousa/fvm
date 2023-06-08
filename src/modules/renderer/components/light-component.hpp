@@ -6,19 +6,40 @@
 #include "glm/glm.hpp"
 #include "light-component.hpp"
 #include "uniform.hpp"
+#include "utils/guid.hpp"
 
-class RenderComponent;
+class RenderSystem;
+
+enum LightType {
+  Directional,
+  Point,
+  Spotlight,
+};
+
+struct Light {
+  LightType type;
+};
 
 class LightComponent : public Component<LightComponent> {
   public:
   LightComponent(COMPONENT_INIT_PARAMS, CameraComponent *camera);
   LightComponent(){};
 
-  friend class RenderComponent;
+  friend class RenderSystem;
+
+  void add_source(glm::vec3 position, ResourceID shader_id);
+
+  void use_directional();
+  void use_spotlight();
+  void use_point();
 
   private:
-  void start(Uniform *uniform);
-  void update(Uniform *uniform);
+  void start();
+  void update(Object *object);
 
   CameraComponent *m_camera;
+
+  Light m_light;
+
+  Object *m_source;
 };

@@ -13,19 +13,19 @@
 #include "game.hpp"
 #include "iostream"
 
-CameraComponent::CameraComponent() {
-}
+CameraComponent::CameraComponent() {}
 
 static float s_speed = 2.0f;
 static glm::vec3 s_position;
 static glm::vec3 s_up = glm::vec3(0.0f, 1.0f, 0.0f);
-static glm::vec3 s_front = glm::vec3(0.0f, 0.0f, -1.0f);
+static glm::vec3 s_front = glm::vec3(0.003012, -0.509046, 0.860734);
 
 static int count = 0;
 
 static glm::vec3 direction;
 
-static float last_x = Window::get()->get_height() / 2, last_y = Window::get()->get_width() / 2;
+static float last_x = Window::get()->get_height() / 2,
+             last_y = Window::get()->get_width() / 2;
 
 static float offset_x, offset_y;
 
@@ -36,8 +36,8 @@ const float sensitivity = 0.1f;
 
 static bool first = true;
 
-CameraComponent::CameraComponent(COMPONENT_INIT_PARAMS, glm::vec3 position) : COMPONENT_INIT(CameraComponent), m_is_orthographic(false) {
-
+CameraComponent::CameraComponent(COMPONENT_INIT_PARAMS, glm::vec3 position)
+    : COMPONENT_INIT(CameraComponent), m_is_orthographic(false) {
   s_position = position;
 
   m_position = s_position;
@@ -51,7 +51,8 @@ CameraComponent::CameraComponent(COMPONENT_INIT_PARAMS, glm::vec3 position) : CO
   });
 
   key_pressed_dispatcher->attach(KeyPressedEvent(KeyCode::A), []() {
-    s_position -= s_speed * Application::get_deltatime() * glm::normalize(glm::cross(s_front, s_up));
+    s_position -= s_speed * Application::get_deltatime() *
+                  glm::normalize(glm::cross(s_front, s_up));
   });
 
   key_pressed_dispatcher->attach(KeyPressedEvent(KeyCode::S), []() {
@@ -59,11 +60,13 @@ CameraComponent::CameraComponent(COMPONENT_INIT_PARAMS, glm::vec3 position) : CO
   });
 
   key_pressed_dispatcher->attach(KeyPressedEvent(KeyCode::D), []() {
-    s_position += s_speed * Application::get_deltatime() * glm::normalize(glm::cross(s_front, s_up));
+    s_position += s_speed * Application::get_deltatime() *
+                  glm::normalize(glm::cross(s_front, s_up));
   });
 
   key_pressed_dispatcher->attach(KeyPressedEvent(KeyCode::D), []() {
-    s_position += s_speed * Application::get_deltatime() * glm::normalize(glm::cross(s_front, s_up));
+    s_position += s_speed * Application::get_deltatime() *
+                  glm::normalize(glm::cross(s_front, s_up));
   });
 
   key_pressed_dispatcher->attach(KeyPressedEvent(KeyCode::Space), []() {
@@ -104,25 +107,19 @@ CameraComponent::CameraComponent(COMPONENT_INIT_PARAMS, glm::vec3 position) : CO
 
     s_front = glm::normalize(direction);
   });
-
-  glm::vec3 coral(1, 0.5f, 0.3f);
-  glm::vec3 light_color(1.0f, 1.0f, 1.0f);
 }
 
-void CameraComponent::use_orthographic() {
-  m_is_orthographic = true;
-}
+void CameraComponent::use_orthographic() { m_is_orthographic = true; }
 
-void CameraComponent::use_perspective() {
-  m_is_orthographic = false;
-}
+void CameraComponent::use_perspective() { m_is_orthographic = false; }
 
 glm::mat4 CameraComponent::get_projection() {
-  // std::cout << m_is_orthographic << std::endl;
   if (m_is_orthographic) {
-    return glm::ortho(0.0f, (float)Window::get_width(), 0.0f, (float)Window::get_height(), 0.1f, 100.0f);
+    return glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
   } else {
-    return glm::perspective(45.0f, (float)Window::get_width() / (float)Window::get_height(), 0.1f, 100.0f);
+    return glm::perspective(
+        45.0f, (float)Window::get_width() / (float)Window::get_height(), 0.1f,
+        100.0f);
   }
 }
 
@@ -134,8 +131,7 @@ glm::mat4 CameraComponent::get_view() {
 
   // view space
   auto transform = glm::mat4(1.0f);
-  transform = glm::lookAt(
-      s_position, s_position + s_front, s_up);
+  transform = glm::lookAt(s_position, s_position + s_front, s_up);
 
   return transform;
 }
