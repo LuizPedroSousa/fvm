@@ -1,5 +1,6 @@
 #pragma once
-#include <cstddef>
+#include "cstddef"
+#include "string"
 
 using ObjectID = size_t;
 using TypeID = size_t;
@@ -11,6 +12,7 @@ using ComponentID = ObjectID;
 using ComponentTypeID = TypeID;
 
 using SystemTypeID = TypeID;
+using ResourceID = std::string;
 
 template <typename T>
 class FamilyTypeID {
