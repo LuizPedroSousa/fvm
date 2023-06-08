@@ -1,18 +1,19 @@
 #pragma once
 #include "./texture.hpp"
+#include "uniform.hpp"
+#include "utils/guid.hpp"
 #include "vector"
 
 class TextureRenderer {
   public:
   TextureRenderer(){};
-  std::vector<Texture> textures;
-  void render();
+  void render(Uniform *uniform);
 
-  void attach(Texture texture);
-  Either<BaseException, Unit> attach(Either<BaseException, Texture> texture);
-
-  void attachMany(size_t size, Texture *textures);
-  Either<BaseException, Unit> attachMany(size_t size, Either<BaseException, Texture *> textures);
+  void attach(ResourceID texture);
+  void attach_many(size_t size, ResourceID *textures);
 
   void start();
+
+  private:
+  std::vector<ResourceID> m_textures;
 };

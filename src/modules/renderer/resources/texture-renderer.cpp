@@ -1,48 +1,36 @@
-#include "./texture-renderer.hpp"
+#include "texture-renderer.hpp"
 #include "either.hpp"
 #include "exceptions/base-exception.hpp"
+#include "game.hpp"
 #include "glad/glad.h"
 #include "uniform.hpp"
 
-void TextureRenderer::attach(Texture texture) {
-  this->textures.push_back(texture);
+void TextureRenderer::attach(ResourceID texture) {
+  m_textures.push_back(texture);
 }
 
-Either<BaseException, Unit> TextureRenderer::attach(Either<BaseException, Texture> texture) {
-  if (texture.isLeft()) {
-    return texture.left();
-  }
-
-  this->textures.push_back(texture.right());
-
-  return Unit();
-}
-
-void TextureRenderer::attachMany(size_t size, Texture *textures) {
+void TextureRenderer::attach_many(size_t size, ResourceID *textures) {
   for (size_t i = 0; i < size; ++i) {
     attach(textures[i]);
   }
 }
 
-Either<BaseException, Unit> TextureRenderer::attachMany(size_t size, Either<BaseException, Texture *> textures) {
-  if (textures.isLeft()) {
-    return textures.left();
-  }
-
-  attachMany(size, textures.right());
-
-  return Unit();
-};
-
 void TextureRenderer::start() {
-  for (int i = 0; i < textures.size(); ++i) {
-    textures[i].uniform.setInt(textures[i].name, i);
-  }
 }
 
-void TextureRenderer::render() {
-  for (int i = 0; i < textures.size(); ++i) {
-    glActiveTexture(i == 0 ? GL_TEXTURE0 : GL_TEXTURE0 + i);
-    glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
+void TextureRenderer::render(Uniform *uniform) {
+
+  auto resource_manager = Game::get()->get_resource_manager();
+
+  for (int i = 0; i < m_textures.size(); ++i) {
+    auto texture_ptr = resource_manager->get_texture_by_id(m_textures[i]);
+
+    if (texture_ptr != nullptr) {
+      glActiveTexture(i == 0 ? GL_TEXTURE0 : GL_TEXTURE0 + i);
+
+      uniform->setInt(texture_ptr->get_name().c_str(), i);
+
+      glBindTexture(GL_TEXTURE_2D, texture_ptr->get_id());
+    }
   }
 }
