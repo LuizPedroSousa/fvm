@@ -1,80 +1,60 @@
 #include "render-component.hpp"
 #include "camera-component.hpp"
-#include "components/light-component.hpp"
-#include "components/resource-component.hpp"
 #include "game.hpp"
 #include "iostream"
+#include "light-component.hpp"
+#include "material-component.hpp"
+#include "mesh-component.hpp"
+#include "resource-component.hpp"
+#include "transform-component.hpp"
 
 #include "glad/glad.h"
 
 RenderComponent::RenderComponent(COMPONENT_INIT_PARAMS) : COMPONENT_INIT(RenderComponent) {
 }
 
-void RenderComponent::start() {
-  auto manager = Game::get()->get_entity_manager();
-  Object *owner = static_cast<Object *>((manager->get_entity(get_owner_id())));
+void RenderComponent::start(Object *owner) {
   if (owner->is_active()) {
     auto resource = owner->get_component<ResourceComponent>();
-    create_buffers(owner);
+    auto transform = owner->get_component<TransformComponent>();
+    auto mesh = owner->get_component<MeshComponent>();
+
+    mesh->start();
+
     resource->start();
-    owner->start();
+    transform->start();
   };
 }
 
-void RenderComponent::update() {
-  auto manager = Game::get()->get_entity_manager();
-  Object *owner = static_cast<Object *>((manager->get_entity(get_owner_id())));
+void RenderComponent::pre_update(Object *owner) {
+  if (owner->is_active()) {
+  }
+}
+
+void RenderComponent::update(Object *owner) {
+
+  if (m_draw_callbacks.before)
+    m_draw_callbacks.before();
 
   if (owner->is_active()) {
+    auto transform = owner->get_component<TransformComponent>();
+    auto material = owner->get_component<MaterialComponent>();
     auto resource = owner->get_component<ResourceComponent>();
-    resource->update();
+    auto mesh = owner->get_component<MeshComponent>();
 
-    auto light = owner->get_component<LightComponent>();
+    resource->pre_update();
 
-    if (light != nullptr) {
-      light->update(resource->get_shader_renderer()->get_uniform());
+    if (transform != nullptr) {
+      transform->update();
     }
 
-    resource->update();
+    if (material != nullptr) {
+      material->update();
+    }
 
-    owner->update();
-    draw(owner);
-  };
-}
+    mesh->draw();
 
-void RenderComponent::draw(Object *object) {
-  glBindVertexArray(object->m_buffers.VAO);
-  glDrawArrays(GL_TRIANGLES, 0, object->vertices.size);
-}
-
-void RenderComponent::create_buffers(Object *object) {
-  GLuint VAO, VBO;
-
-  glGenVertexArrays(1, &VAO);
-
-  glBindVertexArray(VAO);
-
-  glGenBuffers(1, &VBO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  glBufferData(GL_ARRAY_BUFFER, object->vertices.size * 8 * sizeof(float), object->vertices.vertex, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glBindVertexArray(0);
-
-  object->m_buffers = {
-      .VAO = VAO,
-      .VBO = VBO,
+    if (m_draw_callbacks.after)
+      m_draw_callbacks.after();
   };
 }
