@@ -12,7 +12,7 @@ class IEntity {
   ComponentManager *m_component_manager;
 
   protected:
-  ObjectID m_entity_id;
+  EntityID m_entity_id;
   bool m_active;
 
   public:
