@@ -15,10 +15,6 @@ class Window {
   static int get_width() { return get()->m_width; }
   static int get_height() { return get()->m_height; }
 
-  static glm::vec4 *get_clear_color() {
-    return &(get()->m_clear_color);
-  };
-
   void update();
   void post_update();
 
@@ -35,11 +31,8 @@ class Window {
   static void handle_errors(int, const char *description);
   static void mouse_callback(GLFWwindow *window, double xpos, double ypos);
   static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
-  void clear_buffers();
   GLFWwindow *m_value;
   static Window *m_instance;
-
-  glm::vec4 m_clear_color;
 
   int m_height;
   int m_width;

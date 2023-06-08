@@ -23,7 +23,7 @@ Window *Window::get() {
   return m_instance;
 }
 
-Window::Window() : m_clear_color(glm::vec4(0.5f, 0.5f, 1.0f, 0.0f)) {
+Window::Window() {
   glfwSetErrorCallback(handle_errors);
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -33,11 +33,6 @@ Window::Window() : m_clear_color(glm::vec4(0.5f, 0.5f, 1.0f, 0.0f)) {
 
 GLFWwindow *Window::get_value() {
   return Window::get()->m_value;
-}
-
-void Window::clear_buffers() {
-  glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z, m_clear_color.w);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::resizing(GLFWwindow *window, int width, int height) {
@@ -68,9 +63,7 @@ Either<BaseException, Unit> Window::open(int width, int height) {
 
   glfwSetFramebufferSizeCallback(m_value, resizing);
 
-  glEnable(GL_DEPTH_TEST);
-
-  glfwSetInputMode(m_value, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  // glfwSetInputMode(m_value, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
   KeyReleasedDispatcher::get()->attach(KeyReleasedEvent(KeyCode::Escape), []() {
     has_pressed = !has_pressed;
@@ -108,8 +101,6 @@ void Window::update() {
       KeyPressedDispatcher::get()->dispatch(i);
     }
   };
-
-  clear_buffers();
 }
 
 void Window::post_update() {

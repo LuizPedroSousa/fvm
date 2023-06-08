@@ -11,6 +11,12 @@ class RenderSystem : public System<RenderSystem> {
   void update(double dt) override;
   void post_update(double dt) override;
 
+  glm::vec4 *get_clear_color() {
+    return &m_clear_color;
+  };
+
   private:
   SceneSystem *m_scene_system;
+
+  glm::vec4 m_clear_color;
 };
