@@ -2,7 +2,7 @@
 #include "./shader.hpp"
 #include "either.hpp"
 #include "exceptions/base-exception.hpp"
-#include "iostream"
+#include "game.hpp"
 #include <vector>
 
 #include "glad/glad.h"
@@ -16,19 +16,20 @@ void ShaderRenderer::use() {
   glUseProgram(this->id);
 }
 
-Either<BaseException, Unit> ShaderRenderer::attach_many(Shader *shaders, size_t size) {
+Either<BaseException, Unit> ShaderRenderer::attach_many(ResourceID *shader_ids, size_t size) {
   for (int i = 0; i < size; i++) {
-    auto attached = this->attach(shaders[i]);
-    ASSERT_COMPARE(attached);
+    this->attach(shader_ids[i]);
   }
-
-  return Unit();
 }
 
-Either<BaseException, Unit> ShaderRenderer::attach(Shader shader) {
+Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
+  auto resource_manager = Game::get()->get_resource_manager();
+  auto shader_ptr = resource_manager->get_shader_by_id(p_id);
 
-  glAttachShader(this->id, shader.vertex);
-  glAttachShader(this->id, shader.fragment);
+  ASSERT(shader_ptr == nullptr, "Shader not found");
+
+  glAttachShader(this->id, shader_ptr->vertex);
+  glAttachShader(this->id, shader_ptr->fragment);
 
   int success;
 
@@ -44,18 +45,12 @@ Either<BaseException, Unit> ShaderRenderer::attach(Shader shader) {
     ASSERT(true, infoLog);
   };
 
-  glDeleteShader(shader.fragment);
-  glDeleteShader(shader.vertex);
+  glDeleteShader(shader_ptr->fragment);
+  glDeleteShader(shader_ptr->vertex);
 
-  shader.signed_to = this->id;
+  shader_ptr->signed_to = this->id;
 
-  this->shaders.push_back(shader);
+  m_shaders.push_back(p_id);
 
   return Unit();
-}
-
-Either<BaseException, Unit> ShaderRenderer::attach(Either<BaseException, Shader> shader) {
-  ASSERT_COMPARE(shader);
-
-  return attach(shader.right());
 }

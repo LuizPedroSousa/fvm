@@ -6,13 +6,17 @@
 #include "sstream"
 #include <cstring>
 
-Shader::Shader() {
-}
+Shader::Shader() {}
 
-Shader::Shader(unsigned int vertex, unsigned int fragment) : vertex(vertex), fragment(fragment) {
-}
+Shader::Shader(RESOURCE_INIT_PARAMS, unsigned int vertex,
+               const char *vertex_filename, unsigned int fragment,
+               const char *fragment_filename)
+    : RESOURCE_INIT(), vertex(vertex), vertex_filename(vertex_filename),
+      fragment(fragment), fragment_filename(fragment_filename) {}
 
-Either<BaseException, Shader> Shader::create(const char *vertex_filename, const char *fragment_filename) {
+Either<BaseException, Shader> Shader::create(ResourceID id,
+                                             const char *vertex_filename,
+                                             const char *fragment_filename) {
   auto vertex = compile(vertex_filename, GL_VERTEX_SHADER);
 
   if (vertex.isLeft()) {
@@ -25,14 +29,18 @@ Either<BaseException, Shader> Shader::create(const char *vertex_filename, const 
     return fragment.left();
   }
 
-  return Shader(vertex.right(), fragment.right());
+  return Shader(id, vertex.right(), vertex_filename, fragment.right(),
+                fragment_filename);
 }
 
-Either<BaseException, Shader *> Shader::createMany(std::pair<const char *, const char *> files[], size_t size) {
+Either<BaseException, Shader *>
+create_many(std::tuple<ResourceID, const char *, const char *> files[],
+            size_t size) {
   Shader shaders[size * 2];
 
   for (int i = 0; i <= size - 1; i++) {
-    auto shader = Shader::create(files[i].first, files[i].second);
+    auto shader = Shader::create(std::get<0>(files[i]), std::get<1>(files[i]),
+                                 std::get<2>(files[i]));
 
     if (shader.isLeft()) {
       return shader.left();
@@ -44,8 +52,13 @@ Either<BaseException, Shader *> Shader::createMany(std::pair<const char *, const
   return shaders;
 };
 
-const char *Shader::getFile(const char *filename) {
-  auto path = std::filesystem::current_path().parent_path().append("src/assets/shaders").append(filename);
+const char *Shader::get_file(const char *filename) {
+  auto path = std::filesystem::current_path()
+                  .parent_path()
+                  .append("src")
+                  .append("assets")
+                  .append("shaders")
+                  .append(filename);
 
   std::ifstream file(path);
   std::stringstream buffer;
@@ -61,7 +74,7 @@ const char *Shader::getFile(const char *filename) {
 Either<BaseException, u_int> Shader::compile(const char *filename, int type) {
   unsigned int shader;
 
-  const char *shader_source = getFile(filename);
+  const char *shader_source = get_file(filename);
 
   shader = glCreateShader(type);
 
@@ -73,9 +86,13 @@ Either<BaseException, u_int> Shader::compile(const char *filename, int type) {
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
   if (!success) {
-    char *infoLog = new char[512];
-    glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
-    ASSERT(true, infoLog);
+    char *shader_error = new char[512];
+    glGetShaderInfoLog(shader, sizeof(shader_error), NULL, shader_error);
+
+    std::string error = "Can't load shader " + std::string(filename) + "\n" +
+                        std::string(shader_error);
+
+    ASSERT(true, error);
   };
 
   return shader;
