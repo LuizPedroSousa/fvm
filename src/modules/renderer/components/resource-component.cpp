@@ -1,4 +1,5 @@
 #include "resource-component.hpp"
+#include "managers/resource-manager.hpp"
 
 ResourceComponent::ResourceComponent(COMPONENT_INIT_PARAMS) : COMPONENT_INIT(ResourceComponent){};
 
@@ -7,27 +8,15 @@ void ResourceComponent::start() {
   m_shader_renderer.use();
 }
 
-void ResourceComponent::update() {
-  m_texture_renderer.render();
+void ResourceComponent::pre_update() {
   m_shader_renderer.use();
+  m_texture_renderer.render(m_shader_renderer.get_uniform());
 }
 
-Either<BaseException, Unit> ResourceComponent::load_texture(Either<BaseException, Texture> texture) {
-  ASSERT_COMPARE(texture);
+void ResourceComponent::attach_shader(ResourceID id) {
+  m_shader_renderer.attach(id);
+}
 
-  auto attached = m_texture_renderer.attach(texture);
-
-  ASSERT_COMPARE(attached);
-
-  return Unit();
-};
-
-Either<BaseException, Unit> ResourceComponent::load_shader(Either<BaseException, Shader> shader) {
-  ASSERT_COMPARE(shader);
-
-  auto attached = m_shader_renderer.attach(shader);
-
-  ASSERT_COMPARE(attached);
-
-  return Unit();
-};
+void ResourceComponent::attach_texture(ResourceID id) {
+  m_texture_renderer.attach(id);
+}

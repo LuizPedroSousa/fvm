@@ -1,18 +1,15 @@
+#include "assimp/scene.h"
 #include "components/base/component.hpp"
+#include "resources/material.hpp"
 #include "resources/texture.hpp"
-
-struct Material {
-  Texture diffuse;
-  Texture specular;
-  float shinesses;
-};
 
 class MaterialComponent : public Component<MaterialComponent> {
   public:
   MaterialComponent(COMPONENT_INIT_PARAMS);
 
-  Either<BaseException, Unit> load_maps(Either<BaseException, Texture> diffuse, Either<BaseException, Texture> specular, float shininess);
+  void update();
+  void reset_material();
 
-  private:
-  Material m_material;
+  void attach_material(ResourceID material);
+  void attach_materials(std::vector<ResourceID> materials);
 };

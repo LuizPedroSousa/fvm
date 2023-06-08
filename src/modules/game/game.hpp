@@ -7,6 +7,7 @@
 
 #include "managers/component-manager.hpp"
 #include "managers/entity-manager.hpp"
+#include "managers/resource-manager.hpp"
 #include "managers/system-manager.hpp"
 
 class Game {
@@ -22,8 +23,13 @@ class Game {
     return m_entity_manager;
   }
 
+  const IEntity *get_owner(EntityID id) {
+    return m_entity_manager->get_entity(id);
+  }
+
   SystemManager *get_system_manager() { return m_system_manager; }
   ComponentManager *get_component_manager() { return m_component_manager; }
+  ResourceManager *get_resource_manager() { return m_resource_manager; }
 
   private:
   Game();
@@ -31,6 +37,7 @@ class Game {
   SystemManager *m_system_manager;
   ComponentManager *m_component_manager;
   EntityManager *m_entity_manager;
+  ResourceManager *m_resource_manager;
 
   static Game *m_instance;
 };

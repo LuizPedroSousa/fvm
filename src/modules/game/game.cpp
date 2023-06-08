@@ -6,12 +6,13 @@
 
 Game *Game::m_instance = nullptr;
 
-void Game::init() {
-  m_instance = new Game;
-}
+void Game::init() { m_instance = new Game; }
 
-Game::Game() : m_component_manager(new ComponentManager()), m_system_manager(new SystemManager()) {
+Game::Game()
+    : m_component_manager(new ComponentManager()),
+      m_system_manager(new SystemManager()) {
   m_entity_manager = new EntityManager(m_component_manager);
+  m_resource_manager = new ResourceManager();
 }
 
 Either<BaseException, Unit> Game::start() {
@@ -26,6 +27,4 @@ Either<BaseException, Unit> Game::start() {
   return Unit();
 }
 
-void Game::update() {
-  m_system_manager->update(Application::get_deltatime());
-}
+void Game::update() { m_system_manager->update(Application::get_deltatime()); }

@@ -1,26 +1,38 @@
-#include "game.hpp"
 #include "material-component.hpp"
+#include "game.hpp"
+#include "glad/glad.h"
 #include "resource-component.hpp"
 
 MaterialComponent::MaterialComponent(COMPONENT_INIT_PARAMS) : COMPONENT_INIT(MaterialComponent){};
 
-Either<BaseException, Unit> MaterialComponent::load_maps(Either<BaseException, Texture> diffuse, Either<BaseException, Texture> specular, float shininess) {
-  ASSERT_COMPARE(diffuse);
-  ASSERT_COMPARE(specular);
+void MaterialComponent::reset_material() {
+}
 
-  auto owner = Game::get()->get_entity_manager()->get_entity(get_owner_id());
+void MaterialComponent::update() {
+  auto owner = Game::get()->get_owner(get_owner_id());
 
+  owner->get_component<ResourceComponent>()->get_shader_renderer_uniform()->setFloat("material.shininess", 32.0f);
+}
+
+void MaterialComponent::attach_material(ResourceID material_id) {
+  auto owner = Game::get()->get_owner(get_owner_id());
   auto resource = owner->get_component<ResourceComponent>();
 
-  auto diffuse_loaded = resource->load_texture(diffuse.right());
-  ASSERT_COMPARE(specular);
+  auto resource_manager = Game::get()->get_resource_manager();
 
-  auto specular_loaded = resource->load_texture(specular.right());
-  ASSERT_COMPARE(specular);
+  auto material = resource_manager->get_material_by_id(material_id);
 
-  m_material = {
-      .diffuse = diffuse.right(),
-      .specular = specular.right()};
+  for (int i = 0; i < material->diffuses.size(); i++) {
+    resource->attach_texture(material->diffuses[i]);
+  }
 
-  return Unit();
+  for (int i = 0; i < material->speculars.size(); i++) {
+    resource->attach_texture(material->speculars[i]);
+  }
+}
+
+void MaterialComponent::attach_materials(std::vector<ResourceID> material_ids) {
+  for (int i = 0; i < material_ids.size(); i++) {
+    attach_material(material_ids[i]);
+  }
 }
