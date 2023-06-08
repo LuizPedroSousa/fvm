@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.0)
 
 project(fvm)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(assimp REQUIRED)
+
 
 
 if(WIN32)
@@ -37,7 +39,7 @@ endif(WIN32)
 
 add_compile_options(-fPIC)
 
-include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS})
 
 add_executable(fvm src/main.cpp)
 
@@ -47,13 +49,14 @@ add_library(stb_image "external/stb_image/stb_image.cpp")
 
 set(LIBS ${LIBS} glad)
 
+add_subdirectory(external/imgui)
+add_subdirectory(external/imgui/impl)
+
 add_subdirectory(src/shared)
 add_subdirectory(src/modules/window)
 add_subdirectory(src/modules/renderer)
 add_subdirectory(src/modules/application)
 add_subdirectory(src/modules/game)
-add_subdirectory(external/imgui)
-add_subdirectory(external/imgui/impl)
 
 include_directories(${CMAKE_SOURCE_DIR}/external)
 
