@@ -3,36 +3,17 @@
 #include "glm/glm.hpp"
 #include "uniform.hpp"
 
-struct Vertices {
-  float *vertex;
-  size_t size;
-};
-
-struct Buffers {
-  u_int VAO;
-  u_int VBO;
-};
-
 class RenderComponent;
 
 class Object : public Entity<Object> {
   public:
-  Object(ENTITY_INIT_PARAMS, Vertices vertices, glm::vec3 position);
+  Object(ENTITY_INIT_PARAMS, glm::vec3 position, glm::vec3 scale = glm::vec3(0.5f, 0.5f, 0.5f));
   Object(){};
 
-  static Vertices cube();
+  // static Vertices cube();
 
   void on_enable() override{};
   void on_disable() override{};
 
-  void start();
-  void update();
-
-  Vertices vertices;
-
   friend class RenderComponent;
-
-  private:
-  Buffers m_buffers;
-  Uniform *m_uniform;
 };
