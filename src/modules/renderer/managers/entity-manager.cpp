@@ -18,7 +18,3 @@ void EntityManager::destroy_entity(const EntityID &entity_id) {
 IEntity *EntityManager::get_entity(const EntityID &entity_id) {
   return m_entity_table[entity_id].get();
 }
-
-std::unordered_map<EntityID, IEntity_ptr> EntityManager::get_entities() {
-  return m_entity_table;
-}

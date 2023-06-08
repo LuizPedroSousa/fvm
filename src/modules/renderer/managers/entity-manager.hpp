@@ -56,7 +56,25 @@ class EntityManager {
   void destroy_entity(const EntityID &entity_id);
 
   IEntity *get_entity(const EntityID &entity_id);
-  std::unordered_map<EntityID, IEntity_ptr> get_entities();
+
+  template <typename T>
+  std::unordered_map<EntityID, IEntity_ptr> get_entities() {
+    std::unordered_map<EntityID, IEntity_ptr> result;
+    EntityTypeID type_id = T::entity_type_id();
+
+    for (const auto &pair : m_entity_table) {
+      IEntity_ptr entity = pair.second;
+      if (entity->get_entity_type_id() == type_id) {
+        result.emplace(pair.first, entity);
+      }
+    }
+
+    return result;
+  }
+
+  std::unordered_map<EntityID, IEntity_ptr> get_entities() {
+    return m_entity_table;
+  }
 
   private:
   template <typename T>
