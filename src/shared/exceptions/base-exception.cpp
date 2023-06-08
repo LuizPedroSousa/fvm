@@ -3,5 +3,5 @@
 BaseException::BaseException() {
 }
 
-BaseException::BaseException(const char *file, int line, const char *message) : m_line(line), m_file(file), m_message(message) {
+BaseException::BaseException(const char *file, int line, std::string message) : m_line(line), m_file(file), m_message(message) {
 }
