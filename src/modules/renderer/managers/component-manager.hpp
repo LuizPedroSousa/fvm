@@ -74,6 +74,33 @@ class ComponentManager {
   void clean_components(const EntityID entity_id);
 
   template <typename T>
+  std::vector<T *> get_components() {
+    const ComponentTypeID type_id = T::component_type_id();
+
+    auto type_container_iter = m_component_type_table.find(type_id);
+    if (type_container_iter == m_component_type_table.end()) {
+      return {};
+    }
+
+    ComponentContainer<T> *component_container = dynamic_cast<ComponentContainer<T> *>(type_container_iter->second.get());
+    if (component_container == nullptr) {
+      return {};
+    }
+
+    auto &typed_container = component_container->get_typed_component_container();
+
+    std::vector<T *> components;
+    for (const auto &pair : typed_container) {
+      T *component = dynamic_cast<T *>(pair.second.get());
+      if (component != nullptr) {
+        components.push_back(component);
+      }
+    }
+
+    return components;
+  }
+
+  template <typename T>
   T *get_component(const EntityID entity_id) {
     const ComponentTypeID type_id = T::component_type_id();
     try {
