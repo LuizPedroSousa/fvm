@@ -6,7 +6,7 @@
 #include "unordered_map"
 #include "utils/guid.hpp"
 
-using IComponent_ptr = std::shared_ptr<IComponent>;
+using IComponent_ptr = std::unique_ptr<IComponent>;
 
 class ComponentManager {
 
@@ -18,13 +18,15 @@ public:
   T *add_component(const EntityID &entity_id, Args &&...params) {
     ComponentID id = FamilyObjectID<IComponent>::get();
 
-    std::shared_ptr<T> component_ptr =
-        std::make_shared<T>(entity_id, id, std::forward<Args>(params)...);
+    std::unique_ptr<T> component_ptr =
+        std::make_unique<T>(entity_id, id, std::forward<Args>(params)...);
+
     const ComponentTypeID component_type_id = T::component_type_id();
 
     m_entity_component_table[entity_id][component_type_id] = id;
 
-    auto created_component = m_component_table.try_emplace(id, component_ptr);
+    auto created_component =
+        m_component_table.emplace(id, std::move(component_ptr));
 
     ASSERT_THROW(!created_component.second, "Can't create a new Component !");
 
