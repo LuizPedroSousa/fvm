@@ -3,10 +3,9 @@
 #include "systems/render-system.hpp"
 #include "window.hpp"
 
-class BackgroundLayer : public Entity<BackgroundLayer>, public Layer {
-  public:
-  BackgroundLayer(ENTITY_INIT_PARAMS) : ENTITY_INIT() {
-  }
+class BackgroundLayer : public Layer {
+public:
+  BackgroundLayer(ENTITY_INIT_PARAMS) : Layer(id, component_manager) {}
 
   void on_enable() override{};
   void on_disable() override{};
@@ -21,7 +20,8 @@ class BackgroundLayer : public Entity<BackgroundLayer>, public Layer {
 
     ImGui::Text("Edit the bellow background");
 
-    ImGui::ColorEdit3("Background Color", (float *)render_system->get_clear_color());
+    ImGui::ColorEdit3("Background Color",
+                      (float *)render_system->get_clear_color());
 
     float frameTime = 1000.0f / ImGui::GetIO().Framerate;
     float fps = ImGui::GetIO().Framerate;
