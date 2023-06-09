@@ -34,16 +34,11 @@ void LayerSystem::pre_update(double dt) {
 void LayerSystem::update(double dt) {
   auto manager = LayerManager::get();
 
-  auto layers = manager->get_layers();
-
-  for (auto layer = layers.begin(); layer != layers.end(); layer++) {
-
-    if (layer->second->is_active()) {
-      auto parsed_layer = manager->get_layer(layer->second->get_entity_id());
-
-      parsed_layer->update();
-    };
-  };
+  manager->for_each([](Layer *layer) {
+    if (layer->is_active()) {
+      layer->update();
+    }
+  });
 };
 
 void LayerSystem::post_update(double dt) {
