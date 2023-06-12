@@ -8,8 +8,15 @@
 
 #include "layers/background-layer.hpp"
 #include "layers/object-list-layer.hpp"
+#include "layers/scene-layer.hpp"
 
-Either<BaseException, Unit> LayerSystem::start() {
+#include "managers/layer-manager.hpp"
+
+namespace astralix {
+
+LayerSystem::LayerSystem() { LayerManager::init(); }
+
+void LayerSystem::start() {
   // Initialize ImGui
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -19,9 +26,8 @@ Either<BaseException, Unit> LayerSystem::start() {
 
   LayerManager::get()->add_layer<BackgroundLayer>();
   LayerManager::get()->add_layer<ObjectListLayer>();
-
-  return Unit();
-}
+  LayerManager::get()->add_layer<SceneLayer>();
+};
 
 void LayerSystem::fixed_update(double fixed_dt){};
 
@@ -45,3 +51,11 @@ void LayerSystem::post_update(double dt) {
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 };
+
+LayerSystem::~LayerSystem() {
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+}
+
+} // namespace astralix
