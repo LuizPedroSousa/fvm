@@ -1,7 +1,8 @@
 #pragma once
-#include "entities/base/entity.hpp"
+#include "ecs/entities/entity.hpp"
 #include "imgui.h"
 
+namespace astralix {
 class Layer : public Entity<Layer> {
 
 public:
@@ -15,3 +16,4 @@ public:
   virtual void start() = 0;
   virtual void update() = 0;
 };
+} // namespace astralix
