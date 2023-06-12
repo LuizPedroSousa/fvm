@@ -1,22 +1,23 @@
-#include "application.hpp"
+#include "astralix/src/modules/application/application.hpp"
+#include "astralix/src/shared/exceptions/base-exception.hpp"
+#include "game/game.hpp"
 
-int handleException(BaseException exception) {
+int handleException(astralix::BaseException exception) {
   std::cout << exception.what() << std::endl;
 
   return -1;
 }
 
 int main(int argc, char **argv) {
-
   try {
-    auto canProcess = Application::init();
+    Game game;
+    astralix::Application *app = astralix::Application::init();
 
-    if (canProcess.isLeft()) {
-      return handleException(canProcess.left());
-    }
+    game.start();
+    app->start();
 
-    Application::get()->run();
-  } catch (BaseException exception) {
+    app->run();
+  } catch (astralix::BaseException exception) {
     return handleException(exception);
   }
 
