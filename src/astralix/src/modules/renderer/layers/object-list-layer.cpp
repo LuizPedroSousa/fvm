@@ -1,8 +1,9 @@
 #include "object-list-layer.hpp"
-#include "components/material-component.hpp"
-#include "components/transform-component.hpp"
-#include "game.hpp"
+#include "components/material/material-component.hpp"
+#include "components/transform/transform-component.hpp"
+#include "engine.hpp"
 
+namespace astralix {
 void ObjectListLayer::start() {}
 
 static EntityID edit_object_id = -1;
@@ -113,7 +114,7 @@ void ObjectListLayer::update() {
   ImGui::Text("Objects of current scene");
   ImGui::Dummy(ImVec2(0, 20));
 
-  auto manager = Game::get()->get_entity_manager();
+  auto manager = Engine::get()->get_entity_manager();
   manager->for_each<Object>([](Object *object) {
     ImGui::Text("Object - %d", object->get_entity_id());
     ImGui::SameLine();
@@ -132,3 +133,5 @@ void ObjectListLayer::update() {
 
   ImGui::End();
 }
+
+} // namespace astralix

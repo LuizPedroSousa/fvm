@@ -2,6 +2,7 @@
 #include "entities/layer.hpp"
 #include "entities/object.hpp"
 
+namespace astralix {
 class ObjectListLayer : public Layer {
 public:
   ObjectListLayer(ENTITY_INIT_PARAMS) : Layer(id, component_manager) {}
@@ -12,3 +13,5 @@ public:
 private:
   void edit_object(Object *object);
 };
+
+} // namespace astralix

@@ -1,7 +1,9 @@
+#include "engine.hpp"
 #include "entities/layer.hpp"
-#include "game.hpp"
 #include "systems/render-system.hpp"
 #include "window.hpp"
+
+namespace astralix {
 
 class BackgroundLayer : public Layer {
 public:
@@ -12,7 +14,7 @@ public:
 
   void start() override{};
   void update() override {
-    auto manager = Game::get()->get_system_manager();
+    auto manager = Engine::get()->get_system_manager();
 
     auto render_system = manager->get_system<RenderSystem>();
 
@@ -30,3 +32,5 @@ public:
     ImGui::End();
   };
 };
+
+} // namespace astralix
