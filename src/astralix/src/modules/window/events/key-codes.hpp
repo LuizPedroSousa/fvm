@@ -1,7 +1,8 @@
 #pragma once
 
-enum KeyCode : int
-{
+namespace astralix {
+
+enum KeyCode : int {
   // From glfw3.h
   Space = 32,
   Apostrophe = 39, /* ' */
@@ -134,3 +135,4 @@ enum KeyCode : int
   RightSuper = 347,
   Menu = 348
 };
+}

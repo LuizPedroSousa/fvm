@@ -5,15 +5,18 @@
 #include "functional"
 #include "glm/glm.hpp"
 
+namespace astralix {
+
 class Window {
 
-  public:
+public:
+  static void init();
   static Window *get();
 
-  Either<BaseException, Unit> open(int width, int height);
+  void open(int width, int height);
 
-  static int get_width() { return get()->m_width; }
-  static int get_height() { return get()->m_height; }
+  int get_width();
+  int get_height();
 
   void update();
   void post_update();
@@ -23,17 +26,20 @@ class Window {
   bool is_open();
   void close();
 
-  protected:
+protected:
   Window();
 
-  private:
+private:
   static void resizing(GLFWwindow *window, int width, int height);
   static void handle_errors(int, const char *description);
   static void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-  static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+  static void key_callback(GLFWwindow *window, int key, int scancode,
+                           int action, int mods);
   GLFWwindow *m_value;
   static Window *m_instance;
 
-  int m_height;
-  int m_width;
+  int m_height = 0;
+  int m_width = 0;
 };
+
+} // namespace astralix

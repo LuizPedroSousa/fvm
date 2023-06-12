@@ -1,19 +1,21 @@
 #include "functional"
 
+namespace astralix {
+
 class MouseEvent {
-  public:
+public:
   MouseEvent(double x, double y) : m_x(x), m_y(y){};
 
   double get_x() { return m_x; }
   double get_y() { return m_y; }
 
-  private:
+private:
   double m_x;
   double m_y;
 };
 
 class MouseDispatcher {
-  public:
+public:
   void dispatch(MouseEvent event);
 
   void attach(std::function<void(MouseEvent event)> callback);
@@ -26,8 +28,10 @@ class MouseDispatcher {
 
   std::vector<Listener> m_listeners;
 
-  private:
+private:
   MouseDispatcher(){};
 
   static MouseDispatcher *m_instance;
 };
+
+} // namespace astralix

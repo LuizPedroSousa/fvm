@@ -1,5 +1,7 @@
 #include "key-event.hpp"
 
+namespace astralix {
+
 KeyPressedDispatcher *KeyPressedDispatcher::m_instance = nullptr;
 KeyReleasedDispatcher *KeyReleasedDispatcher::m_instance = nullptr;
 
@@ -18,3 +20,4 @@ KeyReleasedDispatcher *KeyReleasedDispatcher::get() {
 
   return m_instance;
 };
+} // namespace astralix

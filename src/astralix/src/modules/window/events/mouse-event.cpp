@@ -1,6 +1,8 @@
 #include "mouse-event.hpp"
 #include "iostream"
 
+namespace astralix {
+
 MouseDispatcher *MouseDispatcher::m_instance = nullptr;
 
 MouseDispatcher *MouseDispatcher::get() {
@@ -21,3 +23,5 @@ void MouseDispatcher::dispatch(MouseEvent event) {
     m_listeners[i].callback(event);
   }
 };
+
+} // namespace astralix
