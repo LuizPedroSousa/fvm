@@ -1,8 +1,10 @@
-#include "components/base/component.hpp"
+#include "ecs/components/component.hpp"
+#include "ecs/guid.hpp"
 #include "entities/object.hpp"
 #include "functional"
-#include "utils/guid.hpp"
 #include "vector"
+
+namespace astralix {
 
 struct DrawCallback {
   std::function<void()> before;
@@ -10,14 +12,14 @@ struct DrawCallback {
 };
 
 class RenderComponent : public Component<RenderComponent> {
-  public:
+public:
   RenderComponent(COMPONENT_INIT_PARAMS);
 
   RenderComponent() {}
 
-  void start(Object *owner);
-  void update(Object *owner);
-  void pre_update(Object *owner);
+  void start(IEntity *owner);
+  void update(IEntity *owner);
+  void pre_update(IEntity *owner);
 
   void on_before_draw(std::function<void()> callback) {
     m_draw_callbacks.before = callback;
@@ -27,6 +29,8 @@ class RenderComponent : public Component<RenderComponent> {
     m_draw_callbacks.after = callback;
   };
 
-  private:
+private:
   DrawCallback m_draw_callbacks;
 };
+
+} // namespace astralix

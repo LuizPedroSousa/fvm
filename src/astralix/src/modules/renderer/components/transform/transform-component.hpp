@@ -1,6 +1,8 @@
 #pragma once
-#include "components/base/component.hpp"
+#include "ecs/components/component.hpp"
 #include "glm/glm.hpp"
+
+namespace astralix {
 
 struct Transform {
   glm::vec3 position;
@@ -12,8 +14,9 @@ struct Transform {
 };
 
 class TransformComponent : public Component<TransformComponent> {
-  public:
-  TransformComponent(COMPONENT_INIT_PARAMS, glm::vec3 position, glm::vec3 scale);
+public:
+  TransformComponent(COMPONENT_INIT_PARAMS, glm::vec3 position,
+                     glm::vec3 scale);
 
   TransformComponent(){};
 
@@ -26,17 +29,15 @@ class TransformComponent : public Component<TransformComponent> {
   void start();
   void update();
 
-  Transform *get_render_transform() {
-    return &m_render_transform;
-  }
+  Transform *get_render_transform() { return &m_render_transform; }
 
-  Transform *get_initial_transform() {
-    return &m_initial_transform;
-  }
+  Transform *get_initial_transform() { return &m_initial_transform; }
 
   void reset_render_transform();
 
-  private:
+private:
   Transform m_initial_transform;
   Transform m_render_transform;
 };
+
+} // namespace astralix

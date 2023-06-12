@@ -1,7 +1,9 @@
 #include "resource-component.hpp"
-#include "managers/resource-manager.hpp"
 
-ResourceComponent::ResourceComponent(COMPONENT_INIT_PARAMS) : COMPONENT_INIT(ResourceComponent){};
+namespace astralix {
+
+ResourceComponent::ResourceComponent(COMPONENT_INIT_PARAMS)
+    : COMPONENT_INIT(ResourceComponent){};
 
 void ResourceComponent::start() {
   m_texture_renderer.start();
@@ -20,3 +22,5 @@ void ResourceComponent::attach_shader(ResourceID id) {
 void ResourceComponent::attach_texture(ResourceID id) {
   m_texture_renderer.attach(id);
 }
+
+} // namespace astralix

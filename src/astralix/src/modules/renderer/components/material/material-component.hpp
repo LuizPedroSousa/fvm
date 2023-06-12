@@ -1,10 +1,12 @@
 #include "assimp/scene.h"
-#include "components/base/component.hpp"
+#include "ecs/components/component.hpp"
 #include "resources/material.hpp"
 #include "resources/texture.hpp"
 
+namespace astralix {
+
 class MaterialComponent : public Component<MaterialComponent> {
-  public:
+public:
   MaterialComponent(COMPONENT_INIT_PARAMS);
 
   void update();
@@ -13,3 +15,5 @@ class MaterialComponent : public Component<MaterialComponent> {
   void attach_material(ResourceID material);
   void attach_materials(std::vector<ResourceID> materials);
 };
+
+} // namespace astralix

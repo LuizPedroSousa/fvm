@@ -1,24 +1,28 @@
 #include "material-component.hpp"
-#include "game.hpp"
+#include "components/resource/resource-component.hpp"
+#include "engine.hpp"
 #include "glad/glad.h"
-#include "resource-component.hpp"
 
-MaterialComponent::MaterialComponent(COMPONENT_INIT_PARAMS) : COMPONENT_INIT(MaterialComponent){};
+namespace astralix {
 
-void MaterialComponent::reset_material() {
-}
+MaterialComponent::MaterialComponent(COMPONENT_INIT_PARAMS)
+    : COMPONENT_INIT(MaterialComponent){};
+
+void MaterialComponent::reset_material() {}
 
 void MaterialComponent::update() {
-  auto owner = Game::get()->get_owner(get_owner_id());
+  auto owner = Engine::get()->get_owner(get_owner_id());
 
-  owner->get_component<ResourceComponent>()->get_shader_renderer_uniform()->setFloat("material.shininess", 32.0f);
+  owner->get_component<ResourceComponent>()
+      ->get_shader_renderer_uniform()
+      ->setFloat("material.shininess", 32.0f);
 }
 
 void MaterialComponent::attach_material(ResourceID material_id) {
-  auto owner = Game::get()->get_owner(get_owner_id());
+  auto owner = Engine::get()->get_owner(get_owner_id());
   auto resource = owner->get_component<ResourceComponent>();
 
-  auto resource_manager = Game::get()->get_resource_manager();
+  auto resource_manager = Engine::get()->get_resource_manager();
 
   auto material = resource_manager->get_material_by_id(material_id);
 
@@ -36,3 +40,5 @@ void MaterialComponent::attach_materials(std::vector<ResourceID> material_ids) {
     attach_material(material_ids[i]);
   }
 }
+
+} // namespace astralix

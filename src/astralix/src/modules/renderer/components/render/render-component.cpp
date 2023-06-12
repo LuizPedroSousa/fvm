@@ -1,19 +1,21 @@
 #include "render-component.hpp"
-#include "camera-component.hpp"
-#include "game.hpp"
+#include "components/camera/camera-component.hpp"
+#include "components/light/light-component.hpp"
+#include "components/material/material-component.hpp"
+#include "components/mesh/mesh-component.hpp"
+#include "components/resource/resource-component.hpp"
+#include "components/transform/transform-component.hpp"
+#include "engine.hpp"
 #include "iostream"
-#include "light-component.hpp"
-#include "material-component.hpp"
-#include "mesh-component.hpp"
-#include "resource-component.hpp"
-#include "transform-component.hpp"
 
 #include "glad/glad.h"
 
-RenderComponent::RenderComponent(COMPONENT_INIT_PARAMS) : COMPONENT_INIT(RenderComponent) {
-}
+namespace astralix {
 
-void RenderComponent::start(Object *owner) {
+RenderComponent::RenderComponent(COMPONENT_INIT_PARAMS)
+    : COMPONENT_INIT(RenderComponent) {}
+
+void RenderComponent::start(IEntity *owner) {
   if (owner->is_active()) {
     auto resource = owner->get_component<ResourceComponent>();
     auto transform = owner->get_component<TransformComponent>();
@@ -22,17 +24,17 @@ void RenderComponent::start(Object *owner) {
     mesh->start();
 
     resource->start();
-    transform->start();
+    if (transform != nullptr)
+      transform->start();
   };
 }
 
-void RenderComponent::pre_update(Object *owner) {
+void RenderComponent::pre_update(IEntity *owner) {
   if (owner->is_active()) {
   }
 }
 
-void RenderComponent::update(Object *owner) {
-
+void RenderComponent::update(IEntity *owner) {
   if (m_draw_callbacks.before)
     m_draw_callbacks.before();
 
@@ -58,3 +60,5 @@ void RenderComponent::update(Object *owner) {
       m_draw_callbacks.after();
   };
 }
+
+} // namespace astralix
