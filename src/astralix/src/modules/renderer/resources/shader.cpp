@@ -1,10 +1,12 @@
-#include "./shader.hpp"
+#include "shader.hpp"
 #include "filesystem"
 #include "fstream"
 #include "glad/glad.h"
 #include "iostream"
 #include "sstream"
 #include <cstring>
+
+namespace astralix {
 
 Shader::Shader() {}
 
@@ -97,3 +99,5 @@ Either<BaseException, u_int> Shader::compile(const char *filename, int type) {
 
   return shader;
 };
+
+} // namespace astralix

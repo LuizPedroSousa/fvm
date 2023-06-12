@@ -1,9 +1,11 @@
-#include "./texture.hpp"
+#include "texture.hpp"
 #include "filesystem"
 #include "glad/glad.h"
 #include "stb_image/stb_image.h"
 #include <cstdarg>
 #include <cstring>
+
+namespace astralix {
 
 Texture::Texture(RESOURCE_INIT_PARAMS, unsigned int p_id, std::string p_name,
                  int p_width, int p_height, const char *p_path)
@@ -74,3 +76,5 @@ Texture::create_many(std::initializer_list<
 
   return result;
 };
+
+} // namespace astralix

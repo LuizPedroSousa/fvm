@@ -3,7 +3,9 @@
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
-#include "game.hpp"
+#include "engine.hpp"
+
+namespace astralix {
 
 Either<BaseException, Model> Model::create(ResourceID id,
                                            const char *filename) {
@@ -88,7 +90,7 @@ Model::process_mesh(aiMesh *node_mesh, const aiScene *scene,
     if (ai_material->GetTextureCount(aiTextureType_DIFFUSE) > 0 ||
         ai_material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
 
-      auto resource_manager = Game::get()->get_resource_manager();
+      auto resource_manager = Engine::get()->get_resource_manager();
 
       std::string name = ai_material->GetName().C_Str();
 
@@ -109,3 +111,5 @@ std::filesystem::path Model::get_path(const char *filename) {
 
   return base_path;
 };
+
+} // namespace astralix

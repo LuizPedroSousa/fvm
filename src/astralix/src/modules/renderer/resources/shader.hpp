@@ -4,6 +4,8 @@
 #include "resources/resource.hpp"
 #include "tuple"
 
+namespace astralix {
+
 class Shader : public Resource {
 public:
   Shader();
@@ -29,3 +31,4 @@ private:
   static Either<BaseException, u_int> compile(const char *filename, int type);
   static const char *get_file(const char *filename);
 };
+} // namespace astralix

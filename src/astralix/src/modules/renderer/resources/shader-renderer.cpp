@@ -1,29 +1,30 @@
-#include "./shader-renderer.hpp"
-#include "./shader.hpp"
+#include "shader-renderer.hpp"
 #include "either.hpp"
+#include "engine.hpp"
 #include "exceptions/base-exception.hpp"
-#include "game.hpp"
+#include "shader.hpp"
 #include <vector>
 
 #include "glad/glad.h"
+
+namespace astralix {
 
 ShaderRenderer::ShaderRenderer() {
   this->id = glCreateProgram();
   m_uniform = Uniform(id);
 }
 
-void ShaderRenderer::use() {
-  glUseProgram(this->id);
-}
+void ShaderRenderer::use() { glUseProgram(this->id); }
 
-Either<BaseException, Unit> ShaderRenderer::attach_many(ResourceID *shader_ids, size_t size) {
+Either<BaseException, Unit> ShaderRenderer::attach_many(ResourceID *shader_ids,
+                                                        size_t size) {
   for (int i = 0; i < size; i++) {
     this->attach(shader_ids[i]);
   }
 }
 
 Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
-  auto resource_manager = Game::get()->get_resource_manager();
+  auto resource_manager = Engine::get()->get_resource_manager();
   auto shader_ptr = resource_manager->get_shader_by_id(p_id);
 
   ASSERT(shader_ptr == nullptr, "Shader not found");
@@ -54,3 +55,4 @@ Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
 
   return Unit();
 }
+} // namespace astralix

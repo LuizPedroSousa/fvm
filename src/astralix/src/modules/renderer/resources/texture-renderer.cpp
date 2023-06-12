@@ -1,9 +1,11 @@
 #include "texture-renderer.hpp"
 #include "either.hpp"
+#include "engine.hpp"
 #include "exceptions/base-exception.hpp"
-#include "game.hpp"
 #include "glad/glad.h"
 #include "uniform.hpp"
+
+namespace astralix {
 
 void TextureRenderer::attach(ResourceID texture) {
   m_textures.push_back(texture);
@@ -15,12 +17,11 @@ void TextureRenderer::attach_many(size_t size, ResourceID *textures) {
   }
 }
 
-void TextureRenderer::start() {
-}
+void TextureRenderer::start() {}
 
 void TextureRenderer::render(Uniform *uniform) {
 
-  auto resource_manager = Game::get()->get_resource_manager();
+  auto resource_manager = Engine::get()->get_resource_manager();
 
   for (int i = 0; i < m_textures.size(); ++i) {
     auto texture_ptr = resource_manager->get_texture_by_id(m_textures[i]);
@@ -34,3 +35,5 @@ void TextureRenderer::render(Uniform *uniform) {
     }
   }
 }
+
+} // namespace astralix

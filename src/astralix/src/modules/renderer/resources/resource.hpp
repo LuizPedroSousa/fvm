@@ -1,6 +1,8 @@
 #pragma once
+#include "ecs/guid.hpp"
 #include "either.hpp"
-#include "utils/guid.hpp"
+
+namespace astralix {
 
 #define RESOURCE_INIT_PARAMS const ResourceID id
 #define RESOURCE_INIT() Resource(id)
@@ -15,3 +17,5 @@ public:
 private:
   ResourceID m_resource_id;
 };
+
+} // namespace astralix

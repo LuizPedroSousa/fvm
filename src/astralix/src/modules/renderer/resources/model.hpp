@@ -7,6 +7,8 @@
 #include "resources/resource.hpp"
 #include "vector"
 
+namespace astralix {
+
 class Model : public Resource {
 public:
   Model(RESOURCE_INIT_PARAMS, const char *filename, std::vector<Mesh> meshes,
@@ -32,3 +34,5 @@ private:
                std::vector<ResourceID> &materials);
   static std::filesystem::path get_path(const char *filename);
 };
+
+} // namespace astralix

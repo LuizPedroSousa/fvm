@@ -1,8 +1,10 @@
 #pragma once
+#include "ecs/guid.hpp"
 #include "glm/glm.hpp"
 #include "memory"
-#include "utils/guid.hpp"
 #include "vector"
+
+namespace astralix {
 
 struct Buffers {
   u_int VAO;
@@ -19,7 +21,7 @@ struct Vertex {
 };
 
 class Mesh {
-  public:
+public:
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
   Buffers m_buffers;
@@ -27,6 +29,7 @@ class Mesh {
   static Mesh capsule_mesh(float radius, float height, int segments, int rings);
   static Mesh cube_mesh(float size);
   static Mesh plane_mesh(float size);
+  static Mesh quad(float size);
 
   Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     this->vertices = vertices;
@@ -34,3 +37,5 @@ class Mesh {
   };
   Mesh(){};
 };
+
+} // namespace astralix

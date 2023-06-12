@@ -1,11 +1,13 @@
 #pragma once
-#include "./texture.hpp"
+#include "ecs/guid.hpp"
+#include "texture.hpp"
 #include "uniform.hpp"
-#include "utils/guid.hpp"
 #include "vector"
 
+namespace astralix {
+
 class TextureRenderer {
-  public:
+public:
   TextureRenderer(){};
   void render(Uniform *uniform);
 
@@ -14,6 +16,8 @@ class TextureRenderer {
 
   void start();
 
-  private:
+private:
   std::vector<ResourceID> m_textures;
 };
+
+} // namespace astralix
