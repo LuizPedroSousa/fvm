@@ -5,11 +5,17 @@ project(fvm)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
+add_compile_options(-fPIC)
+
+
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
+
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(assimp REQUIRED)
-
-
 
 if(WIN32)
   set(LIBS glfw3 opengl32)
@@ -37,27 +43,29 @@ else()
   set(LIBS )
 endif(WIN32)
 
-add_compile_options(-fPIC)
+add_executable(fvm src/main.cpp)
 
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS})
-
-add_executable(fvm src/main.cpp)
 
 add_library(glad "external/glad/glad.c")
 add_library(glm "external/glm/detail/glm.cpp")
 add_library(stb_image "external/stb_image/stb_image.cpp")
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui)
+add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui/impl)
+
 set(LIBS ${LIBS} glad)
 
-add_subdirectory(external/imgui)
-add_subdirectory(external/imgui/impl)
 
-add_subdirectory(src/shared)
-add_subdirectory(src/modules/window)
-add_subdirectory(src/modules/renderer)
-add_subdirectory(src/modules/application)
-add_subdirectory(src/modules/game)
+add_subdirectory(src/astralix/src/shared)
+add_subdirectory(src/astralix/src/modules/window)
+add_subdirectory(src/astralix/src/modules/renderer)
+add_subdirectory(src/astralix/src/modules/physics)
+add_subdirectory(src/astralix/src/modules/engine)
+add_subdirectory(src/astralix/src/modules/application)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/game)
 
 include_directories(${CMAKE_SOURCE_DIR}/external)
 
-target_link_libraries(fvm PRIVATE imgui imgui_impl application)
+target_link_libraries(fvm PRIVATE game application)
