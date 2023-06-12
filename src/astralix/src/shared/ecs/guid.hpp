@@ -2,6 +2,8 @@
 #include "cstddef"
 #include "string"
 
+namespace astralix {
+
 using ObjectID = size_t;
 using TypeID = size_t;
 
@@ -14,31 +16,26 @@ using ComponentTypeID = TypeID;
 using SystemTypeID = TypeID;
 using ResourceID = std::string;
 
-template <typename T>
-class FamilyTypeID {
-  private:
+template <typename T> class FamilyTypeID {
+private:
   static TypeID s_count;
 
-  public:
-  template <typename U>
-  static TypeID get() {
+public:
+  template <typename U> static TypeID get() {
     static const TypeID STATIC_TYPE_ID{s_count++};
     return STATIC_TYPE_ID;
   }
 
-  static TypeID get() {
-    return s_count;
-  }
+  static TypeID get() { return s_count; }
 };
 
-template <typename T>
-class FamilyObjectID {
-  private:
+template <typename T> class FamilyObjectID {
+private:
   FamilyObjectID() {}
   static TypeID s_count;
 
-  public:
-  constexpr static TypeID get() {
-    return s_count++;
-  }
+public:
+  constexpr static TypeID get() { return s_count++; }
 };
+
+} // namespace astralix

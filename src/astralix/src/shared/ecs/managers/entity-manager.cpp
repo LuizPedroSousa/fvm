@@ -1,5 +1,7 @@
 #include "entity-manager.hpp"
 
+namespace astralix {
+
 EntityManager::EntityManager(ComponentManager *component_manager)
     : m_component_manager(component_manager) {}
 
@@ -22,3 +24,5 @@ IEntity *EntityManager::get_entity(const EntityID &entity_id) {
 
   return nullptr;
 }
+
+}; // namespace astralix

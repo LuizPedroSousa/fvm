@@ -1,5 +1,6 @@
 #include "component-manager.hpp"
 
+namespace astralix {
 void ComponentManager::clean_components(const EntityID entity_id) {
   if (m_entity_component_table.find(entity_id) !=
       m_entity_component_table.end()) {
@@ -13,3 +14,5 @@ void ComponentManager::clean_components(const EntityID entity_id) {
     }
   }
 }
+
+} // namespace astralix

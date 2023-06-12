@@ -1,23 +1,18 @@
 #include "system-manager.hpp"
 #include "algorithm"
-#include "systems/base/isystem.hpp"
 #include "map"
 
-SystemManager::SystemManager() {
-}
+namespace astralix {
+SystemManager::SystemManager() {}
 
-SystemManager::~SystemManager() {
-}
+SystemManager::~SystemManager() {}
 
-Either<BaseException, Unit> SystemManager::start() {
+void SystemManager::start() {
   for (ISystem_ptr system : m_system_work_order) {
     if (system->m_enabled) {
-      auto hasStarted = system->start();
-      ASSERT_COMPARE(hasStarted);
+      system->start();
     }
   }
-
-  return Unit();
 }
 
 void SystemManager::fixed_update(const double fixed_dt_ms) {
@@ -41,7 +36,10 @@ void SystemManager::update(const double dt_ms) {
     system->m_time_since_last_update = dt_ms;
 
     // check systems update state
-    system->m_needs_update = (system->m_updater_internal < 0.0f) || ((system->m_updater_internal > 0.0f) && (system->m_time_since_last_update > system->m_updater_internal));
+    system->m_needs_update =
+        (system->m_updater_internal < 0.0f) ||
+        ((system->m_updater_internal > 0.0f) &&
+         (system->m_time_since_last_update > system->m_updater_internal));
 
     if (system->m_enabled && system->m_needs_update) {
       system->pre_update(dt_ms);
@@ -50,6 +48,7 @@ void SystemManager::update(const double dt_ms) {
 
   for (ISystem_ptr system : this->m_system_work_order) {
     if (system->m_enabled && system->m_needs_update) {
+
       system->update(dt_ms);
       system->m_time_since_last_update = 0.0f;
     }
@@ -92,7 +91,9 @@ void SystemManager::update_system_work_order() {
       member.pop_back();
 
       for (int i = 0; i < static_cast<int>(indices.size()); ++i) {
-        if (indices[i] != -1 && (this->m_system_dependency_table[i][index] == true || this->m_system_dependency_table[index][i] == true)) {
+        if (indices[i] != -1 &&
+            (this->m_system_dependency_table[i][index] == true ||
+             this->m_system_dependency_table[index][i] == true)) {
           member.push_back(i);
           indices[i] = -1;
         }
@@ -101,7 +102,9 @@ void SystemManager::update_system_work_order() {
       group.push_back(index);
 
       const ISystem_ptr sys = this->m_system_table[index];
-      current_group_priority = std::max((sys != nullptr ? sys->m_priority : NORMAL_SYSTEM_PRIORITY), current_group_priority);
+      current_group_priority =
+          std::max((sys != nullptr ? sys->m_priority : NORMAL_SYSTEM_PRIORITY),
+                   current_group_priority);
     }
 
     vertex_groups.push_back(group);
@@ -123,12 +126,16 @@ void SystemManager::update_system_work_order() {
     for (size_t j = 0; j < g.size(); ++j) {
       if (vertex_states[g[j]] == 0)
 
-        depth_first_search<SystemTypeID>(g[j], vertex_states, this->m_system_dependency_table, order);
+        depth_first_search<SystemTypeID>(
+            g[j], vertex_states, this->m_system_dependency_table, order);
     }
 
     std::reverse(order.begin(), order.end());
 
-    sorted_vertex_groups.insert(std::pair<SystemPriority, std::vector<SystemTypeID>>(std::numeric_limits<SystemPriority>::max() - group_priority[i], order));
+    sorted_vertex_groups.insert(
+        std::pair<SystemPriority, std::vector<SystemTypeID>>(
+            std::numeric_limits<SystemPriority>::max() - group_priority[i],
+            order));
   }
 
   // re-build system work order
@@ -142,3 +149,5 @@ void SystemManager::update_system_work_order() {
     }
   }
 }
+
+} // namespace astralix

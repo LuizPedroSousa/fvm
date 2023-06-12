@@ -1,10 +1,11 @@
 #pragma once
 
-#include "entities/base/entity.hpp"
+#include "ecs/entities/entity.hpp"
+#include "ecs/guid.hpp"
 #include "functional"
 #include "unordered_map"
-#include "utils/guid.hpp"
 
+namespace astralix {
 using IEntity_ptr = std::unique_ptr<IEntity>;
 
 class EntityManager {
@@ -26,6 +27,10 @@ public:
   void destroy_entity(const EntityID &entity_id);
 
   IEntity *get_entity(const EntityID &entity_id);
+
+  template <typename T> T *get_entity(const EntityID &entity_id) {
+    return dynamic_cast<T *>(get_entity(entity_id));
+  }
 
   template <typename T> void for_each(std::function<void(T *)> fn) {
     std::vector<T *> entities = get_entities<T>();
@@ -53,3 +58,5 @@ private:
   std::unordered_map<EntityID, IEntity_ptr> m_entity_table;
   ComponentManager *m_component_manager;
 };
+
+}; // namespace astralix

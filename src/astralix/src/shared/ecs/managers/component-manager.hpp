@@ -1,10 +1,12 @@
 #pragma once
-#include "components/base/component.hpp"
+#include "ecs/components/component.hpp"
+#include "ecs/guid.hpp"
 #include "either.hpp"
 #include "iostream"
 #include "memory"
 #include "unordered_map"
-#include "utils/guid.hpp"
+
+namespace astralix {
 
 using IComponent_ptr = std::unique_ptr<IComponent>;
 
@@ -74,3 +76,5 @@ private:
   std::unordered_map<EntityID, std::unordered_map<ComponentTypeID, ComponentID>>
       m_entity_component_table;
 };
+
+}; // namespace astralix

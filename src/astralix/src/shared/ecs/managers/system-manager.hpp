@@ -1,25 +1,26 @@
 #pragma once
 
-#include "utils/guid.hpp"
+#include "ecs/guid.hpp"
 
+#include "ecs/systems/isystem.hpp"
 #include "memory"
-#include "systems/base/isystem.hpp"
 #include "unordered_map"
 #include "vector"
 
+namespace astralix {
 class SystemManager {
 
-  public:
+public:
   SystemManager();
   ~SystemManager();
 
-  template <class T, class... Args>
-  T *add_system(Args &&...params) {
+  template <class T, class... Args> T *add_system(Args &&...params) {
     const SystemTypeID type_id = T::system_type_id();
 
     // avoid multiple registrations of the same system
     auto it = this->m_system_table.find(type_id);
-    if ((this->m_system_table.find(type_id) != this->m_system_table.end()) && (it->second != nullptr))
+    if ((this->m_system_table.find(type_id) != this->m_system_table.end()) &&
+        (it->second != nullptr))
       return reinterpret_cast<T *>(it->second.get());
 
     auto system = std::make_shared<T>(std::forward<Args>(params)...);
@@ -46,34 +47,36 @@ class SystemManager {
 
     if (this->m_system_dependency_table[target_id][dependency_id] != true) {
       this->m_system_dependency_table[target_id][dependency_id] = true;
-      // LOG(Info(), "added " << dependency->get_system_type_name() << " as dependency to " << target->get_system_type_name());
+      // LOG(Info(), "added " << dependency->get_system_type_name() << " as
+      // dependency to " << target->get_system_type_name());
     }
   }
 
   template <class Target_, class Dependency_, class... Dependencies>
-  void add_system_dependency(Target_ target, Dependency_ dependency, Dependencies &&...dependencies) {
+  void add_system_dependency(Target_ target, Dependency_ dependency,
+                             Dependencies &&...dependencies) {
     const TypeID target_id = target->get_system_type_id();
     const TypeID dependency_id = dependency->get_system_type_id();
 
     if (this->m_system_dependency_table[target_id][dependency_id] != true) {
       this->m_system_dependency_table[target_id][dependency_id] = true;
-      // LOG(Info(), "added " << dependency->get_system_type_name() << " as dependency to " << target->get_system_type_name());
+      // LOG(Info(), "added " << dependency->get_system_type_name() << " as
+      // dependency to " << target->get_system_type_name());
     }
 
-    this->add_system_dependency(target, std::forward<Dependencies>(dependencies)...);
+    this->add_system_dependency(target,
+                                std::forward<Dependencies>(dependencies)...);
   }
 
   void update_system_work_order();
 
-  template <class T>
-  inline T *get_system() const {
+  template <class T> inline T *get_system() const {
     auto it = this->m_system_table.find(T::system_type_id());
 
     return it != this->m_system_table.end() ? (T *)it->second.get() : nullptr;
   }
 
-  template <class T>
-  void enable_system() {
+  template <class T> void enable_system() {
     const SystemTypeID type_id = T::system_type_id();
 
     // get system
@@ -85,12 +88,12 @@ class SystemManager {
       it->second->m_enabled = true;
     } else {
       //				throw new EXCEPTION_DEBUG_INFO();
-      // LOG(Warning(), "Trying to enable system " << type_id << ", but system is not registered yet.");
+      // LOG(Warning(), "Trying to enable system " << type_id << ", but system
+      // is not registered yet.");
     }
   }
 
-  template <class T>
-  void disable_system() {
+  template <class T> void disable_system() {
     const SystemTypeID type_id = T::system_type_id();
 
     // get system
@@ -102,12 +105,12 @@ class SystemManager {
       it->second->m_enabled = false;
     } else {
       //				throw new EXCEPTION_DEBUG_INFO();
-      // LOG(Warning(), "Trying to disable system " << type_id << ", but system is not registered yet.");
+      // LOG(Warning(), "Trying to disable system " << type_id << ", but system
+      // is not registered yet.");
     }
   }
 
-  template <class T>
-  void set_system_update_interval(double interval_ms) {
+  template <class T> void set_system_update_interval(double interval_ms) {
     const SystemTypeID type_id = T::system_type_id();
 
     // get system
@@ -116,18 +119,18 @@ class SystemManager {
       it->second->m_updater_internal = interval_ms;
     } else {
       //				throw new EXCEPTION_DEBUG_INFO();
-      // LOG(Warning(), "Trying to change system's " << type_id << " update interval, but system is not registered yet.");
+      // LOG(Warning(), "Trying to change system's " << type_id << " update
+      // interval, but system is not registered yet.");
     }
   }
 
-  Either<BaseException, Unit> start();
+  void start();
   void fixed_update(double fixed_dt_ms);
   void update(double dt_ms);
 
-  private:
+private:
   template <typename T>
-  void depth_first_search(T vertex,
-                          std::vector<int> &VERTEX_STATE,
+  void depth_first_search(T vertex, std::vector<int> &VERTEX_STATE,
                           const std::vector<std::vector<bool>> &EDGES,
                           std::vector<T> &output) {
     VERTEX_STATE[vertex] = 1;
@@ -155,3 +158,5 @@ class SystemManager {
   std::vector<std::vector<bool>> m_system_dependency_table;
   std::vector<ISystem_ptr> m_system_work_order;
 };
+
+} // namespace astralix

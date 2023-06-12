@@ -1,10 +1,11 @@
 #pragma once
-#include "ientity.hpp"
-#include "utils/guid.hpp"
 
-template <typename T>
-class Entity : public IEntity {
-  public:
+#include "ientity.hpp"
+
+namespace astralix {
+
+template <typename T> class Entity : public IEntity {
+public:
   static const EntityTypeID ENTITY_TYPE_ID;
 
   EntityTypeID get_entity_type_id() const override { return ENTITY_TYPE_ID; }
@@ -21,3 +22,5 @@ class Entity : public IEntity {
 
 template <typename T>
 const EntityTypeID Entity<T>::ENTITY_TYPE_ID = FamilyTypeID<IEntity>::get<T>();
+
+} // namespace astralix
