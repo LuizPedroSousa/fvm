@@ -36,8 +36,6 @@ void PhysicsSystem::update(double dt) {
   auto component_manager = Engine::get()->get_component_manager();
   auto entity_manager = Engine::get()->get_entity_manager();
 
-  auto entity_manager = Engine::get()->get_entity_manager();
-
   entity_manager->for_each<Object>([dt](Object *object) {
     auto rigidbody_component = object->get_component<RigidBodyComponent>();
 
