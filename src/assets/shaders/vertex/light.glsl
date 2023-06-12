@@ -7,19 +7,16 @@ layout(location=2)in vec2 texture_cord;
 out vec2 _texture_cord;
 out vec3 _normal;
 out vec3 _fragment_position;
-out vec3 _light_position;
 
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 model;
-uniform vec3 light_position;
 
 void main()
 {
-  gl_Position=projection*view*model*vec4(position,1.);
+  _fragment_position=vec3(model*vec4(position,1.));
+  _normal=mat3(transpose(inverse(model)))*normal;
   _texture_cord=texture_cord;
-  _fragment_position=vec3(view*model*vec4(position,1.));
-  _normal=mat3(transpose(inverse(view*model)))*normal;
-  _light_position=vec3(view*vec4(light_position,1.));
+  
+  gl_Position=projection*view*vec4(_fragment_position,1.);
 }
-

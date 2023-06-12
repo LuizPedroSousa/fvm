@@ -30,12 +30,11 @@ void Prologue::load_resources() {
   manager->load_texture("textures::window", "_texture", GL_RGBA,
                         "textures/window.png");
 
-  manager->load_shaders(
-      {{"shaders::lighting", "vertex/triangle.glsl", "fragment/triangle.glsl"},
-       {"shaders::outline", "vertex/triangle.glsl", "fragment/outline.glsl"},
-       {"shaders::window", "vertex/triangle.glsl", "fragment/window.glsl"},
-       {"shaders::point_light_source", "vertex/light_source.glsl",
-        "fragment/light_source.glsl"}});
+  manager->load_shaders({
+      {"shaders::lighting", "vertex/light.glsl", "fragment/light.glsl"},
+      {"shaders::outline", "vertex/light.glsl", "fragment/outline.glsl"},
+      {"shaders::window", "vertex/light.glsl", "fragment/window.glsl"},
+  });
 
   manager->load_models({
       {"models::player::warrior", "warrior/warrior.obj"},
@@ -253,11 +252,11 @@ Either<BaseException, Unit> Prologue::load_terrain() {
   };
 
   auto create_window = [&](glm::vec3 position) {
-    auto grass =
+    auto window =
         Engine::get()->get_entity_manager()->add_entity<astralix::Object>(
             position);
-    auto resource = grass.get_component<astralix::ResourceComponent>();
-    auto render = grass.get_component<astralix::RenderComponent>();
+    auto resource = window.get_component<astralix::ResourceComponent>();
+    auto render = window.get_component<astralix::RenderComponent>();
 
     render->on_before_draw([]() {
       glEnable(GL_BLEND);
@@ -274,7 +273,7 @@ Either<BaseException, Unit> Prologue::load_terrain() {
     resource->attach_shader("shaders::window");
     resource->attach_texture("textures::window");
 
-    grass.get_component<astralix::MeshComponent>()->attach_mesh(
+    window.get_component<astralix::MeshComponent>()->attach_mesh(
         astralix::Mesh::cube_mesh(2.0f));
   };
 
