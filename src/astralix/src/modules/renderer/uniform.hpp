@@ -4,13 +4,15 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "string"
 
+namespace astralix {
+
 class Shader;
 
 class Uniform {
-  private:
+private:
   unsigned int m_render_id;
 
-  public:
+public:
   Uniform();
   Uniform(unsigned int render_id);
   void setBool(const char *name, bool value) const;
@@ -19,3 +21,5 @@ class Uniform {
   void setFloat(const char *name, float value) const;
   void setVec3(const char *name, glm::vec3 value) const;
 };
+
+} // namespace astralix
