@@ -1,37 +1,41 @@
+#pragma once
 #include "functional"
+#include "listener.hpp"
 
 namespace astralix {
 
-class MouseEvent {
+class MouseEvent : public Event {
 public:
   MouseEvent(double x, double y) : m_x(x), m_y(y){};
 
+  MouseEvent(){};
+
   double get_x() { return m_x; }
   double get_y() { return m_y; }
+
+  EVENT_CLASS_TYPE(MouseMovement)
 
 private:
   double m_x;
   double m_y;
 };
 
-class MouseDispatcher {
+class MouseListener : public BaseListener {
 public:
-  void dispatch(MouseEvent event);
+  MouseListener(MouseEvent *event,
+                const std::function<void(MouseEvent *event)> &callback)
+      : BaseListener(event), m_callback(callback) {}
 
-  void attach(std::function<void(MouseEvent event)> callback);
+  void dispatch() override { m_callback((MouseEvent *)m_event); }
 
-  static MouseDispatcher *get();
+  MouseEvent *get_event() override {
+    return static_cast<MouseEvent *>(m_event);
+  }
 
-  struct Listener {
-    std::function<void(MouseEvent event)> callback;
-  };
-
-  std::vector<Listener> m_listeners;
+  LISTENER_CLASS_TYPE(Mouse)
 
 private:
-  MouseDispatcher(){};
-
-  static MouseDispatcher *m_instance;
+  std::function<void(MouseEvent *event)> m_callback;
 };
 
 } // namespace astralix

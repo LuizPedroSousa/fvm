@@ -1,12 +1,12 @@
 #pragma once
 #include "functional"
-#include "iostream"
 #include "key-codes.hpp"
-#include "queue"
+#include "listener.hpp"
 
 namespace astralix {
 
-class KeyEvent {
+class KeyEvent : public Event {
+
 public:
   KeyCode get_key() { return m_key_code; }
 
@@ -18,55 +18,30 @@ protected:
 class KeyPressedEvent : public KeyEvent {
 public:
   KeyPressedEvent(const KeyCode key_code) : KeyEvent(key_code){};
+
+  EVENT_CLASS_TYPE(KeyPressed)
 };
 
 class KeyReleasedEvent : public KeyEvent {
 public:
   KeyReleasedEvent(const KeyCode key_code) : KeyEvent(key_code){};
+
+  EVENT_CLASS_TYPE(KeyReleased)
 };
 
-class KeyPressedDispatcher {
+class KeyboardListener : public BaseListener {
 public:
-  static KeyPressedDispatcher *get();
+  KeyboardListener(KeyEvent *event, const std::function<void()> &callback)
+      : BaseListener(event), m_callback(callback) {}
 
-  void attach(KeyPressedEvent listener, std::function<void()> callback) {
-    m_listeners.push_back({listener, callback});
-  }
+  KeyEvent *get_event() override { return static_cast<KeyEvent *>(m_event); }
 
-  void dispatch(int i) { m_listeners[i].callback(); }
+  void dispatch() override { m_callback(); }
 
-  struct ListenerD {
-    KeyEvent event;
-    std::function<void()> callback;
-  };
-
-  std::vector<ListenerD> m_listeners;
+  LISTENER_CLASS_TYPE(Keyboard)
 
 private:
-  KeyPressedDispatcher(){};
-  static KeyPressedDispatcher *m_instance;
-};
-
-class KeyReleasedDispatcher {
-public:
-  static KeyReleasedDispatcher *get();
-
-  void attach(KeyReleasedEvent listener, std::function<void()> callback) {
-    m_listeners.push_back({listener, callback});
-  }
-
-  void dispatch(int i) { m_listeners[i].callback(); }
-
-  struct ListenerD {
-    KeyEvent event;
-    std::function<void()> callback;
-  };
-
-  std::vector<ListenerD> m_listeners;
-
-private:
-  KeyReleasedDispatcher(){};
-  static KeyReleasedDispatcher *m_instance;
+  std::function<void()> m_callback;
 };
 
 } // namespace astralix
