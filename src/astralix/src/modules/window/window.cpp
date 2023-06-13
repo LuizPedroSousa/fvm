@@ -1,7 +1,9 @@
 #include "glad/glad.h"
 
 #include "application.hpp"
+#include "base.hpp"
 #include "either.hpp"
+#include "events/event-dispatcher.hpp"
 #include "events/key-event.hpp"
 #include "events/mouse-event.hpp"
 #include "exceptions/base-exception.hpp"
@@ -18,6 +20,7 @@ void Window::handle_errors(int, const char *description) {
 }
 
 void Window::init() {
+
   if (m_instance == nullptr) {
     m_instance = new Window;
   }
@@ -26,6 +29,8 @@ void Window::init() {
 Window *Window::get() { return m_instance; }
 
 Window::Window() {
+  EventDispatcher::init();
+
   glfwSetErrorCallback(handle_errors);
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -67,48 +72,56 @@ void Window::open(int width, int height) {
 
   glfwSetFramebufferSizeCallback(m_value, resizing);
 
-  KeyReleasedDispatcher::get()->attach(KeyReleasedEvent(KeyCode::Escape), []() {
-    has_pressed = !has_pressed;
-
-    auto window = Window::get();
-
-    glfwSetCursorPos(window->get_value(), window->get_width() / 2.0f,
-                     window->get_height() / 2.0f);
-
-    glfwSetInputMode(window->get_value(), GLFW_CURSOR,
-                     has_pressed ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-  });
+  EventDispatcher::get()->attach<KeyboardListener, KeyReleasedEvent>(
+      KeyCode::Escape, ASTRA_BIND_EVENT_FN(Window::toggle_view_mouse));
 
   glfwSetCursorPosCallback(m_value, mouse_callback);
   glfwSetKeyCallback(m_value, key_callback);
 }
 
+void Window::toggle_view_mouse() {
+  has_pressed = !has_pressed;
+
+  auto window = Window::get();
+
+  glfwSetCursorPos(window->get_value(), window->get_width() / 2.0f,
+                   window->get_height() / 2.0f);
+
+  glfwSetInputMode(window->get_value(), GLFW_CURSOR,
+                   has_pressed ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+}
+
 void Window::mouse_callback(GLFWwindow *window, double x, double y) {
   if (!has_pressed)
-    MouseDispatcher::get()->dispatch(MouseEvent(x, y));
+    EventDispatcher::get()->for_each<MouseListener, MouseEvent>(
+        [&](MouseListener &listener) {
+          listener.set_event(new MouseEvent(x, y));
+          listener.dispatch();
+        });
 };
 
 void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
                           int mods) {
-  for (int i = 0; i < KeyReleasedDispatcher::get()->m_listeners.size(); i++) {
-    if (KeyReleasedDispatcher::get()->m_listeners[i].event.get_key() == key &&
-        action == GLFW_PRESS) {
-      KeyReleasedDispatcher::get()->dispatch(i);
-      break;
-    }
-  };
+
+  EventDispatcher::get()->for_each<KeyboardListener, KeyReleasedEvent>(
+      [key, action](KeyboardListener &listener) {
+        if (listener.get_event()->get_key() == key && action == GLFW_PRESS) {
+          listener.dispatch();
+          return;
+        }
+      });
 }
 
 void Window::update() {
   glfwPollEvents();
 
-  for (int i = 0; i < KeyPressedDispatcher::get()->m_listeners.size(); i++) {
-    if (glfwGetKey(
-            m_value,
-            KeyPressedDispatcher::get()->m_listeners[i].event.get_key())) {
-      KeyPressedDispatcher::get()->dispatch(i);
-    }
-  };
+  EventDispatcher::get()->for_each<KeyboardListener, KeyPressedEvent>(
+      [](KeyboardListener &listener) {
+        if (glfwGetKey(Window::get()->get_value(),
+                       listener.get_event()->get_key())) {
+          listener.dispatch();
+        }
+      });
 }
 
 void Window::post_update() { glfwSwapBuffers(m_value); }
