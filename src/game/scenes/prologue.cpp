@@ -6,11 +6,12 @@
 #include "components/mesh-collision/mesh-collision-component.hpp"
 #include "components/mesh/mesh-component.hpp"
 #include "components/model/model-component.hpp"
-#include "components/render/render-component.hpp"
 #include "components/resource/resource-component.hpp"
 #include "components/rigidbody/rigidbody-component.hpp"
 #include "components/transform/transform-component.hpp"
 #include "engine.hpp"
+#include "entities/post-processing.hpp"
+#include "entities/skybox.hpp"
 #include "glad/glad.h"
 #include "managers/resource-manager.hpp"
 #include "map"
@@ -27,14 +28,25 @@ using astralix::Unit;
 void Prologue::load_resources() {
   auto manager = Engine::get()->get_resource_manager();
 
-  manager->load_texture("textures::window", "_texture", GL_RGBA,
-                        "textures/window.png");
+  manager->load_texture("textures::window", "_texture", "textures/window.png");
 
-  manager->load_shaders({
-      {"shaders::lighting", "vertex/light.glsl", "fragment/light.glsl"},
-      {"shaders::outline", "vertex/light.glsl", "fragment/outline.glsl"},
-      {"shaders::window", "vertex/light.glsl", "fragment/window.glsl"},
-  });
+  manager->load_cubemap("cubemaps::skybox", "_skybox",
+                        {
+                            "textures/skybox/right.jpg",
+                            "textures/skybox/left.jpg",
+                            "textures/skybox/top.jpg",
+                            "textures/skybox/bottom.jpg",
+                            "textures/skybox/front.jpg",
+                            "textures/skybox/back.jpg",
+                        });
+
+  manager->load_shaders(
+      {{"shaders::lighting", "vertex/light.glsl", "fragment/light.glsl"},
+       {"shaders::outline", "vertex/light.glsl", "fragment/outline.glsl"},
+       {"shaders::window", "vertex/light.glsl", "fragment/window.glsl"},
+       {"shaders::skybox", "vertex/skybox.glsl", "fragment/skybox.glsl"},
+       {"shaders::post_processing", "vertex/postprocessing.glsl",
+        "fragment/postprocessing.glsl"}});
 
   manager->load_models({
       {"models::player::warrior", "warrior/warrior.obj"},
@@ -50,6 +62,12 @@ void Prologue::load_scene_components() {
       add_component<astralix::LightComponent>(std::move(strategy), camera);
 
   light->add_source(glm::vec3(0.0f, 5.0f, 0.0f), "shaders::point_light_source");
+
+  auto manager = Engine::get()->get_entity_manager();
+  manager->add_entity<astralix::Skybox>("cubemaps::skybox", "shaders::skybox");
+
+  auto post_processing =
+      manager->add_entity<astralix::PostProcessing>("shaders::post_processing");
 }
 
 Either<BaseException, Unit> Prologue::load_player() {
@@ -59,47 +77,15 @@ Either<BaseException, Unit> Prologue::load_player() {
         Engine::get()->get_entity_manager()->add_entity<astralix::Object>(
             glm::vec3(0.0f, 0.6f, 0.0f));
 
-    player.get_component<astralix::ResourceComponent>()->attach_shader(
-        "shaders::lighting");
+    auto resource = player.get_component<astralix::ResourceComponent>();
+    resource->attach_shader("shaders::lighting");
 
     player.add_component<astralix::ModelComponent>()->attach_model(
         "models::player::warrior");
     player.add_component<astralix::MeshCollisionComponent>();
-
-    player.get_component<astralix::RenderComponent>()->on_before_draw([]() {
-      glStencilFunc(GL_ALWAYS, 1, 0xFF);
-      glStencilMask(0xFF);
-    });
   };
-
-  auto create_outline = []() {
-    auto player_outline =
-        Engine::get()->get_entity_manager()->add_entity<astralix::Object>(
-            glm::vec3(0.0f, 0.6f, 0.0f), glm::vec3(0.51f));
-    player_outline.get_component<astralix::ResourceComponent>()->attach_shader(
-        "shaders::outline");
-
-    player_outline.add_component<astralix::ModelComponent>()->attach_model(
-        "models::player::warrior");
-
-    player_outline.get_component<astralix::RenderComponent>()->on_before_draw(
-        []() {
-          glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-          glStencilMask(0x00);
-        });
-
-    player_outline.get_component<astralix::RenderComponent>()->on_after_draw(
-        []() {
-          glStencilFunc(GL_ALWAYS, 1, 0xFF);
-          glStencilMask(0xFF);
-          glEnable(GL_DEPTH_TEST);
-          glStencilMask(0xFF);
-        });
-  };
-  ;
 
   create_player();
-  create_outline();
 
   return Unit();
 }
@@ -114,6 +100,7 @@ Either<BaseException, Unit> Prologue::load_terrain() {
 
     auto resource_component =
         object.get_component<astralix::ResourceComponent>();
+
     auto mesh_component = object.get_component<astralix::MeshComponent>();
     auto material_component =
         object.get_component<astralix::MaterialComponent>();
@@ -123,7 +110,7 @@ Either<BaseException, Unit> Prologue::load_terrain() {
 
     std::vector<astralix::Mesh> terrain_meshes;
 
-    auto top = models[0];
+    auto top    = models[0];
     auto middle = models[1];
 
     auto populate_top_meshes = [&](float x, float z) {
@@ -208,93 +195,9 @@ Either<BaseException, Unit> Prologue::load_terrain() {
         middle->materials);
     object.get_component<astralix::MeshComponent>()->attach_meshes(
         terrain_meshes);
-
-    object.get_component<astralix::RenderComponent>()->on_before_draw(
-        []() { glStencilMask(0x00); });
-  };
-
-  auto create_cube = [&]() {
-    auto cube =
-        Engine::get()->get_entity_manager()->add_entity<astralix::Object>(
-            glm::vec3(0.0f, 2.0f, 5.0f));
-    auto cube_outline =
-        Engine::get()->get_entity_manager()->add_entity<astralix::Object>(
-            glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.51f));
-
-    auto cube_mesh_component = cube.get_component<astralix::MeshComponent>();
-    auto cube_outline_mesh_component =
-        cube_outline.get_component<astralix::MeshComponent>();
-
-    cube_mesh_component->attach_mesh(astralix::Mesh::cube_mesh(2.0f));
-    cube_outline_mesh_component->attach_mesh(astralix::Mesh::cube_mesh(2.0f));
-
-    cube.get_component<astralix::ResourceComponent>()->attach_shader(
-        "shaders::lighting");
-    cube_outline.get_component<astralix::ResourceComponent>()->attach_shader(
-        "shaders::outline");
-
-    cube.get_component<astralix::RenderComponent>()->on_before_draw(
-        []() { glStencilMask(0xFF); });
-
-    cube_outline.get_component<astralix::RenderComponent>()->on_before_draw(
-        []() {
-          glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-          glStencilMask(0x00);
-          glDisable(GL_DEPTH_TEST);
-        });
-
-    cube_outline.get_component<astralix::RenderComponent>()->on_after_draw(
-        []() {
-          glStencilMask(0xFF);
-          glStencilFunc(GL_ALWAYS, 1, 0xFF);
-          glEnable(GL_DEPTH_TEST);
-        });
-  };
-
-  auto create_window = [&](glm::vec3 position) {
-    auto window =
-        Engine::get()->get_entity_manager()->add_entity<astralix::Object>(
-            position);
-    auto resource = window.get_component<astralix::ResourceComponent>();
-    auto render = window.get_component<astralix::RenderComponent>();
-
-    render->on_before_draw([]() {
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glEnable(GL_CULL_FACE);
-      glCullFace(GL_BACK);
-    });
-
-    render->on_after_draw([]() {
-      glDisable(GL_BLEND);
-      glDisable(GL_CULL_FACE);
-    });
-
-    resource->attach_shader("shaders::window");
-    resource->attach_texture("textures::window");
-
-    window.get_component<astralix::MeshComponent>()->attach_mesh(
-        astralix::Mesh::cube_mesh(2.0f));
   };
 
   create_floor(24, 24, 1.0f);
-  create_cube();
-
-  std::map<float, glm::vec3> window_pos;
-
-  auto camera = get_component<astralix::CameraComponent>();
-
-  for (int i = 0; i < 4; i++) {
-    auto pos = glm::vec3(0.0f, 1.0f, 4.0f * i);
-
-    float distance = glm::length(camera->get_position() - pos);
-    window_pos[distance] = pos;
-  }
-
-  for (std::map<float, glm::vec3>::reverse_iterator it = window_pos.rbegin();
-       it != window_pos.rend(); ++it) {
-    create_window(it->second);
-  }
 
   return Unit();
 }

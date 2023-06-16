@@ -1,5 +1,6 @@
 #pragma once
 #include "assimp/scene.h"
+#include "base.hpp"
 #include "ecs/guid.hpp"
 #include "memory"
 #include "resources/material.hpp"
@@ -12,8 +13,11 @@ namespace astralix {
 
 class ResourceManager {
 public:
-  Texture *load_texture(ResourceID id, std::string name, int color_type,
-                        const char *filename);
+  Texture *load_texture(ResourceID id, std::string name, const char *filename);
+
+  Texture *load_cubemap(ResourceID id, std::string name,
+                        std::vector<std::string> faces);
+
   Shader *load_shader(ResourceID id, const char *vertex_filename,
                       const char *fragment_filename);
   void load_shaders(
@@ -28,15 +32,16 @@ public:
 
   Shader *get_shader_by_id(ResourceID id);
   Texture *get_texture_by_id(ResourceID id);
+  Texture *get_cubemap_by_id(ResourceID id);
   Model *get_model_by_id(ResourceID id);
   std::vector<Model *> get_models_by_ids(std::initializer_list<ResourceID> ids);
   Material *get_material_by_id(ResourceID id);
 
-  std::unordered_map<ResourceID, std::unique_ptr<Material>> m_material_table;
+  std::unordered_map<ResourceID, Scope<Material>> m_material_table;
 
 private:
-  std::unordered_map<ResourceID, std::unique_ptr<Texture>> m_texture_table;
-  std::unordered_map<ResourceID, std::unique_ptr<Shader>> m_shader_table;
-  std::unordered_map<ResourceID, std::unique_ptr<Model>> m_model_table;
+  std::unordered_map<ResourceID, Scope<Texture>> m_texture_table;
+  std::unordered_map<ResourceID, Scope<Shader>> m_shader_table;
+  std::unordered_map<ResourceID, Scope<Model>> m_model_table;
 };
 } // namespace astralix

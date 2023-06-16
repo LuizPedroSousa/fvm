@@ -11,6 +11,9 @@ public:
               glm::vec3 scale = glm::vec3(0.5f, 0.5f, 0.5f));
   LightSource(){};
 
+  void start();
+  void update();
+
   void on_enable() override{};
   void on_disable() override{};
 };

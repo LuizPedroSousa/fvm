@@ -1,5 +1,7 @@
 #include "mesh.hpp"
+#include "glad/glad.h"
 #include "glm/glm.hpp"
+#include "iostream"
 #include "numbers"
 
 namespace astralix {
@@ -135,12 +137,12 @@ Mesh Mesh::capsule_mesh(float radius, float height, int segments, int rings) {
 
   for (int ring = 0; ring <= rings; ++ring) {
     float phi = ring * pi / rings;
-    float y = height * (ring / static_cast<float>(rings)) - height * 0.5f;
+    float y   = height * (ring / static_cast<float>(rings)) - height * 0.5f;
 
     for (int segment = 0; segment <= segments; ++segment) {
       float theta = segment * 2 * pi / segments;
-      float x = radius * std::cos(theta) * std::sin(phi);
-      float z = radius * std::sin(theta) * std::sin(phi);
+      float x     = radius * std::cos(theta) * std::sin(phi);
+      float z     = radius * std::sin(theta) * std::sin(phi);
 
       Vertex vertex;
       vertex.position = glm::vec3(x, y, z);
@@ -152,7 +154,7 @@ Mesh Mesh::capsule_mesh(float radius, float height, int segments, int rings) {
   for (int ring = 0; ring < rings; ++ring) {
     for (int segment = 0; segment < segments; ++segment) {
       int current_ring = ring * (segments + 1);
-      int next_ring = (ring + 1) * (segments + 1);
+      int next_ring    = (ring + 1) * (segments + 1);
 
       indices.push_back(current_ring + segment);
       indices.push_back(next_ring + segment);
@@ -166,4 +168,16 @@ Mesh Mesh::capsule_mesh(float radius, float height, int segments, int rings) {
 
   return Mesh(vertices, indices);
 }
+
+Mesh::~Mesh() {
+  if (m_buffers.VAO)
+    glDeleteVertexArrays(1, &m_buffers.VAO);
+
+  if (m_buffers.VBO)
+    glDeleteBuffers(1, &m_buffers.VBO);
+
+  if (m_buffers.EBO)
+    glDeleteBuffers(1, &m_buffers.EBO);
+}
+
 } // namespace astralix

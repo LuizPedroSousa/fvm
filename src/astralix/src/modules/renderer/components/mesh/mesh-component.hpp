@@ -16,7 +16,7 @@ public:
   MeshComponent(COMPONENT_INIT_PARAMS);
 
   void start();
-  void draw();
+  void update();
 
   std::vector<Mesh> *get_meshes() { return &m_meshes; }
 

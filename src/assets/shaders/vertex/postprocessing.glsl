@@ -8,5 +8,5 @@ out vec2 _texture_cord;
 
 void main() {
   _texture_cord = texture_cord;
-  gl_Position = vec4(position.x, position.y, 0, 1.);
+  gl_Position   = vec4(position.x, position.y, 0, 1.);
 }

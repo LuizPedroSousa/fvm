@@ -12,7 +12,7 @@ public:
   ResourceComponent() {}
 
   void start();
-  void pre_update();
+  void update();
 
   unsigned int get_shader_renderer_id() { return m_shader_renderer.id; }
 
@@ -23,6 +23,7 @@ public:
   }
 
   void attach_texture(ResourceID id);
+  void attach_cubemap(ResourceID id);
   void attach_shader(ResourceID id);
 
 private:
