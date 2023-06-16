@@ -111,33 +111,36 @@ void CameraComponent::use_orthographic() { m_is_orthographic = true; }
 
 void CameraComponent::use_perspective() { m_is_orthographic = false; }
 
-glm::mat4 CameraComponent::get_projection() {
+void CameraComponent::recalculate_projection_matrix() {
   if (m_is_orthographic) {
-    return glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
+    m_projection_matrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
   } else {
-    auto window = Window::get();
-    return glm::perspective(
+    auto window         = Window::get();
+    m_projection_matrix = glm::perspective(
         45.0f, (float)window->get_width() / (float)window->get_height(), 0.1f,
         100.0f);
   }
 }
 
-glm::mat4 CameraComponent::get_view() {
+void CameraComponent::recalculate_view_matrix() {
   // set static positions
   m_position = s_position;
   m_front    = s_front;
   m_up       = s_up;
 
   // view space
-  auto transform = glm::mat4(1.0f);
-  transform      = glm::lookAt(s_position, s_position + s_front, s_up);
+  auto matrix = glm::mat4(1.0f);
+  matrix      = glm::lookAt(s_position, s_position + s_front, s_up);
 
-  return transform;
+  m_view_matrix = matrix;
 }
 
 void CameraComponent::update(Uniform *uniform) {
-  uniform->setMatrix("view", get_view());
-  uniform->setMatrix("projection", get_projection());
+  recalculate_view_matrix();
+  recalculate_projection_matrix();
+
+  uniform->setMatrix("view", m_view_matrix);
+  uniform->setMatrix("projection", m_projection_matrix);
 }
 
 } // namespace astralix
