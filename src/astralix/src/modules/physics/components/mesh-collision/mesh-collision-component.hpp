@@ -49,7 +49,7 @@ public:
     case 3:
       return SimplexType::triangle;
 
-    case 4:
+    default:
       return SimplexType::tetrahedron;
     };
   }
