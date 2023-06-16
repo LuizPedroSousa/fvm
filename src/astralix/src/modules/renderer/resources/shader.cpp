@@ -21,15 +21,11 @@ Either<BaseException, Shader> Shader::create(ResourceID id,
                                              const char *fragment_filename) {
   auto vertex = compile(vertex_filename, GL_VERTEX_SHADER);
 
-  if (vertex.isLeft()) {
-    return vertex.left();
-  }
+  ASSERT_COMPARE(vertex);
 
   auto fragment = compile(fragment_filename, GL_FRAGMENT_SHADER);
 
-  if (fragment.isLeft()) {
-    return fragment.left();
-  }
+  ASSERT_COMPARE(fragment);
 
   return Shader(id, vertex.right(), vertex_filename, fragment.right(),
                 fragment_filename);
