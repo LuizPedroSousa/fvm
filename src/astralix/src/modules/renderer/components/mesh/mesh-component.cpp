@@ -16,7 +16,7 @@ void MeshComponent::start() {
   }
 }
 
-void MeshComponent::draw() {
+void MeshComponent::update() {
 
   for (int i = 0; i < m_meshes.size(); i++) {
     glBindVertexArray(m_meshes[i].m_buffers.VAO);

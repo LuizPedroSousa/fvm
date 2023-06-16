@@ -38,7 +38,7 @@ void SceneSystem::update(double dt) {
   if (scene != nullptr) {
     auto manager = Engine::get()->get_entity_manager();
 
-    auto light = scene->get_component<LightComponent>();
+    auto light  = scene->get_component<LightComponent>();
     auto camera = scene->get_component<CameraComponent>();
 
     manager->for_each<Object>([&](Object *object) {
