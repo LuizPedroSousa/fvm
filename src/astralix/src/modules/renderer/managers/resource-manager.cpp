@@ -111,21 +111,22 @@ Texture *ResourceManager::get_cubemap_by_id(ResourceID id) {
   return nullptr;
 }
 
-Shader *ResourceManager::load_shader(ResourceID id, const char *vertex_filename,
-                                     const char *fragment_filename) {
-  auto shader_exists = get_shader_by_id(id);
+Shader *ResourceManager::load_shader(LoadShaderDTO dto) {
+  auto shader_exists = get_shader_by_id(dto.id);
 
   if (shader_exists != nullptr) {
     return shader_exists;
   }
 
-  auto created_shader = Shader::create(id, vertex_filename, fragment_filename);
+  auto created_shader =
+      Shader::create(dto.id, dto.vertex_filename, dto.fragment_filename,
+                     dto.geometry_filename);
 
   ASSERT_COMPARE_THROW(created_shader);
 
   Scope<Shader> shader_ptr = create_scope<Shader>(created_shader.right());
 
-  auto inserted_shader = m_shader_table.emplace(id, std::move(shader_ptr));
+  auto inserted_shader = m_shader_table.emplace(dto.id, std::move(shader_ptr));
 
   ASSERT_THROW(!inserted_shader.second, "can't insert shader");
 
@@ -133,10 +134,9 @@ Shader *ResourceManager::load_shader(ResourceID id, const char *vertex_filename,
 }
 
 void ResourceManager::load_shaders(
-    std::initializer_list<std::tuple<ResourceID, const char *, const char *>>
-        shaders) {
+    std::initializer_list<LoadShaderDTO> shaders) {
   for (auto &shader : shaders) {
-    load_shader(std::get<0>(shader), std::get<1>(shader), std::get<2>(shader));
+    load_shader(shader);
   }
 }
 

@@ -11,6 +11,20 @@
 
 namespace astralix {
 
+struct LoadShaderDTO {
+  ResourceID id;
+  const char *vertex_filename;
+  const char *geometry_filename;
+  const char *fragment_filename;
+
+  LoadShaderDTO(ResourceID id, const char *vertex_filename,
+                const char *fragment_filename,
+                const char *geometry_filename = NULL)
+      : id(id), vertex_filename(vertex_filename),
+        geometry_filename(geometry_filename),
+        fragment_filename(fragment_filename){};
+};
+
 class ResourceManager {
 public:
   Texture *load_texture(ResourceID id, std::string name, const char *filename);
@@ -18,11 +32,9 @@ public:
   Texture *load_cubemap(ResourceID id, std::string name,
                         std::vector<std::string> faces);
 
-  Shader *load_shader(ResourceID id, const char *vertex_filename,
-                      const char *fragment_filename);
-  void load_shaders(
-      std::initializer_list<std::tuple<ResourceID, const char *, const char *>>
-          shaders);
+  Shader *load_shader(LoadShaderDTO dto);
+
+  void load_shaders(std::initializer_list<LoadShaderDTO> shaders);
 
   Material *load_material(ResourceID id, aiMaterial *ai_material);
 
