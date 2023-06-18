@@ -70,19 +70,21 @@ void RenderSystem::update(double dt) {
 };
 
 void RenderSystem::post_update(double dt) {
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_STENCIL_TEST);
-  glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z,
-               m_clear_color.w);
-  glClear(GL_COLOR_BUFFER_BIT);
 
   auto entity_manager = Engine::get()->get_entity_manager();
 
   auto post_processing = entity_manager->get_entity<PostProcessing>();
 
-  if (post_processing != nullptr)
+  if (post_processing != nullptr) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_STENCIL_TEST);
+    glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z,
+                 m_clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     post_processing->post_update();
+  }
 };
 
 RenderSystem::~RenderSystem() {}
