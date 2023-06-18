@@ -63,11 +63,10 @@ vec3 calc_spot_light(SpotLight light, vec3 normal, vec3 view_direction);
 float linear_depth(float depth);
 
 void main() {
-  vec3 normalized = normalize(obj_coordinates.normal);
-
   vec3 view_direction = normalize(view_position - obj_coordinates.fragment);
 
-  vec3 result = calc_point_light(point_lights[0], normalized, view_direction);
+  vec3 result =
+      calc_point_light(point_lights[0], obj_coordinates.normal, view_direction);
 
   FragColor = vec4(result, 1);
 }
