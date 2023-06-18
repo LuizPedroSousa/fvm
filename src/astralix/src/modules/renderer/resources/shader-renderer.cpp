@@ -10,7 +10,7 @@
 namespace astralix {
 
 ShaderRenderer::ShaderRenderer() {
-  this->id = glCreateProgram();
+  this->id  = glCreateProgram();
   m_uniform = Uniform(id);
 }
 
@@ -21,16 +21,20 @@ Either<BaseException, Unit> ShaderRenderer::attach_many(ResourceID *shader_ids,
   for (int i = 0; i < size; i++) {
     this->attach(shader_ids[i]);
   }
+
+  return Unit();
 }
 
 Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
   auto resource_manager = Engine::get()->get_resource_manager();
-  auto shader_ptr = resource_manager->get_shader_by_id(p_id);
+  auto shader_ptr       = resource_manager->get_shader_by_id(p_id);
 
   ASSERT(shader_ptr == nullptr, "Shader not found");
 
   glAttachShader(this->id, shader_ptr->vertex);
   glAttachShader(this->id, shader_ptr->fragment);
+  if (shader_ptr->geometry)
+    glAttachShader(this->id, shader_ptr->geometry);
 
   int success;
 
@@ -48,6 +52,8 @@ Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
 
   glDeleteShader(shader_ptr->fragment);
   glDeleteShader(shader_ptr->vertex);
+  if (shader_ptr->geometry)
+    glDeleteShader(shader_ptr->geometry);
 
   shader_ptr->signed_to = this->id;
 
