@@ -42,8 +42,8 @@ void Prologue::load_resources() {
 
   manager->load_shaders(
       {{"shaders::lighting", "vertex/light.glsl", "fragment/light.glsl"},
-       {"shaders::outline", "vertex/light.glsl", "fragment/outline.glsl"},
-       {"shaders::window", "vertex/light.glsl", "fragment/window.glsl"},
+       {"shaders::visualize_normal", "vertex/normal_view.glsl",
+        "fragment/normal_view.glsl", "geometry/normal_view.glsl"},
        {"shaders::skybox", "vertex/skybox.glsl", "fragment/skybox.glsl"},
        {"shaders::post_processing", "vertex/postprocessing.glsl",
         "fragment/postprocessing.glsl"}});
@@ -56,7 +56,7 @@ void Prologue::load_resources() {
 }
 
 void Prologue::load_scene_components() {
-  auto camera = add_component<astralix::CameraComponent>(glm::vec3(0, 4.0f, 0));
+  auto camera = add_component<astralix::CameraComponent>(glm::vec3(0, 2.0f, 0));
   auto strategy = std::make_unique<astralix::PointStrategy>();
   auto light =
       add_component<astralix::LightComponent>(std::move(strategy), camera);
@@ -65,27 +65,24 @@ void Prologue::load_scene_components() {
 
   auto manager = Engine::get()->get_entity_manager();
   manager->add_entity<astralix::Skybox>("cubemaps::skybox", "shaders::skybox");
-
-  auto post_processing =
-      manager->add_entity<astralix::PostProcessing>("shaders::post_processing");
 }
 
 Either<BaseException, Unit> Prologue::load_player() {
-
-  auto create_player = []() {
+  auto create_player = [](std::string shader) {
     auto player =
         Engine::get()->get_entity_manager()->add_entity<astralix::Object>(
             glm::vec3(0.0f, 0.6f, 0.0f));
 
     auto resource = player.get_component<astralix::ResourceComponent>();
-    resource->attach_shader("shaders::lighting");
+    resource->attach_shader(shader);
 
     player.add_component<astralix::ModelComponent>()->attach_model(
         "models::player::warrior");
     player.add_component<astralix::MeshCollisionComponent>();
   };
 
-  create_player();
+  create_player("shaders::lighting");
+  create_player("shaders::visualize_normal");
 
   return Unit();
 }
