@@ -17,7 +17,8 @@ uniform mat4 model;
 
 void main() {
   obj_coordinates.fragment = vec3(model * vec4(position, 1.));
-  obj_coordinates.normal   = mat3(transpose(inverse(model))) * normal;
+  mat3 normal_matrix       = mat3(transpose(inverse(model)));
+  obj_coordinates.normal   = normalize(normal_matrix * normal);
   obj_coordinates.texture  = texture_cord;
 
   gl_Position = projection * view * vec4(obj_coordinates.fragment, 1.);
