@@ -15,6 +15,7 @@ Engine::~Engine() {
   delete m_entity_manager;
   delete m_component_manager;
   delete m_resource_manager;
+  delete m_render_configuration;
 };
 
 void Engine::end() { delete m_instance; }
@@ -24,6 +25,8 @@ Engine::Engine()
       m_system_manager(new SystemManager()) {
   m_entity_manager = new EntityManager(m_component_manager);
   m_resource_manager = new ResourceManager();
+  m_render_configuration =
+      new RenderConfiguration({.samples = 4, .is_enabled = true});
 }
 
 void Engine::start() {

@@ -5,6 +5,7 @@
 #include "ecs/managers/entity-manager.hpp"
 #include "ecs/managers/system-manager.hpp"
 #include "managers/resource-manager.hpp"
+#include "render-configuration.hpp"
 
 namespace astralix {
 
@@ -26,10 +27,15 @@ public:
   SystemManager *get_system_manager() { return m_system_manager; }
   ComponentManager *get_component_manager() { return m_component_manager; }
   ResourceManager *get_resource_manager() { return m_resource_manager; }
+  RenderConfiguration *get_render_configuration() {
+    return m_render_configuration;
+  };
 
 private:
   Engine();
   ~Engine();
+
+  RenderConfiguration *m_render_configuration;
 
   SystemManager *m_system_manager;
   ComponentManager *m_component_manager;
