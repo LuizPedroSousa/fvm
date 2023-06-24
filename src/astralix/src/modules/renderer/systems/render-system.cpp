@@ -17,6 +17,8 @@ RenderSystem::RenderSystem()
     : m_clear_color(glm::vec4(0.5f, 0.5f, 1.0f, 0.0f)){};
 
 void RenderSystem::start() {
+  glEnable(GL_MULTISAMPLE);
+
   auto manager = Engine::get()->get_entity_manager();
 
   auto post_processing = manager->get_entity<PostProcessing>();
@@ -39,16 +41,14 @@ void RenderSystem::fixed_update(double fixed_dt){
 };
 
 void RenderSystem::pre_update(double dt) {
-  auto manager         = Engine::get()->get_entity_manager();
+  auto manager = Engine::get()->get_entity_manager();
   auto post_processing = manager->get_entity<PostProcessing>();
-
   bool has_post_processing =
       post_processing != nullptr && post_processing->is_active();
-
   int default_framebuffer = 0;
 
   glBindFramebuffer(GL_FRAMEBUFFER, has_post_processing
-                                        ? post_processing->get_framebuffer()
+                                        ? post_processing->get_framebuffer().fbo
                                         : default_framebuffer);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);
@@ -59,7 +59,6 @@ void RenderSystem::pre_update(double dt) {
 
 void RenderSystem::update(double dt) {
   auto manager = Engine::get()->get_entity_manager();
-
   auto skybox = manager->get_entity<Skybox>();
 
   manager->for_each<Object>([&](Object *object) { object->update(); });
@@ -70,20 +69,11 @@ void RenderSystem::update(double dt) {
 };
 
 void RenderSystem::post_update(double dt) {
-
   auto entity_manager = Engine::get()->get_entity_manager();
-
   auto post_processing = entity_manager->get_entity<PostProcessing>();
 
   if (post_processing != nullptr) {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_STENCIL_TEST);
-    glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z,
-                 m_clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    post_processing->post_update();
+    post_processing->post_update(m_clear_color);
   }
 };
 
