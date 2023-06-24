@@ -36,6 +36,11 @@ Window::Window() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  RenderConfiguration *render_configuration =
+      Engine::get()->get_render_configuration();
+  if (render_configuration->has_msaa_enabled())
+    glfwWindowHint(GLFW_SAMPLES, render_configuration->msaa.samples);
 }
 
 GLFWwindow *Window::get_value() { return Window::get()->m_value; }
