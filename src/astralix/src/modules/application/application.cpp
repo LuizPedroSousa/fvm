@@ -10,8 +10,8 @@ Application *Application::m_instance = nullptr;
 Application *Application::init() {
   m_instance = new Application;
 
-  Window::init();
   Engine::init();
+  Window::init();
   Time::init();
 
   return m_instance;
