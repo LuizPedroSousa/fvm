@@ -2,29 +2,11 @@
 #include "exceptions/base-exception.hpp"
 #include "iostream"
 #include "stdio.h"
-#include "tuple"
-#include "vector"
 #include <stdexcept>
 
 #include <type_traits>
 
 namespace astralix {
-#define ASSERT(EXPRESSION, MESSAGE)                                            \
-  if (EXPRESSION)                                                              \
-  return BaseException(__FILE__, __LINE__, MESSAGE)
-
-#define ASSERT_THROW(EXPRESSION, MESSAGE)                                      \
-  if (EXPRESSION) {                                                            \
-    throw BaseException(__FILE__, __LINE__, MESSAGE);                          \
-  }
-
-#define ASSERT_COMPARE(EXPRESSION)                                             \
-  if (EXPRESSION.isLeft())                                                     \
-  return EXPRESSION.left()
-
-#define ASSERT_COMPARE_THROW(EXPRESSION)                                       \
-  if (EXPRESSION.isLeft())                                                     \
-  throw EXPRESSION.left()
 
 class Unit {
 public:
