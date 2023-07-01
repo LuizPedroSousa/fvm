@@ -18,7 +18,7 @@ Application *Application::init() {
 }
 
 void Application::start() {
-  Window::get()->open(800, 600);
+  Window::get()->open(1600, 900);
   Engine::get()->start();
 }
 
@@ -37,6 +37,8 @@ void Application::run() {
 
   delete m_instance;
 }
+
+void Application::end() { delete m_instance; }
 
 Application::~Application() {
   Engine::get()->end();

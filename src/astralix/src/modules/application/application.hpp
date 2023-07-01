@@ -12,6 +12,7 @@ public:
   void run();
 
   static Application *get() { return m_instance; }
+  static void end();
 
 private:
   Application(){};
