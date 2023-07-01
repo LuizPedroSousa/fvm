@@ -15,7 +15,7 @@ Either<BaseException, Model> Model::create(ResourceID id,
       get_path(filename),
       aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
-  ASSERT(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE,
+  ASTRA_ASSERT(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE,
          importer.GetErrorString());
 
   std::vector<Mesh> meshes;
@@ -24,7 +24,7 @@ Either<BaseException, Model> Model::create(ResourceID id,
   auto has_node_processed =
       process_nodes(scene->mRootNode, scene, meshes, materials);
 
-  ASSERT_COMPARE_THROW(has_node_processed);
+  ASTRA_ASSERT_EITHER_THROW(has_node_processed);
 
   return Model(id, filename, meshes, materials);
 };
@@ -37,7 +37,7 @@ Model::process_nodes(const aiNode *current_node, const aiScene *scene,
     aiMesh *mesh = scene->mMeshes[current_node->mMeshes[i]];
 
     auto processed_mesh = process_mesh(mesh, scene, materials);
-    ASSERT_COMPARE(processed_mesh);
+    ASTRA_ASSERT_EITHER(processed_mesh);
 
     meshes.push_back(processed_mesh.right());
   }
@@ -90,7 +90,7 @@ Model::process_mesh(aiMesh *node_mesh, const aiScene *scene,
     if (ai_material->GetTextureCount(aiTextureType_DIFFUSE) > 0 ||
         ai_material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
 
-      auto resource_manager = Engine::get()->get_resource_manager();
+      auto resource_manager = ResourceManager::get();
 
       std::string name = ai_material->GetName().C_Str();
 
