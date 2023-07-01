@@ -13,11 +13,6 @@ public:
   void pre_update(double dt) override;
   void update(double dt) override;
   void post_update(double dt) override;
-
-  glm::vec4 *get_clear_color() { return &m_clear_color; };
-
-private:
-  glm::vec4 m_clear_color;
 };
 
 } // namespace astralix
