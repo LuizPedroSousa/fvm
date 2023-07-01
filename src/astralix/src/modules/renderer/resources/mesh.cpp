@@ -6,7 +6,7 @@
 
 namespace astralix {
 
-Mesh Mesh::plane_mesh(float size) {
+Mesh Mesh::plane(float size) {
   float half_length = size / 2.0f;
 
   std::vector<Vertex> vertices = {
@@ -28,7 +28,7 @@ Mesh Mesh::plane_mesh(float size) {
   return Mesh(vertices, indices);
 }
 
-Mesh Mesh::cube_mesh(float size) {
+Mesh Mesh::cube(float size) {
   float half_length = size / 2.0f;
 
   std::vector<Vertex> vertices = {
@@ -113,6 +113,55 @@ Mesh Mesh::cube_mesh(float size) {
   return Mesh(vertices, indices);
 }
 
+Mesh Mesh::sphere() {
+
+  const int segments = 32;
+  const int rings = 16;
+  const float radius = 0.5f;
+
+  std::vector<Vertex> vertices;
+  std::vector<unsigned int> indices;
+
+  const float pi = std::numbers::pi_v<float>;
+
+  for (int ring = 0; ring <= rings; ++ring) {
+    float phi = ring * pi / rings;
+    float y = radius * std::cos(phi);
+
+    for (int segment = 0; segment <= segments; ++segment) {
+      float theta = segment * 2 * pi / segments;
+      float x = radius * std::sin(phi) * std::cos(theta);
+      float z = radius * std::sin(phi) * std::sin(theta);
+
+      Vertex vertex;
+      vertex.position = glm::vec3(x, y, z);
+      vertex.normal = glm::normalize(vertex.position);
+      vertex.texture_cordinates =
+          glm::vec2(static_cast<float>(segment) / segments,
+                    static_cast<float>(ring) / rings);
+
+      vertices.push_back(vertex);
+    }
+  }
+
+  for (int ring = 0; ring < rings; ++ring) {
+    for (int segment = 0; segment < segments; ++segment) {
+      int current_ring = ring * (segments + 1);
+      int next_ring = (ring + 1) * (segments + 1);
+
+      indices.push_back(current_ring + segment);
+      indices.push_back(next_ring + segment);
+      indices.push_back(next_ring + segment + 1);
+
+      indices.push_back(current_ring + segment);
+      indices.push_back(next_ring + segment + 1);
+      indices.push_back(current_ring + segment + 1);
+    }
+  }
+
+  return Mesh(vertices, indices);
+}
+
 Mesh Mesh::quad(float size) {
   std::vector<Vertex> vertices = {
       {glm::vec3(-size, size, 0.0f), glm::vec3(0.0f), glm::vec2(0.0f, 1.0f)},
@@ -129,23 +178,30 @@ Mesh Mesh::quad(float size) {
   return Mesh(vertices, indices);
 }
 
-Mesh Mesh::capsule_mesh(float radius, float height, int segments, int rings) {
+Mesh Mesh::capsule(float radius, float height, int segments, int rings) {
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
 
   const float pi = std::numbers::pi_v<float>;
+  const float halfHeight = height * 0.5f;
 
   for (int ring = 0; ring <= rings; ++ring) {
     float phi = ring * pi / rings;
-    float y   = height * (ring / static_cast<float>(rings)) - height * 0.5f;
+    float y = std::cos(phi);
+    float ringRadius = std::sin(phi);
 
     for (int segment = 0; segment <= segments; ++segment) {
       float theta = segment * 2 * pi / segments;
-      float x     = radius * std::cos(theta) * std::sin(phi);
-      float z     = radius * std::sin(theta) * std::sin(phi);
+      float x = std::cos(theta) * ringRadius;
+      float z = std::sin(theta) * ringRadius;
 
       Vertex vertex;
-      vertex.position = glm::vec3(x, y, z);
+      vertex.position =
+          glm::vec3(x * radius, y * radius * halfHeight, z * radius);
+      vertex.normal = glm::normalize(vertex.position);
+      vertex.texture_cordinates =
+          glm::vec2(static_cast<float>(segment) / segments,
+                    static_cast<float>(ring) / rings);
 
       vertices.push_back(vertex);
     }
@@ -153,16 +209,16 @@ Mesh Mesh::capsule_mesh(float radius, float height, int segments, int rings) {
 
   for (int ring = 0; ring < rings; ++ring) {
     for (int segment = 0; segment < segments; ++segment) {
-      int current_ring = ring * (segments + 1);
-      int next_ring    = (ring + 1) * (segments + 1);
+      int currentRing = ring * (segments + 1);
+      int nextRing = (ring + 1) * (segments + 1);
 
-      indices.push_back(current_ring + segment);
-      indices.push_back(next_ring + segment);
-      indices.push_back(next_ring + segment + 1);
+      indices.push_back(currentRing + segment);
+      indices.push_back(nextRing + segment);
+      indices.push_back(nextRing + segment + 1);
 
-      indices.push_back(current_ring + segment);
-      indices.push_back(next_ring + segment + 1);
-      indices.push_back(current_ring + segment + 1);
+      indices.push_back(currentRing + segment);
+      indices.push_back(nextRing + segment + 1);
+      indices.push_back(currentRing + segment + 1);
     }
   }
 

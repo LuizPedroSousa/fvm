@@ -26,15 +26,17 @@ public:
   std::vector<unsigned int> indices;
   Buffers m_buffers;
 
-  static Mesh capsule_mesh(float radius, float height, int segments, int rings);
-  static Mesh cube_mesh(float size);
-  static Mesh skybox_mesh();
-  static Mesh plane_mesh(float size);
-  static Mesh quad(float size);
+  static Mesh capsule(float radius = 0.5f, float height = 1.0f,
+                      int segments = 16, int rings = 8);
+
+  static Mesh cube(float size = 2.0f);
+  static Mesh plane(float size = 2.0f);
+  static Mesh quad(float size = 1.0f);
+  static Mesh sphere();
 
   Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     this->vertices = vertices;
-    this->indices  = indices;
+    this->indices = indices;
   };
 
   ~Mesh();
