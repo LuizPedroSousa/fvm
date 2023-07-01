@@ -1,3 +1,4 @@
+#pragma once
 #include "ecs/systems/system.hpp"
 
 namespace astralix {
@@ -13,4 +14,5 @@ public:
   void update(double dt) override;
   void post_update(double dt) override;
 };
+
 } // namespace astralix

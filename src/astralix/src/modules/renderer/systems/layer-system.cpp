@@ -1,14 +1,14 @@
+
 #include "layer-system.hpp"
 #include "entities/layer.hpp"
-#include "window.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/impl/imgui_impl_glfw.h"
-#include "imgui/impl/imgui_impl_opengl3.h"
+#include "overlays/dockspace-overlay.hpp"
 
-#include "layers/background-layer.hpp"
-#include "layers/object-list-layer.hpp"
-#include "layers/scene-layer.hpp"
+#include "layers/console-layer.hpp"
+#include "layers/content-browser-layer.hpp"
+#include "layers/properties-layer.hpp"
+#include "layers/scene-hierarchy-layer.hpp"
+#include "layers/viewport-layer.hpp"
 
 #include "managers/layer-manager.hpp"
 
@@ -17,45 +17,42 @@ namespace astralix {
 LayerSystem::LayerSystem() { LayerManager::init(); }
 
 void LayerSystem::start() {
-  // Initialize ImGui
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO &io = ImGui::GetIO();
-  ImGui_ImplGlfw_InitForOpenGL(Window::get_value(), true);
-  ImGui_ImplOpenGL3_Init("#version 330");
 
-  LayerManager::get()->add_layer<BackgroundLayer>();
-  LayerManager::get()->add_layer<ObjectListLayer>();
-  LayerManager::get()->add_layer<SceneLayer>();
+  auto layer_manager = LayerManager::get();
+
+  layer_manager->add_overlay<DockspaceOverlay>();
+
+  layer_manager->add_layer<SceneHierarchyLayer>();
+  layer_manager->add_layer<ViewportLayer>();
+  layer_manager->add_layer<ConsoleLayer>();
+  layer_manager->add_layer<ContentBrowserLayer>();
+  layer_manager->add_layer<PropertiesLayer>();
+
+  layer_manager->for_each([](Overlay *overlay) { overlay->start(); });
+  layer_manager->for_each([](Layer *layer) { layer->start(); });
 };
 
 void LayerSystem::fixed_update(double fixed_dt){};
 
 void LayerSystem::pre_update(double dt) {
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplGlfw_NewFrame();
-  ImGui::NewFrame();
+  auto layer_manager = LayerManager::get();
+
+  layer_manager->for_each([](Overlay *overlay) { overlay->pre_update(); });
 };
 
 void LayerSystem::update(double dt) {
-  auto manager = LayerManager::get();
+  auto layer_manager = LayerManager::get();
 
-  manager->for_each([](Layer *layer) {
-    if (layer->is_active()) {
-      layer->update();
-    }
-  });
+  layer_manager->for_each([](Overlay *overlay) { overlay->update(); });
+  layer_manager->for_each([](Layer *layer) { layer->update(); });
 };
 
 void LayerSystem::post_update(double dt) {
-  ImGui::Render();
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  auto layer_manager = LayerManager::get();
+
+  layer_manager->for_each([](Overlay *overlay) { overlay->post_update(); });
 };
 
-LayerSystem::~LayerSystem() {
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
-}
+LayerSystem::~LayerSystem() {}
 
 } // namespace astralix
