@@ -8,9 +8,10 @@
 namespace astralix {
 
 MeshComponent::MeshComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(MeshComponent){};
+    : COMPONENT_INIT(MeshComponent, "Mesh Renderer", true){};
 
 void MeshComponent::start() {
+
   for (int i = 0; i < m_meshes.size(); i++) {
     create_buffers(&m_meshes[i]);
   }
@@ -57,13 +58,9 @@ void MeshComponent::create_buffers(Mesh *mesh) {
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                         (void *)offsetof(Vertex, texture_cordinates));
 
-  unbind_buffer();
+  glBindVertexArray(0);
 
   mesh->m_buffers = {.VAO = VAO, .VBO = VBO, .EBO = EBO};
 };
-
-void MeshComponent::bind_buffer(u_int *buffer) {}
-
-void MeshComponent::unbind_buffer() { glBindVertexArray(0); }
 
 } // namespace astralix

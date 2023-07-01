@@ -28,8 +28,6 @@ public:
 
 private:
   void create_buffers(Mesh *mesh);
-  void bind_buffer(u_int *buffer);
-  void unbind_buffer();
 
   std::vector<Mesh> m_meshes;
 };
