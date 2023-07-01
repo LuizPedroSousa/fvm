@@ -1,7 +1,9 @@
+#pragma once
 #include "assimp/scene.h"
 #include "ecs/components/component.hpp"
 #include "resources/material.hpp"
 #include "resources/texture.hpp"
+#include "string"
 
 namespace astralix {
 
@@ -14,6 +16,9 @@ public:
 
   void attach_material(ResourceID material);
   void attach_materials(std::vector<ResourceID> materials);
+
+private:
+  static std::string get_name(const char *prefix, int count);
 };
 
 } // namespace astralix

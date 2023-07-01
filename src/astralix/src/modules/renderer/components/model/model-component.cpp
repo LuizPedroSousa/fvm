@@ -1,5 +1,4 @@
 #include "components/material/material-component.hpp"
-#include "engine.hpp"
 
 #include "components/mesh/mesh-component.hpp"
 #include "components/model/model-component.hpp"
@@ -8,17 +7,18 @@
 namespace astralix {
 
 ModelComponent::ModelComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(ModelComponent) {}
+    : COMPONENT_INIT(ModelComponent, "Model Renderer", true) {}
 
 Model *ModelComponent::attach_model(ResourceID id) {
-  auto resource_manager = Engine::get()->get_resource_manager();
+  auto resource_manager = ResourceManager::get();
 
   auto model = resource_manager->get_model_by_id(id);
 
-  auto owner = Engine::get()->get_owner(get_owner_id());
+  auto owner = get_owner();
 
-  owner->get_component<MeshComponent>()->attach_meshes(model->meshes);
-  owner->get_component<MaterialComponent>()->attach_materials(model->materials);
+  owner->get_or_add_component<MeshComponent>()->attach_meshes(model->meshes);
+  owner->get_or_add_component<MaterialComponent>()->attach_materials(
+      model->materials);
 
   m_models.push_back(id);
 
