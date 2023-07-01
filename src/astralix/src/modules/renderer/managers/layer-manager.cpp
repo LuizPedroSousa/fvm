@@ -9,8 +9,8 @@ void LayerManager::init() {
     m_instance = new LayerManager;
 }
 
-LayerManager::LayerManager() : m_component_manager(new ComponentManager()) {
-  m_entity_manager = new EntityManager(m_component_manager);
-};
+LayerManager::LayerManager() { m_context = new LayerContext; };
+
+LayerManager::~LayerManager() { delete m_context; };
 
 } // namespace astralix
