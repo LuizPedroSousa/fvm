@@ -6,15 +6,13 @@
 namespace astralix {
 
 MeshCollisionComponent::MeshCollisionComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(MeshCollisionComponent){};
+    : COMPONENT_INIT(MeshCollisionComponent, "Mesh Collision", true){};
 
 void MeshCollisionComponent::start() {}
 
 glm::vec3
 MeshCollisionComponent::get_support(MeshCollisionComponent *other_collider,
                                     glm::vec3 direction) {
-  auto other_collider_owner =
-      Engine::get()->get_owner(other_collider->get_owner_id());
 
   // vertex minkowski difference
   return find_furthest_point(direction, vertices) -
@@ -41,16 +39,10 @@ MeshCollisionComponent::find_furthest_point(glm::vec3 direction,
 }
 
 bool MeshCollisionComponent::aabb_intersect(MeshCollisionComponent *other) {
-  auto position = Engine::get()
-                      ->get_owner(get_owner_id())
-                      ->get_component<TransformComponent>()
-                      ->get_render_transform()
-                      ->position;
-  auto other_position = Engine::get()
-                            ->get_owner(other->get_owner_id())
-                            ->get_component<TransformComponent>()
-                            ->get_render_transform()
-                            ->position;
+  auto position = get_owner()->get_component<TransformComponent>()->position;
+
+  auto other_position =
+      other->get_owner()->get_component<TransformComponent>()->position;
 
   glm::vec3 min_point, max_point;
   glm::vec3 other_min_point, other_max_point;

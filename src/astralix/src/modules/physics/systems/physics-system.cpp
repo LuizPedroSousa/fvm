@@ -12,7 +12,7 @@ namespace astralix {
 PhysicsSystem::PhysicsSystem(){};
 
 void PhysicsSystem::start() {
-  auto entity_manager = Engine::get()->get_entity_manager();
+  auto entity_manager = EntityManager::get();
 
   entity_manager->for_each<Object>([](Object *object) {
     auto mesh_collision_component =
@@ -33,8 +33,8 @@ void PhysicsSystem::pre_update(double dt){
 };
 
 void PhysicsSystem::update(double dt) {
-  auto component_manager = Engine::get()->get_component_manager();
-  auto entity_manager = Engine::get()->get_entity_manager();
+  auto component_manager = ComponentManager::get();
+  auto entity_manager = EntityManager::get();
 
   entity_manager->for_each<Object>([dt](Object *object) {
     auto rigidbody_component = object->get_component<RigidBodyComponent>();
