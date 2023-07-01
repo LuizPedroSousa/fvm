@@ -1,46 +1,41 @@
 #pragma once
 #include "ecs/entities/entity.hpp"
 
+#include "framebuffer.hpp"
+
 #include "ecs/managers/component-manager.hpp"
 #include "ecs/managers/entity-manager.hpp"
 #include "ecs/managers/system-manager.hpp"
 #include "managers/resource-manager.hpp"
-#include "render-configuration.hpp"
+#include "managers/scene-manager.hpp"
+#include "renderer-api.hpp"
 
 namespace astralix {
 
 class Engine {
 public:
-  static Engine *get() { return m_instance; }
   static void init();
   void end();
+
+  static Engine *get() { return m_instance; }
 
   void start();
   void update();
 
-  EntityManager *get_entity_manager() { return m_entity_manager; }
-
-  const IEntity *get_owner(const EntityID id) {
-    return m_entity_manager->get_entity(id);
-  }
-
-  SystemManager *get_system_manager() { return m_system_manager; }
-  ComponentManager *get_component_manager() { return m_component_manager; }
-  ResourceManager *get_resource_manager() { return m_resource_manager; }
-  RenderConfiguration *get_render_configuration() {
-    return m_render_configuration;
+  struct MSAA {
+    int samples;
+    bool is_enabled;
   };
+
+  bool has_msaa_enabled() { return msaa.is_enabled; }
+
+  Ref<Framebuffer> framebuffer;
+  Scope<RendererAPI> renderer_api;
+  MSAA msaa;
 
 private:
   Engine();
-  ~Engine();
-
-  RenderConfiguration *m_render_configuration;
-
-  SystemManager *m_system_manager;
-  ComponentManager *m_component_manager;
-  EntityManager *m_entity_manager;
-  ResourceManager *m_resource_manager;
+  ~Engine() = default;
 
   static Engine *m_instance;
 };

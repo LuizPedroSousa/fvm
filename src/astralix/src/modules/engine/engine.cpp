@@ -10,36 +10,41 @@ Engine *Engine::m_instance = nullptr;
 
 void Engine::init() { m_instance = new Engine; }
 
-Engine::~Engine() {
-  delete m_system_manager;
-  delete m_entity_manager;
-  delete m_component_manager;
-  delete m_resource_manager;
-  delete m_render_configuration;
-};
-
 void Engine::end() { delete m_instance; }
 
-Engine::Engine()
-    : m_component_manager(new ComponentManager()),
-      m_system_manager(new SystemManager()) {
-  m_entity_manager = new EntityManager(m_component_manager);
-  m_resource_manager = new ResourceManager();
-  m_render_configuration =
-      new RenderConfiguration({.samples = 4, .is_enabled = true});
+Engine::Engine() {
+  this->msaa = {.samples = 4, .is_enabled = false};
+
+  EntityManager::init();
+  ComponentManager::init();
+
+  SceneManager::init();
+  ResourceManager::init();
+  SystemManager::init();
+
+  this->renderer_api = std::move(RendererAPI::create(RendererAPI::API::OpenGL));
 }
 
 void Engine::start() {
-  m_system_manager->add_system<SceneSystem>();
-  m_system_manager->add_system<RenderSystem>();
-  m_system_manager->add_system<PhysicsSystem>();
-  m_system_manager->add_system<LayerSystem>();
+  FramebufferSpecification framebuffer_spec;
+  framebuffer_spec.attachments = {FramebufferTextureFormat::RGBA8,
+                                  FramebufferTextureFormat::RED_INTEGER,
+                                  FramebufferTextureFormat::Depth};
+  framebuffer_spec.width = 1280;
+  framebuffer_spec.height = 720;
+  framebuffer = std::move(Framebuffer::create(framebuffer_spec));
 
-  m_system_manager->start();
+  auto system_manager = SystemManager::get();
+
+  system_manager->add_system<SceneSystem>();
+  system_manager->add_system<RenderSystem>();
+  system_manager->add_system<PhysicsSystem>();
+  system_manager->add_system<LayerSystem>();
+  system_manager->start();
 }
 
 void Engine::update() {
-  m_system_manager->update(Time::get()->get_deltatime());
+  SystemManager::get()->update(Time::get()->get_deltatime());
 }
 
 } // namespace astralix
