@@ -1,5 +1,4 @@
 #pragma once
-#include "components/camera/camera-component.hpp"
 #include "strategy.hpp"
 
 namespace astralix {
@@ -8,8 +7,7 @@ class SpotLightStrategy : public LightStrategy {
 public:
   SpotLightStrategy();
 
-  void update(LightSource *source, Object *object,
-              CameraComponent *camera) override;
+  void update(Object *source, Object *object, Object *camera) override;
 };
 
 } // namespace astralix

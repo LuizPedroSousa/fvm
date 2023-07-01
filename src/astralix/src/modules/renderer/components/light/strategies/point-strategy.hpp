@@ -8,8 +8,7 @@ public:
   PointStrategy(){
       //
   };
-  void update(LightSource *source, Object *object,
-              CameraComponent *camera) override;
+  void update(Object *source, Object *object, Object *camera) override;
 };
 
 } // namespace astralix
