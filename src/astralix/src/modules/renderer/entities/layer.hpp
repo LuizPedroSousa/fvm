@@ -1,17 +1,16 @@
 #pragma once
-#include "ecs/entities/entity.hpp"
-#include "imgui.h"
+#include "imgui/imgui.h"
+
+#include "imgui/imgui_internal.h"
+#include "imgui/misc/cpp/imgui_stdlib.h"
 
 namespace astralix {
-class Layer : public Entity<Layer> {
+class Layer {
 
 public:
-  Layer() {}
+  Layer(const std::string &name) : name(name) {}
 
-  Layer(ENTITY_INIT_PARAMS) : ENTITY_INIT() {}
-
-  void on_enable() override{};
-  void on_disable() override{};
+  std::string name;
 
   virtual void start() = 0;
   virtual void update() = 0;
