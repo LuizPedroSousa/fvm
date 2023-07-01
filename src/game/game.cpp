@@ -4,6 +4,4 @@
 
 Game::Game() {}
 
-void Game::start() {
-  astralix::Engine::get()->get_entity_manager()->add_entity<Prologue>();
-}
+void Game::start() { astralix::SceneManager::get()->add_scene<Prologue>(); }
