@@ -1,4 +1,5 @@
 #include "shader.hpp"
+#include "assert.hpp"
 #include "filesystem"
 #include "fstream"
 #include "glad/glad.h"
@@ -22,43 +23,39 @@ Shader::Shader(RESOURCE_INIT_PARAMS, unsigned int vertex,
                const char *fragment_filename, unsigned int geometry,
                const char *geometry_filename)
     : Shader(id, vertex, vertex_filename, fragment, fragment_filename) {
-  this->geometry            = geometry;
+  this->geometry = geometry;
   this->m_geometry_filename = geometry_filename;
 }
 
-Either<BaseException, Shader> Shader::create(ResourceID id,
-                                             const char *vertex_filename,
-                                             const char *fragment_filename,
-                                             const char *geometry_filename) {
-  auto vertex = compile(vertex_filename, GL_VERTEX_SHADER);
+Either<BaseException, Shader> Shader::create(CreateShaderDTO dto) {
+  auto vertex = compile(dto.vertex_filename, GL_VERTEX_SHADER);
 
-  ASSERT_COMPARE(vertex);
+  ASTRA_ASSERT_EITHER(vertex);
 
-  auto fragment = compile(fragment_filename, GL_FRAGMENT_SHADER);
+  auto fragment = compile(dto.fragment_filename, GL_FRAGMENT_SHADER);
 
-  ASSERT_COMPARE(fragment);
+  ASTRA_ASSERT_EITHER(fragment);
 
-  if (geometry_filename != NULL) {
-    auto geometry = compile(geometry_filename, GL_GEOMETRY_SHADER);
+  if (dto.geometry_filename != NULL) {
+    auto geometry = compile(dto.geometry_filename, GL_GEOMETRY_SHADER);
 
-    ASSERT_COMPARE(geometry);
+    ASTRA_ASSERT_EITHER(geometry);
 
-    return Shader(id, vertex.right(), vertex_filename, fragment.right(),
-                  fragment_filename, geometry.right(), geometry_filename);
+    return Shader(dto.id, vertex.right(), dto.vertex_filename, fragment.right(),
+                  dto.fragment_filename, geometry.right(),
+                  dto.geometry_filename);
   }
 
-  return Shader(id, vertex.right(), vertex_filename, fragment.right(),
-                fragment_filename);
+  return Shader(dto.id, vertex.right(), dto.vertex_filename, fragment.right(),
+                dto.fragment_filename);
 }
 
-Either<BaseException, Shader *> create_many(
-    std::tuple<ResourceID, const char *, const char *, const char *> files[],
-    size_t size) {
+Either<BaseException, Shader *> create_many(CreateShaderDTO dtos[],
+                                            size_t size) {
   Shader shaders[size * 2];
 
   for (int i = 0; i <= size - 1; i++) {
-    auto [id, vertex, fragment, geometry] = files[i];
-    auto shader = Shader::create(id, vertex, fragment, geometry);
+    auto shader = Shader::create(dtos[i]);
 
     if (shader.isLeft()) {
       return shader.left();

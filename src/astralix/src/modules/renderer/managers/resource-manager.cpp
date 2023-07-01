@@ -58,49 +58,6 @@ Material *ResourceManager::get_material_by_id(ResourceID id) {
   return nullptr;
 }
 
-Texture *ResourceManager::load_texture(ResourceID id, std::string name,
-                                       const char *filename) {
-  auto texture_exists = get_texture_by_id(id);
-
-  if (texture_exists != nullptr) {
-    return texture_exists;
-  }
-
-  auto texture_created = Texture::create(id, name, filename);
-
-  ASSERT_COMPARE_THROW(texture_created);
-
-  Scope<Texture> texture_ptr = create_scope<Texture>(texture_created.right());
-
-  auto inserted_texture = m_texture_table.emplace(id, std::move(texture_ptr));
-
-  ASSERT_THROW(!inserted_texture.second, "can't insert texture");
-
-  return m_texture_table[id].get();
-}
-
-Texture *ResourceManager::load_cubemap(ResourceID id, std::string name,
-                                       std::vector<std::string> faces) {
-  auto cubemap_exists = get_cubemap_by_id(id);
-
-  if (cubemap_exists != nullptr) {
-    return cubemap_exists;
-  }
-
-  auto created_cubemap = Texture::create_cubemap(id, name, faces);
-
-  ASSERT_COMPARE_THROW(created_cubemap);
-
-  Scope<Texture> texture_ptr = create_scope<Texture>(created_cubemap.right());
-
-  auto inserted_texture = m_texture_table.emplace(id, std::move(texture_ptr));
-
-  ASSERT_THROW(!inserted_texture.second,
-               "can't insert cubemap into textures table");
-
-  return m_texture_table[id].get();
-}
-
 Texture *ResourceManager::get_cubemap_by_id(ResourceID id) {
   auto it = m_texture_table.find(id);
 
@@ -111,32 +68,80 @@ Texture *ResourceManager::get_cubemap_by_id(ResourceID id) {
   return nullptr;
 }
 
-Shader *ResourceManager::load_shader(LoadShaderDTO dto) {
+Texture *ResourceManager::load_texture(CreateTextureDTO dto) {
+  auto texture_exists = get_texture_by_id(dto.id);
+
+  if (texture_exists != nullptr) {
+    return texture_exists;
+  }
+
+  auto texture_created = Texture::create(dto);
+
+  ASTRA_ASSERT_EITHER_THROW(texture_created);
+
+  Scope<Texture> texture_ptr = create_scope<Texture>(texture_created.right());
+
+  auto inserted_texture =
+      m_texture_table.emplace(dto.id, std::move(texture_ptr));
+
+  ASTRA_ASSERT_THROW(!inserted_texture.second, "can't insert texture");
+
+  return m_texture_table[dto.id].get();
+}
+
+void ResourceManager::load_textures(
+    std::initializer_list<CreateTextureDTO> dtos) {
+  for (auto &dto : dtos) {
+    load_texture(dto);
+  }
+}
+
+Texture *ResourceManager::load_cubemap(ResourceID id,
+                                       std::vector<std::string> faces) {
+  auto cubemap_exists = get_cubemap_by_id(id);
+
+  if (cubemap_exists != nullptr) {
+    return cubemap_exists;
+  }
+
+  auto created_cubemap = Texture::create_cubemap(id, faces);
+
+  ASTRA_ASSERT_EITHER_THROW(created_cubemap);
+
+  Scope<Texture> texture_ptr = create_scope<Texture>(created_cubemap.right());
+
+  auto inserted_texture = m_texture_table.emplace(id, std::move(texture_ptr));
+
+  ASTRA_ASSERT_THROW(!inserted_texture.second,
+               "can't insert cubemap into textures table");
+
+  return m_texture_table[id].get();
+}
+
+Shader *ResourceManager::load_shader(CreateShaderDTO dto) {
   auto shader_exists = get_shader_by_id(dto.id);
 
   if (shader_exists != nullptr) {
     return shader_exists;
   }
 
-  auto created_shader =
-      Shader::create(dto.id, dto.vertex_filename, dto.fragment_filename,
-                     dto.geometry_filename);
+  auto created_shader = Shader::create(dto);
 
-  ASSERT_COMPARE_THROW(created_shader);
+  ASTRA_ASSERT_EITHER_THROW(created_shader);
 
   Scope<Shader> shader_ptr = create_scope<Shader>(created_shader.right());
 
   auto inserted_shader = m_shader_table.emplace(dto.id, std::move(shader_ptr));
 
-  ASSERT_THROW(!inserted_shader.second, "can't insert shader");
+  ASTRA_ASSERT_THROW(!inserted_shader.second, "can't insert shader");
 
   return shader_ptr.get();
 }
 
 void ResourceManager::load_shaders(
-    std::initializer_list<LoadShaderDTO> shaders) {
-  for (auto &shader : shaders) {
-    load_shader(shader);
+    std::initializer_list<CreateShaderDTO> dtos) {
+  for (auto &dto : dtos) {
+    load_shader(dto);
   }
 }
 
@@ -171,7 +176,7 @@ Material *ResourceManager::load_material(ResourceID material_id,
       };
 
       Texture *texture_ptr = load_texture(
-          texture_id, get_name(), ("models/" + std::string(filename)).c_str());
+          {texture_id, ("models/" + std::string(filename)).c_str()});
 
       textures.push_back(texture_ptr->get_resource_id());
     };
@@ -179,7 +184,7 @@ Material *ResourceManager::load_material(ResourceID material_id,
     return textures;
   };
 
-  auto diffuses  = get_texture(aiTextureType_DIFFUSE);
+  auto diffuses = get_texture(aiTextureType_DIFFUSE);
   auto speculars = get_texture(aiTextureType_SPECULAR);
 
   auto created_material = Material::create(material_id, diffuses, speculars);
@@ -189,7 +194,7 @@ Material *ResourceManager::load_material(ResourceID material_id,
   auto inserted_material =
       m_material_table.emplace(material_id, std::move(material_ptr));
 
-  ASSERT_THROW(!inserted_material.second, "Can't insert material");
+  ASTRA_ASSERT_THROW(!inserted_material.second, "Can't insert material");
 
   return m_material_table[material_id].get();
 }
@@ -203,11 +208,13 @@ Model *ResourceManager::load_model(ResourceID id, const char *filename) {
 
   auto model = Model::create(id, filename);
 
+  ASTRA_ASSERT_EITHER_THROW(model);
+
   Scope<Model> model_ptr = create_scope<Model>(model.right());
 
   auto inserted_moel = m_model_table.emplace(id, std::move(model_ptr));
 
-  ASSERT_THROW(!inserted_moel.second, "Can't insert model");
+  ASTRA_ASSERT_THROW(!inserted_moel.second, "Can't insert model");
 
   return model_ptr.get();
 }

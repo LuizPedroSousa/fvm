@@ -1,5 +1,6 @@
 #pragma once
 #include "assimp/scene.h"
+#include "base-manager.hpp"
 #include "base.hpp"
 #include "ecs/guid.hpp"
 #include "memory"
@@ -11,30 +12,16 @@
 
 namespace astralix {
 
-struct LoadShaderDTO {
-  ResourceID id;
-  const char *vertex_filename;
-  const char *geometry_filename;
-  const char *fragment_filename;
-
-  LoadShaderDTO(ResourceID id, const char *vertex_filename,
-                const char *fragment_filename,
-                const char *geometry_filename = NULL)
-      : id(id), vertex_filename(vertex_filename),
-        geometry_filename(geometry_filename),
-        fragment_filename(fragment_filename){};
-};
-
-class ResourceManager {
+class ResourceManager : public BaseManager<ResourceManager> {
 public:
-  Texture *load_texture(ResourceID id, std::string name, const char *filename);
+  Texture *load_texture(CreateTextureDTO);
+  void load_textures(std::initializer_list<CreateTextureDTO>);
 
-  Texture *load_cubemap(ResourceID id, std::string name,
-                        std::vector<std::string> faces);
+  Texture *load_cubemap(ResourceID id, std::vector<std::string> faces);
 
-  Shader *load_shader(LoadShaderDTO dto);
+  Shader *load_shader(CreateShaderDTO dto);
 
-  void load_shaders(std::initializer_list<LoadShaderDTO> shaders);
+  void load_shaders(std::initializer_list<CreateShaderDTO> shaders);
 
   Material *load_material(ResourceID id, aiMaterial *ai_material);
 
@@ -50,6 +37,8 @@ public:
   Material *get_material_by_id(ResourceID id);
 
   std::unordered_map<ResourceID, Scope<Material>> m_material_table;
+
+  ResourceManager() = default;
 
 private:
   std::unordered_map<ResourceID, Scope<Texture>> m_texture_table;

@@ -10,26 +10,23 @@
 namespace astralix {
 
 ShaderRenderer::ShaderRenderer() {
-  this->id  = glCreateProgram();
+  this->id = glCreateProgram();
   m_uniform = Uniform(id);
 }
 
 void ShaderRenderer::use() { glUseProgram(this->id); }
 
-Either<BaseException, Unit> ShaderRenderer::attach_many(ResourceID *shader_ids,
-                                                        size_t size) {
+void ShaderRenderer::attach_many(ResourceID *shader_ids, size_t size) {
   for (int i = 0; i < size; i++) {
-    this->attach(shader_ids[i]);
+    attach(shader_ids[i]);
   }
-
-  return Unit();
 }
 
-Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
-  auto resource_manager = Engine::get()->get_resource_manager();
-  auto shader_ptr       = resource_manager->get_shader_by_id(p_id);
+void ShaderRenderer::attach(ResourceID p_id) {
+  auto resource_manager = ResourceManager::get();
+  auto shader_ptr = resource_manager->get_shader_by_id(p_id);
 
-  ASSERT(shader_ptr == nullptr, "Shader not found");
+  ASTRA_ASSERT_THROW(shader_ptr == nullptr, "Shader not found");
 
   glAttachShader(this->id, shader_ptr->vertex);
   glAttachShader(this->id, shader_ptr->fragment);
@@ -47,7 +44,7 @@ Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
 
     glGetProgramInfoLog(this->id, 512, NULL, infoLog);
 
-    ASSERT(true, infoLog);
+    ASTRA_ASSERT_THROW(true, infoLog);
   };
 
   glDeleteShader(shader_ptr->fragment);
@@ -58,7 +55,5 @@ Either<BaseException, Unit> ShaderRenderer::attach(ResourceID p_id) {
   shader_ptr->signed_to = this->id;
 
   m_shaders.push_back(p_id);
-
-  return Unit();
 }
 } // namespace astralix

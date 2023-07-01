@@ -17,8 +17,8 @@ public:
 
   Uniform *get_uniform() { return &m_uniform; }
 
-  Either<BaseException, Unit> attach_many(ResourceID *shaders, size_t size);
-  Either<BaseException, Unit> attach(ResourceID shader);
+  void attach_many(ResourceID *shaders, size_t size);
+  void attach(ResourceID shader);
 
 private:
   Uniform m_uniform;

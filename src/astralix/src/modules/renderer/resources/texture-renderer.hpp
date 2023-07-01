@@ -6,20 +6,25 @@
 
 namespace astralix {
 
+struct TextureRenderData {
+  ResourceID id;
+  std::string name;
+};
+
 class TextureRenderer {
 public:
   TextureRenderer(){};
   void render(Uniform *uniform);
 
-  void attach(ResourceID texture_id);
-  void attach_cubemap(ResourceID cubemap_ids);
-  void attach_many(size_t size, ResourceID *texture_ids);
+  void attach(TextureRenderData data);
+  void attach_cubemap(TextureRenderData data);
+  void attach_many(size_t size, TextureRenderData *data);
 
   void start();
 
 private:
-  std::vector<ResourceID> m_textures;
-  std::vector<ResourceID> m_cubemaps;
+  std::vector<TextureRenderData> m_textures;
+  std::vector<TextureRenderData> m_cubemaps;
 };
 
 } // namespace astralix
