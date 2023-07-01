@@ -22,9 +22,9 @@ public:
     return m_shader_renderer.get_uniform();
   }
 
-  void attach_texture(ResourceID id);
-  void attach_cubemap(ResourceID id);
-  void attach_shader(ResourceID id);
+  ResourceComponent *attach_texture(TextureRenderData data);
+  ResourceComponent *attach_cubemap(TextureRenderData data);
+  ResourceComponent *attach_shader(ResourceID id);
 
 private:
   TextureRenderer m_texture_renderer;
