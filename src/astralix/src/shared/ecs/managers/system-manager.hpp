@@ -2,18 +2,17 @@
 
 #include "ecs/guid.hpp"
 
+#include "base-manager.hpp"
+#include "base.hpp"
 #include "ecs/systems/isystem.hpp"
 #include "memory"
 #include "unordered_map"
 #include "vector"
 
 namespace astralix {
-class SystemManager {
+class SystemManager : public BaseManager<SystemManager> {
 
 public:
-  SystemManager();
-  ~SystemManager();
-
   template <class T, class... Args> T *add_system(Args &&...params) {
     const SystemTypeID type_id = T::system_type_id();
 
@@ -127,6 +126,9 @@ public:
   void start();
   void fixed_update(double fixed_dt_ms);
   void update(double dt_ms);
+
+  ~SystemManager();
+  SystemManager();
 
 private:
   template <typename T>

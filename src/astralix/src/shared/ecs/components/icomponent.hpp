@@ -2,20 +2,16 @@
 
 #include "ecs/guid.hpp"
 
-#define COMPONENT_INIT_PARAMS                                                  \
-  const EntityID &owner_id, const ComponentID &component_id
-#define COMPONENT_INIT(Type) Component<Type>(owner_id, component_id)
-
 namespace astralix {
-
-class EntityManager;
 
 class IComponent {
   friend class ComponentManager;
 
 public:
-  IComponent(COMPONENT_INIT_PARAMS)
-      : m_owner_id(owner_id), m_component_id(component_id), m_active(true) {}
+  IComponent(const EntityID &owner_id, const ComponentID &component_id,
+             const std::string &name, const bool &is_removable)
+      : m_owner_id(owner_id), name(name), m_component_id(component_id),
+        m_active(true), is_removable(is_removable) {}
 
   virtual ~IComponent() = default;
 
@@ -24,6 +20,7 @@ public:
   inline const ComponentID &get_component_id() const {
     return this->m_component_id;
   }
+
   inline const EntityID &get_owner_id() const { return this->m_owner_id; }
 
   virtual ComponentTypeID get_component_type_id() const = 0;
@@ -42,7 +39,10 @@ public:
   }
 
   inline void set_active(const bool active) { this->m_active = active; }
-  inline bool is_active() const { return this->m_active; }
+  bool &is_active() { return this->m_active; }
+
+  bool is_removable;
+  std::string name;
 
 protected:
   EntityID m_owner_id;

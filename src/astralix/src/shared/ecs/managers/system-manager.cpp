@@ -3,6 +3,7 @@
 #include "map"
 
 namespace astralix {
+
 SystemManager::SystemManager() {}
 
 SystemManager::~SystemManager() {}

@@ -1,26 +1,47 @@
 #pragma once
 
-#include "ecs/entities/entity.hpp"
+#include "ecs/entities/ientity.hpp"
 #include "ecs/guid.hpp"
+#include "ecs/managers/component-manager.hpp"
 #include "functional"
 #include "unordered_map"
 
+#include "base-manager.hpp"
 #include "base.hpp"
+#include "entity-manager.hpp"
 
 namespace astralix {
 
-class EntityManager {
+class EntityManager : public BaseManager<EntityManager> {
+
 public:
-  explicit EntityManager(ComponentManager *component_manager);
-  ~EntityManager();
-  template <typename T, typename... Args> T &add_entity(Args &&...params) {
-    EntityID id         = FamilyObjectID<IEntity>::get();
-    Scope<T> entity_ptr = create_scope<T>(id, this->m_component_manager,
-                                          std::forward<Args>(params)...);
+  template <typename T, typename... Args>
+  T &add_entity(const std::string &&name = "GameObject", Args &&...params) {
+    EntityID id = FamilyObjectID<IEntity>::get();
+
+    int count = 1;
+    std::string unique_name = name;
+
+    bool name_exists = true;
+    while (name_exists) {
+      name_exists = false;
+      for (const auto &pair : m_entity_table) {
+        const Scope<IEntity> &entity = pair.second;
+        if (entity->name == unique_name) {
+          name_exists = true;
+          unique_name = name + " (" + std::to_string(count) + ")";
+          count++;
+          break;
+        }
+      }
+    }
+
+    Scope<T> entity_ptr =
+        create_scope<T>(id, unique_name, std::forward<Args>(params)...);
 
     auto created_entity = m_entity_table.emplace(id, std::move(entity_ptr));
 
-    ASSERT_THROW(!created_entity.second, "Error creating new Entity!");
+    ASTRA_ASSERT_THROW(!created_entity.second, "Error creating new Entity!");
 
     return dynamic_cast<T &>(*m_entity_table[id].get());
   }
@@ -28,6 +49,23 @@ public:
   void destroy_entity(const EntityID &entity_id);
 
   IEntity *get_entity(const EntityID &entity_id);
+
+  template <typename T> bool has_entity_with_component() {
+    auto entity = get_entity_with_component<T>();
+
+    return entity != nullptr;
+  }
+
+  template <typename T> IEntity *get_entity_with_component() {
+    for (const auto &pair : m_entity_table) {
+      const Scope<IEntity> &entity = pair.second;
+      if (entity->has_component<T>()) {
+        return entity.get();
+      }
+    }
+
+    return nullptr;
+  }
 
   template <typename T> T *get_entity() {
     EntityTypeID type_id = T::entity_type_id();
@@ -44,6 +82,14 @@ public:
 
   template <typename T> T *get_entity(const EntityID &entity_id) {
     return dynamic_cast<T *>(get_entity(entity_id));
+  }
+
+  void for_each(std::function<void(IEntity *)> fn) {
+    for (const auto &pair : m_entity_table) {
+      const Scope<IEntity> &entity = pair.second;
+
+      fn(entity.get());
+    }
   }
 
   template <typename T> void for_each(std::function<void(T *)> fn) {
@@ -68,9 +114,11 @@ public:
     return result;
   }
 
+  explicit EntityManager();
+  ~EntityManager();
+
 private:
   std::unordered_map<EntityID, Scope<IEntity>> m_entity_table;
-  ComponentManager *m_component_manager;
 };
 
 }; // namespace astralix
