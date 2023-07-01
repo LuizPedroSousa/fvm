@@ -37,10 +37,9 @@ Window::Window() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  RenderConfiguration *render_configuration =
-      Engine::get()->get_render_configuration();
-  if (render_configuration->has_msaa_enabled())
-    glfwWindowHint(GLFW_SAMPLES, render_configuration->msaa.samples);
+  auto engine = Engine::get();
+  if (engine->has_msaa_enabled())
+    glfwWindowHint(GLFW_SAMPLES, engine->msaa.samples);
 }
 
 GLFWwindow *Window::get_value() { return Window::get()->m_value; }
@@ -65,13 +64,13 @@ void Window::open(int width, int height) {
   if (window == NULL) {
     glfwTerminate();
 
-    ASSERT_THROW(true, "Couldn't create window for OpenGL");
+    ASTRA_ASSERT_THROW(true, "Couldn't create window for OpenGL");
   }
 
   glfwMakeContextCurrent(m_value);
 
-  ASSERT_THROW(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
-               "Couldn't load GLAD");
+  ASTRA_ASSERT_THROW(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
+                     "Couldn't load GLAD");
 
   glViewport(0, 0, m_width, m_height);
 
