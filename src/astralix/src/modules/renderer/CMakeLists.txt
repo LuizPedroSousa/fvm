@@ -14,4 +14,4 @@ include_directories(${PROJECT_SOURCE_DIR}/external)
 # Define os alvos que a biblioteca do módulo depende
 target_include_directories(renderer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${ASSIMP_INCLUDE_DIRS})
 
-target_link_libraries(renderer ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} assimp window application glm stb_image shared glad)
+target_link_libraries(renderer ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} assimp engine window application glm stb_image shared glad)
