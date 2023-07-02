@@ -5,13 +5,7 @@
 namespace astralix {
 
 Scope<RendererAPI> RendererAPI::create(const API &p_api) {
-  switch (p_api) {
-  case API::OpenGL:
-    return create_scope<OpenGLRendererAPI>();
-
-  default:
-    ASTRA_ASSERT_THROW(true, "NONE isn't a valid renderer API type");
-  }
+  return create_renderer_component_scope<RendererAPI, OpenGLRendererAPI>(p_api);
 }
 
 } // namespace astralix
