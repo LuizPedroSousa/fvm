@@ -2,7 +2,6 @@
 #include "either.hpp"
 #include "engine.hpp"
 #include "exceptions/base-exception.hpp"
-#include "glad/glad.h"
 #include "uniform.hpp"
 
 namespace astralix {
@@ -32,28 +31,30 @@ void TextureRenderer::render(Uniform *uniform) {
 
   auto resource_manager = ResourceManager::get();
 
-  for (u_int i = 0; i < m_cubemaps.size(); i++) {
-    auto cubemap_ptr = resource_manager->get_cubemap_by_id(m_cubemaps[i].id);
+  for (uint32_t slot = 0; slot < m_cubemaps.size(); slot++) {
+    auto cubemap_ptr = resource_manager->get_texture_by_id(m_cubemaps[slot].id);
 
-    if (cubemap_ptr != nullptr) {
-      glActiveTexture(i == 0 ? GL_TEXTURE0 : GL_TEXTURE0 + i);
+    ASTRA_ASSERT_THROW(cubemap_ptr == nullptr,
+                       "TRYING TO RENDER: Texture3D was not found");
 
-      uniform->setInt(m_cubemaps[i].name.c_str(), i);
+    cubemap_ptr->active(slot);
 
-      glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_ptr->get_id());
-    }
+    uniform->setInt(m_cubemaps[slot].name.c_str(), slot);
+
+    cubemap_ptr->bind();
   }
 
-  for (u_int i = 0; i < m_textures.size(); ++i) {
-    auto texture_ptr = resource_manager->get_texture_by_id(m_textures[i].id);
+  for (uint32_t slot = 0; slot < m_textures.size(); slot++) {
+    auto texture_ptr = resource_manager->get_texture_by_id(m_textures[slot].id);
 
-    if (texture_ptr != nullptr) {
-      glActiveTexture(i == 0 ? GL_TEXTURE0 : GL_TEXTURE0 + i);
+    ASTRA_ASSERT_THROW(texture_ptr == nullptr,
+                       "TRYING TO RENDER: Texture2D was not found");
 
-      uniform->setInt(m_textures[i].name.c_str(), i);
+    texture_ptr->active(slot);
 
-      glBindTexture(GL_TEXTURE_2D, texture_ptr->get_id());
-    }
+    uniform->setInt(m_textures[slot].name.c_str(), slot);
+
+    texture_ptr->bind();
   }
 }
 

@@ -4,7 +4,7 @@
 
 namespace astralix {
 
-#define RESOURCE_INIT_PARAMS const ResourceID id
+#define RESOURCE_INIT_PARAMS const ResourceID &id
 #define RESOURCE_INIT() Resource(id)
 
 class Resource {

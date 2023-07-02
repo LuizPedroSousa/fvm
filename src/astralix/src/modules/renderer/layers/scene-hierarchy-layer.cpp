@@ -8,7 +8,8 @@
 
 namespace astralix {
 void SceneHierarchyLayer::start() {
-  ResourceManager::get()->load_texture({"icons::cube", "icons/cube.png"});
+  ResourceManager::get()->load_texture(
+      Texture2D::create("icons::cube", "icons/cube.png"));
 }
 
 void SceneHierarchyLayer::update() {

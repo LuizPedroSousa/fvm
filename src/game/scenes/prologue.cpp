@@ -25,16 +25,18 @@ using astralix::Engine;
 void Prologue::load_resources() {
   auto manager = astralix::ResourceManager::get();
 
-  manager->load_texture({"textures::default", "textures/diffuse.png", false});
-
-  manager->load_cubemap("cubemaps::skybox", {
-                                                "textures/skybox/right.jpg",
-                                                "textures/skybox/left.jpg",
-                                                "textures/skybox/top.jpg",
-                                                "textures/skybox/bottom.jpg",
-                                                "textures/skybox/front.jpg",
-                                                "textures/skybox/back.jpg",
-                                            });
+  manager->load_textures(
+      {astralix::Texture2D::create("textures::default", "textures/diffuse.png",
+                                   false),
+       astralix::Texture3D::create("cubemaps::skybox",
+                                   {
+                                       "textures/skybox/right.jpg",
+                                       "textures/skybox/left.jpg",
+                                       "textures/skybox/top.jpg",
+                                       "textures/skybox/bottom.jpg",
+                                       "textures/skybox/front.jpg",
+                                       "textures/skybox/back.jpg",
+                                   })});
 
   manager->load_shaders(
       {{"shaders::lighting", "vertex/light.glsl", "fragment/light.glsl"},
