@@ -1,5 +1,4 @@
 #include "model.hpp"
-#include "glad/glad.h"
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
@@ -16,7 +15,7 @@ Either<BaseException, Model> Model::create(ResourceID id,
       aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 
   ASTRA_ASSERT(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE,
-         importer.GetErrorString());
+               importer.GetErrorString());
 
   std::vector<Mesh> meshes;
   std::vector<ResourceID> materials;

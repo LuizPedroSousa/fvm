@@ -3,14 +3,9 @@
 #include "glm/glm.hpp"
 #include "memory"
 #include "vector"
+#include "vertex-array.hpp"
 
 namespace astralix {
-
-struct Buffers {
-  u_int VAO = 0;
-  u_int VBO = 0;
-  u_int EBO = 0;
-};
 
 class Mesh;
 
@@ -22,9 +17,10 @@ struct Vertex {
 
 class Mesh {
 public:
+  Ref<VertexArray> vertex_array;
+
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
-  Buffers m_buffers;
 
   static Mesh capsule(float radius = 0.5f, float height = 1.0f,
                       int segments = 16, int rings = 8);
@@ -39,8 +35,7 @@ public:
     this->indices = indices;
   };
 
-  ~Mesh();
-  Mesh(){};
+  ~Mesh() = default;
 };
 
 } // namespace astralix

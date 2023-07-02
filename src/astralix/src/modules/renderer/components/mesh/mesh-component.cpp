@@ -2,8 +2,8 @@
 #include "components/material/material-component.hpp"
 #include "components/resource/resource-component.hpp"
 #include "engine.hpp"
-#include "glad/glad.h"
 #include "vector"
+#include "vertex-array.hpp"
 
 namespace astralix {
 
@@ -11,56 +11,33 @@ MeshComponent::MeshComponent(COMPONENT_INIT_PARAMS)
     : COMPONENT_INIT(MeshComponent, "Mesh Renderer", true){};
 
 void MeshComponent::start() {
+  for (auto &mesh : m_meshes) {
+    mesh.vertex_array = VertexArray::create();
 
-  for (int i = 0; i < m_meshes.size(); i++) {
-    create_buffers(&m_meshes[i]);
+    auto vertex_buffer = VertexBuffer::create(
+        &mesh.vertices[0], mesh.vertices.size() * sizeof(Vertex));
+
+    BufferLayout layout({
+        BufferElement(ShaderDataType::Float3, "position"),
+        BufferElement(ShaderDataType::Float3, "normal"),
+        BufferElement(ShaderDataType::Float2, "texture_coordinates"),
+    });
+
+    vertex_buffer->set_layout(layout);
+
+    mesh.vertex_array->add_vertex_buffer(vertex_buffer);
+
+    mesh.vertex_array->set_index_buffer(
+        IndexBuffer::create(&mesh.indices[0], mesh.indices.size()));
+
+    mesh.vertex_array->unbind();
   }
 }
 
 void MeshComponent::update() {
-
-  for (int i = 0; i < m_meshes.size(); i++) {
-    glBindVertexArray(m_meshes[i].m_buffers.VAO);
-    glDrawElements(GL_TRIANGLES,
-                   static_cast<unsigned int>(m_meshes[i].indices.size()),
-                   GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+  for (auto mesh : m_meshes) {
+    Engine::get()->renderer_api->draw_indexed(mesh.vertex_array);
   }
-};
-
-void MeshComponent::create_buffers(Mesh *mesh) {
-  u_int VAO, VBO, EBO;
-
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-
-  glBindVertexArray(VAO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex),
-               &mesh->vertices[0], GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0],
-               GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void *)offsetof(Vertex, normal));
-
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        (void *)offsetof(Vertex, texture_cordinates));
-
-  glBindVertexArray(0);
-
-  mesh->m_buffers = {.VAO = VAO, .VBO = VBO, .EBO = EBO};
 };
 
 } // namespace astralix

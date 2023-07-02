@@ -1,5 +1,4 @@
 #include "mesh.hpp"
-#include "glad/glad.h"
 #include "glm/glm.hpp"
 #include "iostream"
 #include "numbers"
@@ -223,17 +222,6 @@ Mesh Mesh::capsule(float radius, float height, int segments, int rings) {
   }
 
   return Mesh(vertices, indices);
-}
-
-Mesh::~Mesh() {
-  if (m_buffers.VAO)
-    glDeleteVertexArrays(1, &m_buffers.VAO);
-
-  if (m_buffers.VBO)
-    glDeleteBuffers(1, &m_buffers.VBO);
-
-  if (m_buffers.EBO)
-    glDeleteBuffers(1, &m_buffers.EBO);
 }
 
 } // namespace astralix
