@@ -6,13 +6,8 @@
 namespace astralix {
 
 Ref<Framebuffer> Framebuffer::create(const FramebufferSpecification &spec) {
-  switch (Engine::get()->renderer_api->get_api()) {
-  case RendererAPI::API::OpenGL:
-    return create_ref<OpenGLFramebuffer>(spec);
-  default:
-    ASTRA_ASSERT_THROW(true, "NONE ins't a valid renderer api");
-    break;
-  }
+  return create_renderer_component_ref<Framebuffer, OpenGLFramebuffer>(
+      Engine::get()->renderer_api->get_api(), spec);
 };
 
 } // namespace astralix

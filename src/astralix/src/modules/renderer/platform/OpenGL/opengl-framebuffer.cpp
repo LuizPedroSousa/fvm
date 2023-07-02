@@ -73,7 +73,7 @@ static bool is_depth_format(FramebufferTextureFormat format) {
   return false;
 }
 
-u_int32_t static map_bind_type_to_opengl(FramebufferBindType type) {
+uint32_t static map_bind_type_to_opengl(FramebufferBindType type) {
   switch (type) {
   case FramebufferBindType::Read:
     return GL_READ_FRAMEBUFFER;
@@ -105,7 +105,7 @@ OpenGLFramebuffer::~OpenGLFramebuffer() {
   glDeleteTextures(1, &m_depth_attachment);
 };
 
-void OpenGLFramebuffer::bind(FramebufferBindType type, u_int32_t id) {
+void OpenGLFramebuffer::bind(FramebufferBindType type, uint32_t id) {
   glBindFramebuffer(utils::map_bind_type_to_opengl(type),
                     id != -1 ? id : m_renderer_id);
   glViewport(0, 0, m_specification.width, m_specification.height);

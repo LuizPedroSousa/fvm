@@ -10,7 +10,7 @@ public:
   ~OpenGLFramebuffer() override;
 
   void bind(FramebufferBindType type = FramebufferBindType::Default,
-            u_int32_t id = -1) override;
+            uint32_t id = -1) override;
   void unbind() override;
 
   void resize(uint32_t width, uint32_t height) override;

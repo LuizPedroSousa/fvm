@@ -30,4 +30,24 @@ void OpenGLRendererAPI::clear_buffers() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
+void OpenGLRendererAPI::draw_indexed(const Ref<VertexArray> &vertex_array,
+                                     uint32_t index_count) {
+  vertex_array->bind();
+
+  uint32_t count = index_count != -1
+                       ? index_count
+                       : vertex_array->get_index_buffer()->get_count();
+  glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+
+  vertex_array->unbind();
+}
+
+void OpenGLRendererAPI::draw_lines(const Ref<VertexArray> &vertex_array,
+                                   uint32_t vertex_count) {
+
+  vertex_array->bind();
+  glDrawArrays(GL_LINES, 0, vertex_count);
+  vertex_array->unbind();
+}
+
 } // namespace astralix

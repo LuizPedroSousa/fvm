@@ -1,6 +1,9 @@
 #pragma once
+
+#include "assert.hpp"
 #include "base.hpp"
 #include "glm/glm.hpp"
+#include "vertex-array.hpp"
 
 namespace astralix {
 
@@ -16,6 +19,11 @@ public:
   virtual void clear_buffers() = 0;
   virtual void disable_buffer_testing() = 0;
   virtual void enable_buffer_testing() = 0;
+  virtual void draw_indexed(const Ref<VertexArray> &vertex_array,
+                            uint32_t index_count = -1) = 0;
+
+  virtual void draw_lines(const Ref<VertexArray> &vertex_array,
+                          uint32_t vertex_count) = 0;
 
   API get_api() { return m_api; };
 
@@ -29,5 +37,28 @@ protected:
   glm::vec4 m_clear_color = glm::vec4(0.5f, 0.5f, 1.0f, 0.0f);
   API m_api;
 };
+
+template <typename T, typename O, typename... Args>
+Ref<T> create_renderer_component_ref(RendererAPI::API api, Args &&...params) {
+  switch (api) {
+  case RendererAPI::API::OpenGL:
+    return create_ref<O>(std::forward<Args>(params)...);
+
+  default:
+    ASTRA_ASSERT_THROW(true, "NONE ins't a valid renderer api");
+  }
+}
+
+template <typename T, typename O, typename... Args>
+Scope<T> create_renderer_component_scope(RendererAPI::API api,
+                                         Args &&...params) {
+  switch (api) {
+  case RendererAPI::API::OpenGL:
+    return create_scope<O>(std::forward<Args>(params)...);
+
+  default:
+    ASTRA_ASSERT_THROW(true, "NONE ins't a valid renderer api");
+  }
+}
 
 } // namespace astralix

@@ -1,6 +1,5 @@
 #include "material-component.hpp"
 #include "components/resource/resource-component.hpp"
-#include "glad/glad.h"
 
 namespace astralix {
 

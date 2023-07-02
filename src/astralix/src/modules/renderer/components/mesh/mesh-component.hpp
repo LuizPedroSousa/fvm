@@ -27,8 +27,6 @@ public:
   void attach_mesh(Mesh mesh) { m_meshes.push_back(mesh); };
 
 private:
-  void create_buffers(Mesh *mesh);
-
   std::vector<Mesh> m_meshes;
 };
 
