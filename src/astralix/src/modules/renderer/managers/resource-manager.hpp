@@ -14,10 +14,8 @@ namespace astralix {
 
 class ResourceManager : public BaseManager<ResourceManager> {
 public:
-  Texture *load_texture(CreateTextureDTO);
-  void load_textures(std::initializer_list<CreateTextureDTO>);
-
-  Texture *load_cubemap(ResourceID id, std::vector<std::string> faces);
+  Ref<Texture> load_texture(Ref<Texture> texture);
+  void load_textures(std::initializer_list<Ref<Texture>> textures);
 
   Shader *load_shader(CreateShaderDTO dto);
 
@@ -30,8 +28,8 @@ public:
       std::initializer_list<std::pair<ResourceID, const char *>> models);
 
   Shader *get_shader_by_id(ResourceID id);
-  Texture *get_texture_by_id(ResourceID id);
-  Texture *get_cubemap_by_id(ResourceID id);
+  Ref<Texture> get_texture_by_id(ResourceID id);
+
   Model *get_model_by_id(ResourceID id);
   std::vector<Model *> get_models_by_ids(std::initializer_list<ResourceID> ids);
   Material *get_material_by_id(ResourceID id);
@@ -41,7 +39,7 @@ public:
   ResourceManager() = default;
 
 private:
-  std::unordered_map<ResourceID, Scope<Texture>> m_texture_table;
+  std::unordered_map<ResourceID, Ref<Texture>> m_texture_table;
   std::unordered_map<ResourceID, Scope<Shader>> m_shader_table;
   std::unordered_map<ResourceID, Scope<Model>> m_model_table;
 };

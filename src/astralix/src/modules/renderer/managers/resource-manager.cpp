@@ -3,119 +3,21 @@
 #include "glad/glad.h"
 
 namespace astralix {
-Shader *ResourceManager::get_shader_by_id(ResourceID id) {
-  auto it = m_shader_table.find(id);
-
-  if (it != m_shader_table.end()) {
-    return it->second.get();
-  }
-
-  return nullptr;
-}
-
-Texture *ResourceManager::get_texture_by_id(ResourceID id) {
-  auto it = m_texture_table.find(id);
-
-  if (it != m_texture_table.end()) {
-    return it->second.get();
-  }
-
-  return nullptr;
-}
-
-Model *ResourceManager::get_model_by_id(ResourceID id) {
-  auto it = m_model_table.find(id);
-
-  if (it != m_model_table.end()) {
-    return it->second.get();
-  }
-
-  return nullptr;
-}
-
-std::vector<Model *>
-ResourceManager::get_models_by_ids(std::initializer_list<ResourceID> ids) {
-  std::vector<Model *> models;
-
-  for (auto id : ids) {
-    auto model = get_model_by_id(id);
-
-    if (model != nullptr) {
-      models.push_back(model);
-    }
-  }
-
-  return models;
-}
-
-Material *ResourceManager::get_material_by_id(ResourceID id) {
-  auto it = m_material_table.find(id);
-
-  if (it != m_material_table.end()) {
-    return it->second.get();
-  }
-
-  return nullptr;
-}
-
-Texture *ResourceManager::get_cubemap_by_id(ResourceID id) {
-  auto it = m_texture_table.find(id);
-
-  if (it != m_texture_table.end()) {
-    return it->second.get();
-  }
-
-  return nullptr;
-}
-
-Texture *ResourceManager::load_texture(CreateTextureDTO dto) {
-  auto texture_exists = get_texture_by_id(dto.id);
-
-  if (texture_exists != nullptr) {
-    return texture_exists;
-  }
-
-  auto texture_created = Texture::create(dto);
-
-  ASTRA_ASSERT_EITHER_THROW(texture_created);
-
-  Scope<Texture> texture_ptr = create_scope<Texture>(texture_created.right());
-
+Ref<Texture> ResourceManager::load_texture(Ref<Texture> texture) {
+  auto texture_id = texture->get_resource_id();
   auto inserted_texture =
-      m_texture_table.emplace(dto.id, std::move(texture_ptr));
+      m_texture_table.emplace(texture_id, std::move(texture));
 
   ASTRA_ASSERT_THROW(!inserted_texture.second, "can't insert texture");
 
-  return m_texture_table[dto.id].get();
+  return m_texture_table[texture_id];
 }
 
 void ResourceManager::load_textures(
-    std::initializer_list<CreateTextureDTO> dtos) {
-  for (auto &dto : dtos) {
-    load_texture(dto);
+    std::initializer_list<Ref<Texture>> textures) {
+  for (auto texture : textures) {
+    load_texture(texture);
   }
-}
-
-Texture *ResourceManager::load_cubemap(ResourceID id,
-                                       std::vector<std::string> faces) {
-  auto cubemap_exists = get_cubemap_by_id(id);
-
-  if (cubemap_exists != nullptr) {
-    return cubemap_exists;
-  }
-
-  auto created_cubemap = Texture::create_cubemap(id, faces);
-
-  ASTRA_ASSERT_EITHER_THROW(created_cubemap);
-
-  Scope<Texture> texture_ptr = create_scope<Texture>(created_cubemap.right());
-
-  auto inserted_texture = m_texture_table.emplace(id, std::move(texture_ptr));
-
-  ASTRA_ASSERT_THROW(!inserted_texture.second,
-               "can't insert cubemap into textures table");
-
-  return m_texture_table[id].get();
 }
 
 Shader *ResourceManager::load_shader(CreateShaderDTO dto) {
@@ -161,8 +63,7 @@ Material *ResourceManager::load_material(ResourceID material_id,
 
       const char *filename = filename_str.C_Str();
 
-      ResourceID texture_id =
-          ("textures::" + material_id + "::" + filename).c_str();
+      ResourceID texture_id = "textures::" + material_id + "::" + filename;
 
       auto get_name = [type]() -> std::string {
         std::string prefix = "materials[0].";
@@ -175,8 +76,9 @@ Material *ResourceManager::load_material(ResourceID material_id,
         return name;
       };
 
-      Texture *texture_ptr = load_texture(
-          {texture_id, ("models/" + std::string(filename)).c_str()});
+      std::string path = "models/" + std::string(filename);
+      Ref<Texture> texture_ptr =
+          load_texture(Texture2D::create(texture_id, path));
 
       textures.push_back(texture_ptr->get_resource_id());
     };
@@ -224,6 +126,61 @@ void ResourceManager::load_models(
   for (auto &model : models) {
     load_model(model.first, model.second);
   }
+}
+
+Shader *ResourceManager::get_shader_by_id(ResourceID id) {
+  auto it = m_shader_table.find(id);
+
+  if (it != m_shader_table.end()) {
+    return it->second.get();
+  }
+
+  return nullptr;
+}
+
+Ref<Texture> ResourceManager::get_texture_by_id(ResourceID id) {
+  auto it = m_texture_table.find(id);
+
+  if (it != m_texture_table.end()) {
+    return it->second;
+  }
+
+  return nullptr;
+}
+
+Model *ResourceManager::get_model_by_id(ResourceID id) {
+  auto it = m_model_table.find(id);
+
+  if (it != m_model_table.end()) {
+    return it->second.get();
+  }
+
+  return nullptr;
+}
+
+std::vector<Model *>
+ResourceManager::get_models_by_ids(std::initializer_list<ResourceID> ids) {
+  std::vector<Model *> models;
+
+  for (auto id : ids) {
+    auto model = get_model_by_id(id);
+
+    if (model != nullptr) {
+      models.push_back(model);
+    }
+  }
+
+  return models;
+}
+
+Material *ResourceManager::get_material_by_id(ResourceID id) {
+  auto it = m_material_table.find(id);
+
+  if (it != m_material_table.end()) {
+    return it->second.get();
+  }
+
+  return nullptr;
 }
 
 } // namespace astralix
