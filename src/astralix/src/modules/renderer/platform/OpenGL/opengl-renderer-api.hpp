@@ -14,6 +14,12 @@ public:
   void disable_buffer_testing() override;
 
   void clear_buffers() override;
+
+  void draw_indexed(const Ref<VertexArray> &vertex_array,
+                    uint32_t index_count = -1) override;
+
+  void draw_lines(const Ref<VertexArray> &vertex_array,
+                  uint32_t vertex_count) override;
 };
 
 } // namespace astralix
