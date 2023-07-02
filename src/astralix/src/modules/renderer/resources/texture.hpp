@@ -1,4 +1,5 @@
 #pragma once
+#include "base.hpp"
 #include "either.hpp"
 #include "exceptions/base-exception.hpp"
 #include "filesystem"
@@ -9,17 +10,6 @@
 
 namespace astralix {
 
-struct CreateTextureDTO {
-  ResourceID id;
-  const char *filename;
-  bool flip_image_on_loading;
-
-  CreateTextureDTO(ResourceID id, const char *filename,
-                   bool flip_image_on_loading = false)
-      : id(id), filename(filename),
-        flip_image_on_loading(flip_image_on_loading) {}
-};
-
 struct Image {
   int width;
   int height;
@@ -29,27 +19,38 @@ struct Image {
 
 class Texture : public Resource {
 public:
-  Texture(){};
+  Texture(const ResourceID &resource_id) : Resource(resource_id){};
+  virtual void bind() const = 0;
+  virtual void active(uint32_t slot) const = 0;
+  virtual uint32_t get_renderer_id() const = 0;
+  virtual uint32_t get_width() const = 0;
+  virtual uint32_t get_height() const = 0;
 
-  static Either<BaseException, Texture> create(CreateTextureDTO dto);
+protected:
+  static std::filesystem::path get_path(const std::string &path);
 
-  static Either<BaseException, Texture>
-  create_cubemap(ResourceID id, std::vector<std::string> faces);
-
-  static Either<BaseException, Texture *>
-  create_many(std::initializer_list<CreateTextureDTO> textures);
-
-  const u_int get_id() { return m_id; }
-
-private:
-  unsigned int m_id;
-
-  Texture(RESOURCE_INIT_PARAMS, unsigned int p_id);
-  static std::filesystem::path get_path(const char *filename);
-
-  static Either<BaseException, Image> load_image(std::string filename,
-                                                 bool flip_image_on_loading);
-
+  static Image load_image(std::string filename, bool flip_image_on_loading);
+  static void free_image(u_char *data);
   static int get_image_format(int nr_channels);
 };
+
+class Texture2D : public Texture {
+public:
+  static Ref<Texture2D> create(const ResourceID &resource_id,
+                               const std::string &path,
+                               const bool flip_image_on_loading = false);
+
+protected:
+  Texture2D(const ResourceID &resource_id) : Texture(resource_id){};
+};
+
+class Texture3D : public Texture {
+public:
+  static Ref<Texture3D> create(const ResourceID &resource_id,
+                               const std::vector<std::string> &faces_path);
+
+protected:
+  Texture3D(const ResourceID &resource_id) : Texture(resource_id){};
+};
+
 } // namespace astralix
