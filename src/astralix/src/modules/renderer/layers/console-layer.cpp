@@ -10,9 +10,10 @@ void ConsoleLayer::start() {
 
   auto resource_manager = ResourceManager::get();
 
-  resource_manager->load_textures({{"icons::warn", "icons/warn.png"},
-                                   {"icons::info", "icons/info.png"},
-                                   {"icons::error", "icons/error.png"}});
+  resource_manager->load_textures(
+      {Texture2D::create("icons::warn", "icons/warn.png"),
+       Texture2D::create("icons::info", "icons/info.png"),
+       Texture2D::create("icons::error", "icons/error.png")});
 };
 
 void ConsoleLayer::update() {
@@ -49,7 +50,7 @@ void ConsoleLayer::update() {
     ImVec4 clearColor = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); // Transparent color
 
     auto info_icon = reinterpret_cast<void *>(
-        resource_manager->get_texture_by_id("icons::info")->get_id());
+        resource_manager->get_texture_by_id("icons::info")->get_renderer_id());
 
     ImGui::PushStyleColor(ImGuiCol_Button,
                           clearColor); // Set the button color to transparent
@@ -70,7 +71,8 @@ void ConsoleLayer::update() {
     ImGui::SetCursorPosY(icon_position_y);
     if (ImGui::ImageButton(
             reinterpret_cast<void *>(
-                resource_manager->get_texture_by_id("icons::warn")->get_id()),
+                resource_manager->get_texture_by_id("icons::warn")
+                    ->get_renderer_id()),
             icon_size)) {
     }
 
@@ -82,7 +84,8 @@ void ConsoleLayer::update() {
     ImGui::Text("0");
     if (ImGui::ImageButton(
             reinterpret_cast<void *>(
-                resource_manager->get_texture_by_id("icons::error")->get_id()),
+                resource_manager->get_texture_by_id("icons::error")
+                    ->get_renderer_id()),
             icon_size)) {
     }
 

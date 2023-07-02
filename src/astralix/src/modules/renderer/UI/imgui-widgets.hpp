@@ -88,7 +88,7 @@ tree_node(const char *label, const char *icon_name,
   ImGui::SameLine(cursor_x);
 
   void *icon = reinterpret_cast<void *>(
-      ResourceManager::get()->get_texture_by_id(icon_name)->get_id());
+      ResourceManager::get()->get_texture_by_id(icon_name)->get_renderer_id());
 
   float spacing = 4.0f;
 

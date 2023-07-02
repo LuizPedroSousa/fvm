@@ -2,7 +2,6 @@
 #include "either.hpp"
 #include "engine.hpp"
 #include "exceptions/base-exception.hpp"
-#include "glad/glad.h"
 #include "uniform.hpp"
 
 namespace astralix {

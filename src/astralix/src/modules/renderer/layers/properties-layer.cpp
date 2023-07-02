@@ -30,13 +30,13 @@ namespace astralix {
 
 void PropertiesLayer::start() {
   ResourceManager::get()->load_textures(
-      {{"icons::transform", "icons/transform.png"},
-       {"icons::camera", "icons/camera.png"},
-       {"icons::rigidbody", "icons/rigidbody.png"},
-       {"icons::light", "icons/light.png"},
-       {"icons::mesh", "icons/mesh.png"},
-       {"icons::skybox", "icons/skybox.png"},
-       {"icons::settings", "icons/adjust.png"}});
+      {Texture2D::create("icons::transform", "icons/transform.png"),
+       Texture2D::create("icons::camera", "icons/camera.png"),
+       Texture2D::create("icons::rigidbody", "icons/rigidbody.png"),
+       Texture2D::create("icons::light", "icons/light.png"),
+       Texture2D::create("icons::mesh", "icons/mesh.png"),
+       Texture2D::create("icons::skybox", "icons/skybox.png"),
+       Texture2D::create("icons::settings", "icons/adjust.png")});
 }
 
 void PropertiesLayer::update() {
@@ -58,10 +58,10 @@ void PropertiesLayer::update() {
 
     ImGui::Dummy(ImVec2(10.0f, 0.0f));
     ImGui::SetCursorPosY(spacing_y);
-    ImGui::Image(
-        reinterpret_cast<void *>(
-            ResourceManager::get()->get_texture_by_id("icons::cube")->get_id()),
-        ImVec2{18, 18});
+    ImGui::Image(reinterpret_cast<void *>(ResourceManager::get()
+                                              ->get_texture_by_id("icons::cube")
+                                              ->get_renderer_id()),
+                 ImVec2{18, 18});
 
     ImGui::SameLine();
 
@@ -110,8 +110,10 @@ void PropertiesLayer::draw_component(IEntity *entity, const char *icon_name,
 
     ImGui::SameLine(content_region_available.x - line_height * 0.5f);
 
-    auto settings_icon = reinterpret_cast<void *>(
-        ResourceManager::get()->get_texture_by_id("icons::settings")->get_id());
+    auto settings_icon =
+        reinterpret_cast<void *>(ResourceManager::get()
+                                     ->get_texture_by_id("icons::settings")
+                                     ->get_renderer_id());
 
     if (ImGui::ImageButton(settings_icon, ImVec2{line_height, line_height})) {
       ImGui::OpenPopup("component_settings");

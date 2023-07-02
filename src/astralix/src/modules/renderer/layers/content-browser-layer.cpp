@@ -26,12 +26,14 @@ void ContentBrowserLayer::start() {
 
   m_directory_icon_id =
       resource_manager
-          ->load_texture({"icons::directory", "icons/directory.png", true})
-          ->get_id();
+          ->load_texture(Texture2D::create("icons::directory",
+                                           "icons/directory.png", true))
+          ->get_renderer_id();
 
-  m_file_icon_id =
-      resource_manager->load_texture({"icons::file", "icons/file.png", true})
-          ->get_id();
+  m_file_icon_id = resource_manager
+                       ->load_texture(Texture2D::create("icons::file",
+                                                        "icons/file.png", true))
+                       ->get_renderer_id();
 };
 
 void ContentBrowserLayer::update() {
