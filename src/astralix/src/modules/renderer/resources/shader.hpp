@@ -1,54 +1,34 @@
 #pragma once
-#include "either.hpp"
-#include "exceptions/base-exception.hpp"
+#include "base.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "resources/resource.hpp"
-#include "tuple"
 
 namespace astralix {
 
-struct CreateShaderDTO {
-  ResourceID id;
-  const char *vertex_filename;
-  const char *geometry_filename;
-  const char *fragment_filename;
-
-  CreateShaderDTO(ResourceID id, const char *vertex_filename,
-                  const char *fragment_filename,
-                  const char *geometry_filename = NULL)
-      : id(id), vertex_filename(vertex_filename),
-        geometry_filename(geometry_filename),
-        fragment_filename(fragment_filename){};
-};
-
 class Shader : public Resource {
 public:
-  Shader();
+  virtual void bind() const = 0;
+  virtual void unbind() const = 0;
 
-  unsigned int signed_to = 0;
-  unsigned int vertex = 0;
-  unsigned int fragment = 0;
-  unsigned int geometry = 0;
+  virtual void attach() const = 0;
 
-  Either<BaseException, Shader> static create(CreateShaderDTO);
+  virtual void set_bool(const std::string &name, bool value) const = 0;
+  virtual void set_int(const std::string &name, int value) const = 0;
+  virtual void set_matrix(const std::string &name, glm::mat4 matrix) const = 0;
+  virtual void set_float(const std::string &name, float value) const = 0;
+  virtual void set_vec3(const std::string &name, glm::vec3 value) const = 0;
 
-  Either<BaseException, Shader *> static create_many(CreateShaderDTO dtos[],
-                                                     size_t size);
+  static Ref<Shader> create(const ResourceID &resource_id,
+                            const std::string &fragment_path,
+                            const std::string &vertex_path,
+                            const std::string &geometry_path = "");
 
-private:
-  Shader(RESOURCE_INIT_PARAMS, unsigned int vertex, const char *vertex_filename,
-         unsigned int fragment, const char *fragment_filename);
+protected:
+  Shader(const ResourceID &resource_id) : Resource(resource_id) {}
 
-  Shader(RESOURCE_INIT_PARAMS, unsigned int vertex, const char *vertex_filename,
-         unsigned int fragment, const char *fragment_filename,
-         unsigned int geometry, const char *geometry_filename);
-
-  static Either<BaseException, unsigned int> compile(const char *filename,
-                                                     int type);
-  static const char *get_file(const char *filename);
-
-  const char *m_fragment_filename;
-  const char *m_geometry_filename;
-  const char *m_vertex_filename;
+  static std::string get_file(const std::string &path);
 };
 
 } // namespace astralix
