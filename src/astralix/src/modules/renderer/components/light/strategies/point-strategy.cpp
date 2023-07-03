@@ -8,20 +8,15 @@ void PointStrategy::update(Object *source, Object *object, Object *camera) {
   auto resource = object->get_component<ResourceComponent>();
   auto transform = source->get_component<TransformComponent>();
 
-  resource->get_shader_renderer_uniform()->setFloat(
-      "point_lights[0].attenuation.constant", 1.0f);
-  resource->get_shader_renderer_uniform()->setFloat(
-      "point_lights[0].attenuation.linear", 0.09f);
-  resource->get_shader_renderer_uniform()->setFloat(
-      "point_lights[0].attenuation.quadratic", 0.032f);
-  resource->get_shader_renderer_uniform()->setVec3(
-      "point_lights[0].exposure.ambient", glm::vec3(1.0f));
-  resource->get_shader_renderer_uniform()->setVec3(
-      "point_lights[0].exposure.diffuse", glm::vec3(0.5f));
-  resource->get_shader_renderer_uniform()->setVec3(
-      "point_lights[0].exposure.specular", glm::vec3(1.0f));
-  resource->get_shader_renderer_uniform()->setVec3("point_lights[0].position",
-                                                   transform->position);
+  auto shader = resource->get_shader();
+
+  shader->set_float("point_lights[0].attenuation.constant", 1.0f);
+  shader->set_float("point_lights[0].attenuation.linear", 0.09f);
+  shader->set_float("point_lights[0].attenuation.quadratic", 0.032f);
+  shader->set_vec3("point_lights[0].exposure.ambient", glm::vec3(1.0f));
+  shader->set_vec3("point_lights[0].exposure.diffuse", glm::vec3(0.5f));
+  shader->set_vec3("point_lights[0].exposure.specular", glm::vec3(1.0f));
+  shader->set_vec3("point_lights[0].position", transform->position);
 }
 
 } // namespace astralix

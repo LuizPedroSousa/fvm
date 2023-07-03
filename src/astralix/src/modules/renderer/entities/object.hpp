@@ -1,7 +1,6 @@
 #pragma once
 #include "ecs/entities/entity.hpp"
 #include "glm/glm.hpp"
-#include "uniform.hpp"
 
 namespace astralix {
 

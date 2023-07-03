@@ -12,7 +12,7 @@ PostProcessing::PostProcessing(ENTITY_INIT_PARAMS, ResourceID shader_id)
     : ENTITY_INIT() {
   add_component<MeshComponent>()->attach_mesh(Mesh::quad(1.0f));
   add_component<PostProcessingComponent>();
-  add_component<ResourceComponent>()->attach_shader(shader_id);
+  add_component<ResourceComponent>()->set_shader(shader_id);
 }
 
 void PostProcessing::start() {

@@ -37,7 +37,7 @@ void PostProcessingComponent::post_update() {
     resolve_screen_texture();
   }
 
-  resource->get_shader_renderer_uniform()->setInt("screen_texture", 0);
+  resource->get_shader()->set_int("screen_texture", 0);
 
   u_int32_t screen_texture =
       is_msaa_enabled ? m_multisampled_framebuffer->get_color_attachment_id()

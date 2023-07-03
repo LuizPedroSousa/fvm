@@ -65,9 +65,10 @@ void Object::update() {
       component_manager->get_component<LightComponent>()->update(this);
     }
 
-    if (entity_manager->has_entity_with_component<CameraComponent>()) {
+    if (entity_manager->has_entity_with_component<CameraComponent>() &&
+        resource->has_shader()) {
       component_manager->get_component<CameraComponent>()->update(
-          resource->get_shader_renderer_uniform());
+          resource->get_shader());
     }
 
     if (skybox != nullptr && skybox->is_active()) {

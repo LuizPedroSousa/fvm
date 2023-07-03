@@ -152,12 +152,12 @@ void CameraComponent::recalculate_camera_rotation(float x, float y) {
   front = glm::normalize(direction);
 }
 
-void CameraComponent::update(Uniform *uniform) {
+void CameraComponent::update(Ref<Shader> &shader) {
   recalculate_view_matrix();
   recalculate_projection_matrix();
 
-  uniform->setMatrix("view", m_view_matrix);
-  uniform->setMatrix("projection", m_projection_matrix);
+  shader->set_matrix("view", m_view_matrix);
+  shader->set_matrix("projection", m_projection_matrix);
 }
 
 } // namespace astralix

@@ -17,9 +17,9 @@ public:
   Ref<Texture> load_texture(Ref<Texture> texture);
   void load_textures(std::initializer_list<Ref<Texture>> textures);
 
-  Shader *load_shader(CreateShaderDTO dto);
+  Ref<Shader> load_shader(Ref<Shader> shader);
 
-  void load_shaders(std::initializer_list<CreateShaderDTO> shaders);
+  void load_shaders(std::initializer_list<Ref<Shader>> shaders);
 
   Material *load_material(ResourceID id, aiMaterial *ai_material);
 
@@ -27,7 +27,7 @@ public:
   void load_models(
       std::initializer_list<std::pair<ResourceID, const char *>> models);
 
-  Shader *get_shader_by_id(ResourceID id);
+  Ref<Shader> get_shader_by_id(ResourceID id);
   Ref<Texture> get_texture_by_id(ResourceID id);
 
   Model *get_model_by_id(ResourceID id);
@@ -40,7 +40,7 @@ public:
 
 private:
   std::unordered_map<ResourceID, Ref<Texture>> m_texture_table;
-  std::unordered_map<ResourceID, Scope<Shader>> m_shader_table;
+  std::unordered_map<ResourceID, Ref<Shader>> m_shader_table;
   std::unordered_map<ResourceID, Scope<Model>> m_model_table;
 };
 } // namespace astralix

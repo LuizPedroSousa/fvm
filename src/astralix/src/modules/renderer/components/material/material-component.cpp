@@ -11,9 +11,8 @@ void MaterialComponent::reset_material() {}
 void MaterialComponent::update() {
   auto owner = get_owner();
 
-  owner->get_component<ResourceComponent>()
-      ->get_shader_renderer_uniform()
-      ->setFloat("material.shininess", 32.0f);
+  owner->get_component<ResourceComponent>()->get_shader()->set_float(
+      "material.shininess", 32.0f);
 }
 
 void MaterialComponent::attach_material(ResourceID material_id) {
