@@ -39,10 +39,13 @@ void Prologue::load_resources() {
                                    })});
 
   manager->load_shaders(
-      {{"shaders::lighting", "vertex/light.glsl", "fragment/light.glsl"},
-       {"shaders::visualize_normal", "vertex/normal_view.glsl",
-        "fragment/normal_view.glsl", "geometry/normal_view.glsl"},
-       {"shaders::skybox", "vertex/skybox.glsl", "fragment/skybox.glsl"}});
+      {astralix::Shader::create(
+           "shaders::visualize_normal", "fragment/normal_view.glsl",
+           "vertex/normal_view.glsl", "geometry/normal_view.glsl"),
+       astralix::Shader::create("shaders::lighting", "fragment/light.glsl",
+                                "vertex/light.glsl"),
+       astralix::Shader::create("shaders::skybox", "fragment/skybox.glsl",
+                                "vertex/skybox.glsl")});
 }
 
 void Prologue::load_scene_components() {
