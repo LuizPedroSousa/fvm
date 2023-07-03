@@ -6,17 +6,28 @@ ResourceComponent::ResourceComponent(COMPONENT_INIT_PARAMS)
     : COMPONENT_INIT(ResourceComponent, "Resource Renderer", false){};
 
 void ResourceComponent::start() {
-  m_texture_renderer.start();
-  m_shader_renderer.use();
+  if (has_shader()) {
+    m_shader->bind();
+    m_texture_renderer.start();
+  }
 }
 
 void ResourceComponent::update() {
-  m_shader_renderer.use();
-  m_texture_renderer.render(m_shader_renderer.get_uniform());
+  if (has_shader()) {
+    m_shader->bind();
+    m_texture_renderer.render(m_shader);
+  }
 }
 
-ResourceComponent *ResourceComponent::attach_shader(ResourceID id) {
-  m_shader_renderer.attach(id);
+ResourceComponent *ResourceComponent::set_shader(ResourceID id) {
+  auto resource_manager = ResourceManager::get();
+  auto shader_ptr = resource_manager->get_shader_by_id(id);
+
+  ASTRA_ASSERT_THROW(shader_ptr == nullptr, "Shader not found");
+
+  shader_ptr->attach();
+
+  m_shader = shader_ptr;
 
   return this;
 }
