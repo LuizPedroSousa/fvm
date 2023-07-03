@@ -36,6 +36,4 @@ void SceneSystem::update(double dt) {
 
 void SceneSystem::post_update(double dt){};
 
-void SceneSystem::pre_render(Uniform *uniform) {}
-
 } // namespace astralix

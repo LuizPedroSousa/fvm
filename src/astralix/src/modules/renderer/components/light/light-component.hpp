@@ -4,11 +4,9 @@
 #include "ecs/guid.hpp"
 #include "either.hpp"
 #include "entities/object.hpp"
-#include "exceptions/base-exception.hpp"
 #include "glm/glm.hpp"
 #include "light-component.hpp"
 #include "strategies/strategy.hpp"
-#include "uniform.hpp"
 
 namespace astralix {
 

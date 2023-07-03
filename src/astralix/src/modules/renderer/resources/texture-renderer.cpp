@@ -2,7 +2,6 @@
 #include "either.hpp"
 #include "engine.hpp"
 #include "exceptions/base-exception.hpp"
-#include "uniform.hpp"
 
 namespace astralix {
 
@@ -27,7 +26,7 @@ void TextureRenderer::attach_many(size_t size, TextureRenderData *textures) {
 
 void TextureRenderer::start() {}
 
-void TextureRenderer::render(Uniform *uniform) {
+void TextureRenderer::render(Ref<Shader> shader) {
 
   auto resource_manager = ResourceManager::get();
 
@@ -39,7 +38,7 @@ void TextureRenderer::render(Uniform *uniform) {
 
     cubemap_ptr->active(slot);
 
-    uniform->setInt(m_cubemaps[slot].name.c_str(), slot);
+    shader->set_int(m_cubemaps[slot].name.c_str(), slot);
 
     cubemap_ptr->bind();
   }
@@ -52,7 +51,7 @@ void TextureRenderer::render(Uniform *uniform) {
 
     texture_ptr->active(slot);
 
-    uniform->setInt(m_textures[slot].name.c_str(), slot);
+    shader->set_int(m_textures[slot].name.c_str(), slot);
 
     texture_ptr->bind();
   }

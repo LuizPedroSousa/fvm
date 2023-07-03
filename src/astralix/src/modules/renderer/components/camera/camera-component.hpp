@@ -2,7 +2,6 @@
 #include "ecs/components/component.hpp"
 #include "glm/glm.hpp"
 #include "resources/shader.hpp"
-#include "uniform.hpp"
 
 namespace astralix {
 
@@ -10,7 +9,7 @@ class CameraComponent : public Component<CameraComponent> {
 public:
   CameraComponent(COMPONENT_INIT_PARAMS);
 
-  void update(Uniform *uniform);
+  void update(Ref<Shader> &shader);
 
   void use_perspective();
   void use_orthographic();
@@ -41,8 +40,6 @@ public:
 private:
   void recalculate_projection_matrix();
   void recalculate_view_matrix();
-
-  unsigned int m_shader_render_id;
 
   glm::mat4 m_view_matrix;
   glm::mat4 m_projection_matrix;

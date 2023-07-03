@@ -161,7 +161,7 @@ void ContentBrowserLayer::draw_directory_view() {
   int columns_count =
       (int)((panel_width < 0 ? cell_size : panel_width) / cell_size);
 
-  ImGui::Columns(columns_count, 0, false);
+  ImGui::Columns(columns_count < 1 ? 1 : columns_count, 0, false);
 
   for (auto &directory_entry :
        std::filesystem::directory_iterator(m_current_directory)) {

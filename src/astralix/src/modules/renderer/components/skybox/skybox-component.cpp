@@ -16,7 +16,7 @@ SkyboxComponent::SkyboxComponent(COMPONENT_INIT_PARAMS,
   auto resource = owner->get_component<ResourceComponent>();
 
   resource->attach_cubemap({cubemap_id, "_skybox"});
-  resource->attach_shader(skybox_shader_id);
+  resource->set_shader(skybox_shader_id);
 
   mesh->attach_mesh(Mesh::cube(2.0f));
 };
@@ -42,16 +42,13 @@ void SkyboxComponent::update() {
   auto camera = component_manager->get_component<CameraComponent>();
 
   if (camera != nullptr) {
-    auto renderer = resource->get_shader_renderer();
-    renderer->use();
-
-    auto uniform = renderer->get_uniform();
+    auto shader = resource->get_shader();
 
     auto view_without_transformation =
         glm::mat4(glm::mat3(camera->get_view_matrix()));
-    uniform->setMatrix("view_without_transformation",
+    shader->set_matrix("view_without_transformation",
                        view_without_transformation);
-    uniform->setMatrix("projection", camera->get_projection_matrix());
+    shader->set_matrix("projection", camera->get_projection_matrix());
   }
 }
 

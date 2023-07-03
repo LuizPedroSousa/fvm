@@ -20,30 +20,19 @@ void ResourceManager::load_textures(
   }
 }
 
-Shader *ResourceManager::load_shader(CreateShaderDTO dto) {
-  auto shader_exists = get_shader_by_id(dto.id);
+Ref<Shader> ResourceManager::load_shader(Ref<Shader> shader) {
+  auto shader_id = shader->get_resource_id();
 
-  if (shader_exists != nullptr) {
-    return shader_exists;
-  }
-
-  auto created_shader = Shader::create(dto);
-
-  ASTRA_ASSERT_EITHER_THROW(created_shader);
-
-  Scope<Shader> shader_ptr = create_scope<Shader>(created_shader.right());
-
-  auto inserted_shader = m_shader_table.emplace(dto.id, std::move(shader_ptr));
+  auto inserted_shader = m_shader_table.emplace(shader_id, std::move(shader));
 
   ASTRA_ASSERT_THROW(!inserted_shader.second, "can't insert shader");
 
-  return shader_ptr.get();
+  return m_shader_table[shader_id];
 }
 
-void ResourceManager::load_shaders(
-    std::initializer_list<CreateShaderDTO> dtos) {
-  for (auto &dto : dtos) {
-    load_shader(dto);
+void ResourceManager::load_shaders(std::initializer_list<Ref<Shader>> shaders) {
+  for (auto shader : shaders) {
+    load_shader(shader);
   }
 }
 
@@ -128,11 +117,11 @@ void ResourceManager::load_models(
   }
 }
 
-Shader *ResourceManager::get_shader_by_id(ResourceID id) {
+Ref<Shader> ResourceManager::get_shader_by_id(ResourceID id) {
   auto it = m_shader_table.find(id);
 
   if (it != m_shader_table.end()) {
-    return it->second.get();
+    return it->second;
   }
 
   return nullptr;

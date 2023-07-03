@@ -31,9 +31,8 @@ void TransformComponent::update() {
 
   auto resource = owner->get_component<ResourceComponent>();
 
-  if (resource != nullptr) {
-    resource->get_shader_renderer()->get_uniform()->setMatrix("model",
-                                                              this->matrix);
+  if (resource != nullptr && resource->has_shader()) {
+    resource->get_shader()->set_matrix("model", this->matrix);
   }
 }
 

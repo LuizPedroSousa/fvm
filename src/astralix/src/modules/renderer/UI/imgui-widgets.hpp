@@ -275,7 +275,7 @@ static void entity_templates() {
 
     entity.add_component<MeshComponent>()->attach_mesh(mesh);
     entity.get_component<ResourceComponent>()
-        ->attach_shader("shaders::lighting")
+        ->set_shader("shaders::lighting")
         ->attach_texture({"textures::default", "materials[0].diffuse"})
         ->attach_texture({"textures::default", "materials[0].specular"});
 

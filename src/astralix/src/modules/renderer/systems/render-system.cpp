@@ -18,9 +18,9 @@ void RenderSystem::start() {
   auto entity_manager = EntityManager::get();
   auto resource_manager = ResourceManager::get();
 
-  resource_manager->load_shader({"shaders::post_processing",
-                                 "vertex/postprocessing.glsl",
-                                 "fragment/postprocessing.glsl"});
+  resource_manager->load_shader(Shader::create("shaders::post_processing",
+                                               "fragment/postprocessing.glsl",
+                                               "vertex/postprocessing.glsl"));
 
   entity_manager->add_entity<PostProcessing>("Post Processing",
                                              "shaders::post_processing");
