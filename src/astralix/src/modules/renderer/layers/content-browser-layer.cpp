@@ -189,6 +189,7 @@ void ContentBrowserLayer::draw_directory_view() {
 
       ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", item_path,
                                 (wcslen(item_path) + 1) * sizeof(wchar_t));
+
       ImGui::EndDragDropSource();
     }
 
