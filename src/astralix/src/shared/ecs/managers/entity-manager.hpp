@@ -17,7 +17,8 @@ class EntityManager : public BaseManager<EntityManager> {
 public:
   template <typename T, typename... Args>
   T &add_entity(const std::string &&name = "GameObject", Args &&...params) {
-    EntityID id = FamilyObjectID<IEntity>::get();
+    EntityID id = EntityID();
+    EntityFamilyID family_id = FamilyObjectID<IEntity>::get();
 
     int count = 1;
     std::string unique_name = name;
@@ -36,8 +37,8 @@ public:
       }
     }
 
-    Scope<T> entity_ptr =
-        create_scope<T>(id, unique_name, std::forward<Args>(params)...);
+    Scope<T> entity_ptr = create_scope<T>(id, family_id, unique_name,
+                                          std::forward<Args>(params)...);
 
     auto created_entity = m_entity_table.emplace(id, std::move(entity_ptr));
 
