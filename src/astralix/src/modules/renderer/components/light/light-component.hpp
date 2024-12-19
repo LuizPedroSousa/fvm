@@ -10,19 +10,20 @@
 
 namespace astralix {
 
-class SceneSystem;
+  class SceneSystem;
 
-class LightComponent : public Component<LightComponent> {
-public:
-  LightComponent(COMPONENT_INIT_PARAMS, Scope<LightStrategy> strategy,
-                 EntityID camera);
+  class LightComponent : public Component<LightComponent>
+  {
+  public:
+    LightComponent(COMPONENT_INIT_PARAMS, Scope<LightStrategy> strategy,
+      EntityID camera);
 
-  void start();
-  void update(Object *object);
+    void start();
+    void update(Object* object);
 
-private:
-  EntityID m_camera;
+  private:
+    EntityID m_camera;
 
-  Scope<LightStrategy> m_strategy;
-};
+    Scope<LightStrategy> m_strategy;
+  };
 } // namespace astralix

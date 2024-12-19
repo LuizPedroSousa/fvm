@@ -7,15 +7,16 @@
 
 namespace astralix {
 
-class ModelComponent : public Component<ModelComponent> {
-public:
-  ModelComponent(COMPONENT_INIT_PARAMS);
+  class ModelComponent : public Component<ModelComponent>
+  {
+  public:
+    ModelComponent(COMPONENT_INIT_PARAMS);
 
-  Model *attach_model(ResourceID id);
-  std::vector<Model *> attach_models(std::initializer_list<ResourceID> ids);
+    Model* attach_model(ResourceID id);
+    std::vector<Model*> attach_models(std::initializer_list<ResourceID> ids);
 
-private:
-  std::vector<ResourceID> m_models;
-};
+  private:
+    std::vector<ResourceID> m_models;
+  };
 
 } // namespace astralix

@@ -11,23 +11,24 @@
 
 namespace astralix {
 
-class MeshComponent : public Component<MeshComponent> {
-public:
-  MeshComponent(COMPONENT_INIT_PARAMS);
+  class MeshComponent : public Component<MeshComponent>
+  {
+  public:
+    MeshComponent(COMPONENT_INIT_PARAMS);
 
-  void start();
-  void update();
+    void start();
+    void update();
 
-  std::vector<Mesh> *get_meshes() { return &m_meshes; }
+    std::vector<Mesh>* get_meshes() { return &m_meshes; }
 
-  void attach_meshes(std::vector<Mesh> meshes) {
-    m_meshes.insert(m_meshes.end(), meshes.begin(), meshes.end());
+    void attach_meshes(std::vector<Mesh> meshes) {
+      m_meshes.insert(m_meshes.end(), meshes.begin(), meshes.end());
+    };
+
+    void attach_mesh(Mesh mesh) { m_meshes.push_back(mesh); };
+
+  private:
+    std::vector<Mesh> m_meshes;
   };
-
-  void attach_mesh(Mesh mesh) { m_meshes.push_back(mesh); };
-
-private:
-  std::vector<Mesh> m_meshes;
-};
 
 } // namespace astralix

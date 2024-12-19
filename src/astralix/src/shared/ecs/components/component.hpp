@@ -1,4 +1,6 @@
 #pragma once
+#include "base.hpp"
+#include "ecs/components/serializers/component-serializer.hpp"
 #include "ecs/managers/entity-manager.hpp"
 #include "engine.hpp"
 
@@ -7,8 +9,8 @@ namespace astralix {
 #define COMPONENT_INIT_PARAMS                                                  \
   const EntityID &owner_id, const ComponentID &component_id
 
-#define COMPONENT_INIT(Type, Name, Is_Removable)                               \
-  Component<Type>(owner_id, component_id, Name, Is_Removable)
+#define COMPONENT_INIT(Type, Name, Is_Removable, Serializer)                   \
+  Component<Type>(owner_id, component_id, Name, Is_Removable, Serializer)
 
 class IEntity;
 
@@ -22,8 +24,8 @@ public:
   static ComponentTypeID component_type_id() { return s_component_type_id; }
 
   Component(COMPONENT_INIT_PARAMS, const std::string &name,
-            const bool &is_removable)
-      : IComponent(owner_id, component_id, name, is_removable) {}
+            const bool &is_removable, Ref<ComponentSerializer> serializer)
+      : IComponent(owner_id, component_id, name, is_removable, serializer) {}
 
   IEntity *get_owner() {
     return EntityManager::get()->get_entity(get_owner_id());

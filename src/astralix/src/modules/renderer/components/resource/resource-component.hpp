@@ -5,25 +5,26 @@
 
 namespace astralix {
 
-class ResourceComponent : public Component<ResourceComponent> {
-public:
-  ResourceComponent(COMPONENT_INIT_PARAMS);
-  ResourceComponent() {}
+  class ResourceComponent : public Component<ResourceComponent>
+  {
+  public:
+    ResourceComponent(COMPONENT_INIT_PARAMS);
+    ResourceComponent() {}
 
-  void start();
-  void update();
+    void start();
+    void update();
 
-  ResourceComponent *attach_texture(TextureRenderData data);
-  ResourceComponent *attach_cubemap(TextureRenderData data);
-  ResourceComponent *set_shader(ResourceID id);
+    ResourceComponent* attach_texture(TextureRenderData data);
+    ResourceComponent* attach_cubemap(TextureRenderData data);
+    ResourceComponent* set_shader(ResourceID id);
 
-  bool has_shader() { return m_shader != nullptr; };
+    bool has_shader() { return m_shader != nullptr; };
 
-  Ref<Shader> &get_shader() { return m_shader; }
+    Ref<Shader>& get_shader() { return m_shader; }
 
-private:
-  TextureRenderer m_texture_renderer;
-  Ref<Shader> m_shader;
-};
+  private:
+    TextureRenderer m_texture_renderer;
+    Ref<Shader> m_shader;
+  };
 
 } // namespace astralix
