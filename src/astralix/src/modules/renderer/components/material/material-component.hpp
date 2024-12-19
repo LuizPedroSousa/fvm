@@ -7,18 +7,18 @@
 
 namespace astralix {
 
-class MaterialComponent : public Component<MaterialComponent> {
-public:
-  MaterialComponent(COMPONENT_INIT_PARAMS);
+  class MaterialComponent : public Component<MaterialComponent> {
+  public:
+    MaterialComponent(COMPONENT_INIT_PARAMS);
 
-  void update();
-  void reset_material();
+    void update();
+    void reset_material();
 
-  void attach_material(ResourceID material);
-  void attach_materials(std::vector<ResourceID> materials);
+    void attach_material(ResourceID material);
+    void attach_materials(std::vector<ResourceID> materials);
 
-private:
-  static std::string get_name(const char *prefix, int count);
-};
+  private:
+    static std::string get_name(const char* prefix, int count);
+  };
 
 } // namespace astralix

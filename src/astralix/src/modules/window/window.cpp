@@ -54,11 +54,13 @@ static bool has_pressed = false;
 
 int Window::get_height() { return m_height; }
 int Window::get_width() { return m_width; }
+std::string Window::get_title() { return m_title; }
 
-void Window::open(int width, int height) {
+void Window::open(const char *title, int width, int height) {
   m_width = width;
-  m_height = width;
-  GLFWwindow *window = glfwCreateWindow(m_width, m_height, "FVM", NULL, NULL);
+  m_height = height;
+  m_title = title;
+  GLFWwindow *window = glfwCreateWindow(m_width, m_height, title, NULL, NULL);
   m_value = window;
 
   if (window == NULL) {
@@ -106,7 +108,6 @@ void Window::mouse_callback(GLFWwindow *window, double x, double y) {
 
 void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
                           int mods) {
-
   EventDispatcher::get()->for_each<KeyboardListener, KeyReleasedEvent>(
       [key, action](KeyboardListener &listener) {
         if (listener.get_event()->get_key() == key && action == GLFW_PRESS) {

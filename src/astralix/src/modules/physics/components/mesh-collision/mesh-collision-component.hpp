@@ -6,81 +6,83 @@
 
 namespace astralix {
 
-class Simplex {
+  class Simplex {
 
-public:
-  Simplex()
-      : m_points({glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec3(0)}),
-        m_size(0){
+  public:
+    Simplex()
+      : m_points({ glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec3(0) }),
+      m_size(0) {
 
-        };
+    };
 
-  Simplex &operator=(std::initializer_list<glm::vec3> list) {
-    for (auto point = list.begin(); point != list.end(); point++) {
-      m_points[std::distance(list.begin(), point)] = *point;
+    Simplex& operator=(std::initializer_list<glm::vec3> list) {
+      for (auto point = list.begin(); point != list.end(); point++) {
+        m_points[std::distance(list.begin(), point)] = *point;
+      }
+
+      m_size = list.size();
+
+      return *this;
     }
 
-    m_size = list.size();
+    glm::vec3& operator[](unsigned int index) { return m_points[index]; }
 
-    return *this;
-  }
+    void push_front(glm::vec3 point) {
+      m_points = { point, m_points[0], m_points[1], m_points[2] };
 
-  glm::vec3 &operator[](unsigned int index) { return m_points[index]; }
+      m_size = std::min(m_size + 1, 4u);
+    }
 
-  void push_front(glm::vec3 point) {
-    m_points = {point, m_points[0], m_points[1], m_points[2]};
+    auto size() const { return m_size; }
 
-    m_size = std::min(m_size + 1, 4u);
-  }
+    auto begin() const { return m_points.begin(); }
 
-  auto size() const { return m_size; }
+    auto end() const { return m_points.end() - (4 - m_size); }
 
-  auto begin() const { return m_points.begin(); }
+    enum SimplexType { line, triangle, tetrahedron };
 
-  auto end() const { return m_points.end() - (4 - m_size); }
+    SimplexType get_type() {
+      switch (m_size) {
+      case 2:
+        return SimplexType::line;
 
-  enum SimplexType { line, triangle, tetrahedron };
+      case 3:
+        return SimplexType::triangle;
 
-  SimplexType get_type() {
-    switch (m_size) {
-    case 2:
-      return SimplexType::line;
+      default:
+        return SimplexType::tetrahedron;
+      };
+    }
 
-    case 3:
-      return SimplexType::triangle;
+  private:
+    std::array<glm::vec3, 4> m_points;
+    unsigned m_size;
+  };
 
-    default:
-      return SimplexType::tetrahedron;
-    };
-  }
+  class MeshCollisionComponent
+    : public Component<MeshCollisionComponent>
+  {
+  public:
+    MeshCollisionComponent(COMPONENT_INIT_PARAMS);
 
-private:
-  std::array<glm::vec3, 4> m_points;
-  unsigned m_size;
-};
+    void start();
 
-class MeshCollisionComponent : public Component<MeshCollisionComponent> {
-public:
-  MeshCollisionComponent(COMPONENT_INIT_PARAMS);
+    bool aabb_intersect(MeshCollisionComponent* other);
+    bool has_intersect(MeshCollisionComponent* other);
 
-  void start();
+    glm::vec3 get_support(MeshCollisionComponent* other_collider,
+      glm::vec3 direction);
+    glm::vec3 find_furthest_point(glm::vec3 direction,
+      std::vector<glm::vec3> vertices);
 
-  bool aabb_intersect(MeshCollisionComponent *other);
-  bool has_intersect(MeshCollisionComponent *other);
+    bool can_check_next_simplex(Simplex& simplex, glm::vec3& direction);
 
-  glm::vec3 get_support(MeshCollisionComponent *other_collider,
-                        glm::vec3 direction);
-  glm::vec3 find_furthest_point(glm::vec3 direction,
-                                std::vector<glm::vec3> vertices);
+    bool search_line(Simplex& simplex, glm::vec3& direction);
+    bool search_triangle(Simplex& simplex, glm::vec3& direction);
+    bool search_tetrahedron(Simplex& simplex, glm::vec3& direction);
+    bool is_same_direction(glm::vec3& direction, glm::vec3& ao);
 
-  bool can_check_next_simplex(Simplex &simplex, glm::vec3 &direction);
-
-  bool search_line(Simplex &simplex, glm::vec3 &direction);
-  bool search_triangle(Simplex &simplex, glm::vec3 &direction);
-  bool search_tetrahedron(Simplex &simplex, glm::vec3 &direction);
-  bool is_same_direction(glm::vec3 &direction, glm::vec3 &ao);
-
-  std::vector<glm::vec3> vertices;
-};
+    std::vector<glm::vec3> vertices;
+  };
 
 } // namespace astralix

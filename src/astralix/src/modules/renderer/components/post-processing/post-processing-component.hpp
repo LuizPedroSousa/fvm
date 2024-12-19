@@ -7,17 +7,19 @@
 
 namespace astralix {
 
-class PostProcessingComponent : public Component<PostProcessingComponent> {
-public:
-  PostProcessingComponent(COMPONENT_INIT_PARAMS);
-  ~PostProcessingComponent() = default;
+  class PostProcessingComponent
+    : public Component<PostProcessingComponent>
+  {
+  public:
+    PostProcessingComponent(COMPONENT_INIT_PARAMS);
+    ~PostProcessingComponent() = default;
 
-  void start();
-  void post_update();
+    void start();
+    void post_update();
 
-private:
-  void resolve_screen_texture();
+  private:
+    void resolve_screen_texture();
 
-  Ref<Framebuffer> m_multisampled_framebuffer;
-};
+    Ref<Framebuffer> m_multisampled_framebuffer;
+  };
 } // namespace astralix

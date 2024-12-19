@@ -76,6 +76,8 @@
     "valarray": "cpp",
     "variant": "cpp",
     "*.inc": "cpp",
-    "forward_list": "cpp"
+    "forward_list": "cpp",
+    "text_encoding": "cpp",
+    "cassert": "cpp"
   }
 }

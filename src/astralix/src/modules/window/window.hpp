@@ -13,10 +13,11 @@ public:
   static void init();
   static Window *get();
 
-  void open(int width, int height);
+  void open(const char *title, int width, int height);
 
   int get_width();
   int get_height();
+  std::string get_title();
 
   void update();
   void post_update();
@@ -42,6 +43,7 @@ private:
 
   int m_height = 0;
   int m_width = 0;
+  std::string m_title;
 };
 
 } // namespace astralix

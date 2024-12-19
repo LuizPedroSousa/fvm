@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "managers/project-manager.hpp"
 #include "systems/layer-system.hpp"
 #include "systems/physics-system.hpp"
 #include "systems/render-system.hpp"
@@ -8,7 +9,11 @@
 namespace astralix {
 Engine *Engine::m_instance = nullptr;
 
-void Engine::init() { m_instance = new Engine; }
+void Engine::init() {
+  if (m_instance == nullptr) {
+    m_instance = new Engine;
+  }
+}
 
 void Engine::end() { delete m_instance; }
 
@@ -18,6 +23,7 @@ Engine::Engine() {
   EntityManager::init();
   ComponentManager::init();
 
+  ProjectManager::init();
   SceneManager::init();
   ResourceManager::init();
   SystemManager::init();
@@ -30,8 +36,8 @@ void Engine::start() {
   framebuffer_spec.attachments = {FramebufferTextureFormat::RGBA8,
                                   FramebufferTextureFormat::RED_INTEGER,
                                   FramebufferTextureFormat::Depth};
-  framebuffer_spec.width = 1280;
-  framebuffer_spec.height = 720;
+  framebuffer_spec.width = 1920;
+  framebuffer_spec.height = 1080;
   framebuffer = std::move(Framebuffer::create(framebuffer_spec));
 
   auto system_manager = SystemManager::get();

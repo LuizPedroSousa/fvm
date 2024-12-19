@@ -18,7 +18,7 @@ Application *Application::init() {
 }
 
 void Application::start() {
-  Window::get()->open(1600, 900);
+  Window::get()->open("FVM Editor", 1920, 1080);
   Engine::get()->start();
 }
 

@@ -6,7 +6,7 @@ namespace astralix {
 
 template <typename T> class Entity : public IEntity {
 public:
-  Entity(ENTITY_INIT_PARAMS) : IEntity(id, name) {}
+  Entity(ENTITY_INIT_PARAMS) : IEntity(id, family_id, name) {}
   Entity() {}
 
   ~Entity() {}

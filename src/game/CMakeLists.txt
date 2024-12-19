@@ -5,4 +5,4 @@ add_library(game STATIC ${GAME_SRC} ${GAME_HEADERS})
 
 include_directories(${PROJECT_SOURCE_DIR}/external)
 target_include_directories(game PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(game ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} physics application engine renderer window shared glm glad)
+target_link_libraries(game ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} physics application engine renderer window shared glm glad project)
