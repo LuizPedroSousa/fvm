@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(fvm)
 
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+# set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
@@ -12,7 +12,7 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(assimp REQUIRED)
 
-set(VCPKG_INSTALLED_ROOT "${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-linux")
+set(VCPKG_INSTALLED_ROOT "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux")
 set(jsoncpp_DIR "${VCPKG_INSTALLED_ROOT}/share/jsoncpp")
 set(imgui_DIR "${VCPKG_INSTALLED_ROOT}/share/imgui")
 set(imguizmo_DIR "${VCPKG_INSTALLED_ROOT}/share/imguizmo")

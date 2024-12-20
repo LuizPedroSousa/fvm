@@ -1,0 +1,9 @@
+{
+  "name": "fvm",
+  "version": "1.0",
+  "dependencies": [
+    "imgui",
+    "jsoncpp",
+    "imguizmo"
+  ]
+}
