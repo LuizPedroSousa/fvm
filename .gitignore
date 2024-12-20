@@ -5,6 +5,8 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+vcpkg
+vcpkg_installed
 
 # Compiled binary files
 *.o

@@ -2,8 +2,17 @@
   "name": "fvm",
   "version": "1.0",
   "dependencies": [
-    "imgui",
-    "jsoncpp",
-    "imguizmo"
+    {
+      "name": "imgui",
+      "platform": "linux",
+      "features": [
+        "docking-experimental",
+        "opengl3-binding",
+        "vulkan-binding",
+        "glfw-binding"
+      ]
+    },
+    "imguizmo",
+    "jsoncpp"
   ]
 }

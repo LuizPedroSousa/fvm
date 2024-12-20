@@ -55,9 +55,8 @@ add_library(glad "external/glad/glad.c")
 add_library(glm "external/glm/detail/glm.cpp")
 add_library(stb_image "external/stb_image/stb_image.cpp")
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui)
+# add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui)
 add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui/impl)
-
 set(LIBS ${LIBS} glad)
 
 set(LIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external ${VCPKG_INSTALLED_ROOT}/include)
