@@ -12,7 +12,7 @@
 #include "application.hpp"
 #include "window.hpp"
 
-#include "managers/layer-manager.hpp"
+#include "layers/managers/layer-manager.hpp"
 
 #include "components/camera/camera-component.hpp"
 #include "components/light/light-component.hpp"
@@ -26,9 +26,12 @@
 #include "components/rigidbody/rigidbody-component.hpp"
 #include "components/skybox/skybox-component.hpp"
 #include "components/transform/transform-component.hpp"
+#include "iostream"
+#include "filesystem"
+#include "managers/project-manager.hpp"
+#include "editor.hpp"
 
 namespace astralix {
-
   void DockspaceOverlay::start() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -37,6 +40,13 @@ namespace astralix {
 
     ImGui_ImplGlfw_InitForOpenGL(Window::get_value(), true);
     ImGui_ImplOpenGL3_Init("#version 410");
+
+    auto editor = Editor::get();
+
+
+    auto current_layout = editor->get_current_layout();
+
+    ImGui::LoadIniSettingsFromMemory(current_layout->ini_settings.c_str());
   }
 
   void DockspaceOverlay::update() {
@@ -115,6 +125,7 @@ namespace astralix {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+    io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
       GLFWwindow* backup_current_context = glfwGetCurrentContext();
       ImGui::UpdatePlatformWindows();
@@ -133,9 +144,12 @@ namespace astralix {
   }
 
   void DockspaceOverlay::draw_menu_bar() {
-
     if (ImGui::BeginMenuBar()) {
       if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Save")) {
+          SceneManager::get()->get_active_scene()->save();
+        }
+
         if (ImGui::MenuItem("Exit")) {
           Application::get()->end();
         }

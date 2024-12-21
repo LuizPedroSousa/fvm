@@ -64,6 +64,7 @@ set(LIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external ${VCPKG_INSTALLED_ROOT}/include
 add_subdirectory(src/astralix/src/shared)
 add_subdirectory(src/astralix/src/modules/window)
 add_subdirectory(src/astralix/src/modules/renderer)
+add_subdirectory(src/astralix/src/modules/editor)
 add_subdirectory(src/astralix/src/modules/physics)
 add_subdirectory(src/astralix/src/modules/engine)
 add_subdirectory(src/astralix/src/modules/application)

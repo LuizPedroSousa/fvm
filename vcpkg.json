@@ -4,15 +4,15 @@
   "dependencies": [
     {
       "name": "imgui",
-      "platform": "linux",
       "features": [
         "docking-experimental",
-        "opengl3-binding",
-        "vulkan-binding",
-        "glfw-binding"
-      ]
+        "glfw-binding",
+        "opengl3-binding"
+      ],
+      "platform": "linux"
     },
     "imguizmo",
-    "jsoncpp"
+    "jsoncpp",
+    "websocketpp"
   ]
 }

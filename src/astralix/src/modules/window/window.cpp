@@ -9,6 +9,7 @@
 #include "exceptions/base-exception.hpp"
 #include "imgui.h"
 #include "stdio.h"
+#include "engine.hpp"
 #include "window.hpp"
 
 namespace astralix {
