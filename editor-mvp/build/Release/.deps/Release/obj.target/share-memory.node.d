@@ -1,0 +1,1 @@
+cmd_Release/obj.target/share-memory.node := g++ -o Release/obj.target/share-memory.node -shared -pthread -rdynamic -m64  -Wl,-soname=share-memory.node -Wl,--start-group Release/obj.target/share-memory/share-memory.o -Wl,--end-group 

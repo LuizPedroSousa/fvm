@@ -1,6 +1,5 @@
 #pragma once
 #include "either.hpp"
-#include "engine.hpp"
 #include "exceptions/base-exception.hpp"
 
 namespace astralix {
@@ -15,7 +14,7 @@ public:
   static void end();
 
 private:
-  Application(){};
+  Application() {};
   ~Application();
 
   static Application *m_instance;

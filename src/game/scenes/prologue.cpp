@@ -74,8 +74,6 @@ void Prologue::load_scene_components() {
 void Prologue::start() {
   load_resources();
   load_scene_components();
-
-  save();
 }
 
 void Prologue::update() {}

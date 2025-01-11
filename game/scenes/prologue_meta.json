@@ -1,115 +1,110 @@
 {
-	"entities" : 
-	[
-		{
-			"active" : true,
-			"components" : 
-			[
-				{
-					"active" : true,
-					"component_id" : "12",
-					"name" : "Skybox",
-					"owner_id" : "5707709616435919416"
-				},
-				{
-					"active" : true,
-					"component_id" : "11",
-					"name" : "Transform",
-					"owner_id" : "5707709616435919416"
-				},
-				{
-					"active" : true,
-					"component_id" : "10",
-					"name" : "Resource Renderer",
-					"owner_id" : "5707709616435919416"
-				}
-			],
-			"id" : "5707709616435919416",
-			"name" : "Ground"
-		},
-		{
-			"active" : true,
-			"components" : 
-			[
-				{
-					"active" : true,
-					"component_id" : "8",
-					"name" : "Skybox",
-					"owner_id" : "966155245590479606"
-				},
-				{
-					"active" : true,
-					"component_id" : "9",
-					"name" : "Mesh Renderer",
-					"owner_id" : "966155245590479606"
-				},
-				{
-					"active" : true,
-					"component_id" : "7",
-					"name" : "Transform",
-					"owner_id" : "966155245590479606"
-				},
-				{
-					"active" : true,
-					"component_id" : "6",
-					"name" : "Resource Renderer",
-					"owner_id" : "966155245590479606"
-				}
-			],
-			"id" : "966155245590479606",
-			"name" : "Skybox"
-		},
-		{
-			"active" : true,
-			"components" : 
-			[
-				{
-					"active" : true,
-					"component_id" : "5",
-					"name" : "Light",
-					"owner_id" : "15513393600505874161"
-				},
-				{
-					"active" : true,
-					"component_id" : "4",
-					"name" : "Transform",
-					"owner_id" : "15513393600505874161"
-				},
-				{
-					"active" : true,
-					"component_id" : "3",
-					"name" : "Resource Renderer",
-					"owner_id" : "15513393600505874161"
-				}
-			],
-			"id" : "15513393600505874161",
-			"name" : "Light"
-		},
-		{
-			"active" : true,
-			"components" : 
-			[
-				{
-					"active" : true,
-					"component_id" : "2",
-					"name" : "Camera",
-					"owner_id" : "1332959190989885650"
-				},
-				{
-					"active" : true,
-					"component_id" : "1",
-					"name" : "Transform",
-					"owner_id" : "1332959190989885650"
-				},
-				{
-					"active" : true,
-					"component_id" : "0",
-					"name" : "Resource Renderer",
-					"owner_id" : "1332959190989885650"
-				}
-			],
-			"id" : "1332959190989885650",
-			"name" : "camera"
-		}
-	]
+  "entities": [
+    {
+      "active": true,
+      "components": [
+        {
+          "active": true,
+          "component_id": "12",
+          "name": "Skybox",
+          "owner_id": "18375423016469190949"
+        },
+        {
+          "active": true,
+          "component_id": "11",
+          "name": "Transform",
+          "owner_id": "18375423016469190949"
+        },
+        {
+          "active": true,
+          "component_id": "10",
+          "name": "Resource Renderer",
+          "owner_id": "18375423016469190949"
+        }
+      ],
+      "id": "18375423016469190949",
+      "name": "Ground"
+    },
+    {
+      "active": true,
+      "components": [
+        {
+          "active": true,
+          "component_id": "8",
+          "name": "Skybox",
+          "owner_id": "1013893732520795855"
+        },
+        {
+          "active": true,
+          "component_id": "9",
+          "name": "Mesh Renderer",
+          "owner_id": "1013893732520795855"
+        },
+        {
+          "active": true,
+          "component_id": "7",
+          "name": "Transform",
+          "owner_id": "1013893732520795855"
+        },
+        {
+          "active": true,
+          "component_id": "6",
+          "name": "Resource Renderer",
+          "owner_id": "1013893732520795855"
+        }
+      ],
+      "id": "1013893732520795855",
+      "name": "Skybox"
+    },
+    {
+      "active": true,
+      "components": [
+        {
+          "active": true,
+          "component_id": "5",
+          "name": "Light",
+          "owner_id": "10363367289895062399"
+        },
+        {
+          "active": true,
+          "component_id": "4",
+          "name": "Transform",
+          "owner_id": "10363367289895062399"
+        },
+        {
+          "active": true,
+          "component_id": "3",
+          "name": "Resource Renderer",
+          "owner_id": "10363367289895062399"
+        }
+      ],
+      "id": "10363367289895062399",
+      "name": "Light"
+    },
+    {
+      "active": true,
+      "components": [
+        {
+          "active": true,
+          "component_id": "2",
+          "name": "Camera",
+          "owner_id": "18189433101890013259"
+        },
+        {
+          "active": true,
+          "component_id": "1",
+          "name": "Transform",
+          "owner_id": "18189433101890013259"
+        },
+        {
+          "active": true,
+          "component_id": "0",
+          "name": "Resource Renderer",
+          "owner_id": "18189433101890013259"
+        }
+      ],
+      "id": "18189433101890013259",
+      "name": "camera"
+    }
+  ]
 }

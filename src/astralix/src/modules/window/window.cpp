@@ -9,7 +9,12 @@
 #include "exceptions/base-exception.hpp"
 #include "imgui.h"
 #include "stdio.h"
+#include "engine.hpp"
 #include "window.hpp"
+#define GLFW_EXPOSE_NATIVE_X11;
+#include "GLFW/glfw3native.h"
+#include <X11/Xlib.h>
+
 
 namespace astralix {
 
@@ -63,11 +68,45 @@ namespace astralix {
     GLFWwindow* window = glfwCreateWindow(m_width, m_height, title, NULL, NULL);
     m_value = window;
 
+
     if (window == NULL) {
       glfwTerminate();
 
       ASTRA_ASSERT_THROW(true, "Couldn't create window for OpenGL");
     }
+
+    // auto x11WindowID = glfwGetX11Window(window);
+
+
+    // Display* display = XOpenDisplay(NULL);
+
+    // if (display == NULL) {
+    //   std::cerr << "Unable to open X display!" << std::endl;
+    //   exit(1);
+    // }
+
+    // int electronWindowID = 41943044;
+
+
+    // XMapWindow(display, electronWindowID);
+    // XFlush(display);  // Make sure X server has processed mapping
+
+    // int result = XReparentWindow(display, x11WindowID, electronWindowID, 10, 10);
+    // XFlush(display);  // Ensure the reparenting command is processed
+
+    // XMapWindow(display, x11WindowID); // Ensure child window is also mapped
+
+
+
+
+    // if (result != 0) {
+    //   char error_msg[1024];
+    //   XGetErrorText(display, result, error_msg, sizeof(error_msg));
+    //   std::cerr << "Error reparenting window: " << error_msg << std::endl;
+    // }
+    // else {
+    //   std::cout << "Window reparented successfully." << std::endl;
+    // }
 
     glfwMakeContextCurrent(m_value);
 
@@ -84,6 +123,7 @@ namespace astralix {
     glfwSetCursorPosCallback(m_value, mouse_callback);
     glfwSetKeyCallback(m_value, key_callback);
   }
+
 
   void Window::toggle_view_mouse() {
     has_pressed = !has_pressed;

@@ -9,17 +9,38 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 add_compile_options(-fPIC)
 
 find_package(OpenGL REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
 find_package(assimp REQUIRED)
 
 set(VCPKG_INSTALLED_ROOT "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux")
 set(jsoncpp_DIR "${VCPKG_INSTALLED_ROOT}/share/jsoncpp")
 set(imgui_DIR "${VCPKG_INSTALLED_ROOT}/share/imgui")
 set(imguizmo_DIR "${VCPKG_INSTALLED_ROOT}/share/imguizmo")
+set(glfw3_DIR "${VCPKG_INSTALLED_ROOT}/share/glfw3")
+set(uwebsockets_DIR "${VCPKG_INSTALLED_ROOT}/share/unofficial-uwebsockets")
+
+# find_path(UWEBSOCKETS_INCLUDE_DIRS "${VCPKG_INSTALLED_ROOT}/include/uwebsockets/App.h")
+find_path(USOCKET_LIB_A "${VCPKG_INSTALLED_ROOT}/lib/libuSockets.a")
+find_package(ZLIB REQUIRED)
+
+# set(boost_DIR "${VCPKG_INSTALLED_ROOT}/share/boost")
+
+# set(gtk4 "${VCPKG_INSTALLED_ROOT}/share/gtk-4.0")
 find_package(jsoncpp CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
-find_package(imguizmo CONFIG REQUIRED)
 
+# find_package(boost CONFIG REQUIRED)
+find_package(PkgConfig)
+
+find_package(PkgConfig REQUIRED)
+
+find_package(glfw3 CONFIG REQUIRED)
+
+find_package(X11 REQUIRED)
+
+# pkg_check_modules(GTKMM_VARS REQUIRED IMPORTED_TARGET gtkmm-4.0)
+
+# find_package(imguizmo CONFIG REQUIRED)
+# find_package(gtk CONFIG REQUIRED)
 if(WIN32)
   set(LIBS glfw3 opengl32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -27,7 +48,6 @@ elseif(UNIX AND NOT APPLE)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
   find_package(OpenGL REQUIRED)
   add_definitions(${OPENGL_DEFINITIONS})
-  find_package(X11 REQUIRED)
 
   # note that the order is important for setting the libs
   # use pkg-config --libs $(pkg-config --print-requires --print-requires-private glfw3) in a terminal to confirm
@@ -49,7 +69,7 @@ endif(WIN32)
 
 add_executable(fvm src/main.cpp)
 
-include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS})
+include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS} ${GTK4_INCLUDE_DIRS})
 
 add_library(glad "external/glad/glad.c")
 add_library(glm "external/glm/detail/glm.cpp")
@@ -64,6 +84,7 @@ set(LIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external ${VCPKG_INSTALLED_ROOT}/include
 add_subdirectory(src/astralix/src/shared)
 add_subdirectory(src/astralix/src/modules/window)
 add_subdirectory(src/astralix/src/modules/renderer)
+add_subdirectory(src/astralix/src/modules/editor)
 add_subdirectory(src/astralix/src/modules/physics)
 add_subdirectory(src/astralix/src/modules/engine)
 add_subdirectory(src/astralix/src/modules/application)
@@ -74,4 +95,4 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/game)
 include_directories(${LIB_INCLUDE_DIR})
 link_directories(${VCPKG_INSTALLED_ROOT}/lib)
 
-target_link_libraries(fvm PRIVATE game application)
+target_link_libraries(fvm PRIVATE game application X11::X11 "${VCPKG_INSTALLED_ROOT}/lib/libuSockets.a" ZLIB::ZLIB)
