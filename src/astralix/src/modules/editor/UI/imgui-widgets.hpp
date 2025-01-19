@@ -279,13 +279,13 @@ namespace astralix::UI {
     auto create_object_with_mesh = [&](const char* name, Mesh mesh) {
       auto entity = entity_manager->add_entity<Object>(name);
 
-      entity.add_component<MeshComponent>()->attach_mesh(mesh);
-      entity.get_component<ResourceComponent>()
+      entity->add_component<MeshComponent>()->attach_mesh(mesh);
+      entity->get_component<ResourceComponent>()
         ->set_shader("shaders::lighting")
         ->attach_texture({ "textures::default", "materials[0].diffuse" })
         ->attach_texture({ "textures::default", "materials[0].specular" });
 
-      entity.start();
+      entity->start();
       };
 
     auto create_light = [&](const char* name, Scope<LightStrategy> strategy) {
@@ -293,7 +293,7 @@ namespace astralix::UI {
       auto camera_obj =
         entity_manager->get_entity_with_component<CameraComponent>();
 
-      entity.add_component<LightComponent>(std::move(strategy),
+      entity->add_component<LightComponent>(std::move(strategy),
         camera_obj->get_entity_id());
       };
 

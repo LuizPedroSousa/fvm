@@ -3,6 +3,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
 #include "engine.hpp"
+#include "managers/resource-manager.hpp"
 
 namespace astralix {
 

@@ -1,47 +1,38 @@
 #pragma once
+#include "events/event.hpp"
+#include "events/listener.hpp"
 #include "functional"
 #include "key-codes.hpp"
-#include "listener.hpp"
+
+#define BASE_FIELDS KeyCode key_code;
 
 namespace astralix {
 
-class KeyEvent : public Event {
-
+class KeyPressedEvent : public Event {
 public:
-  KeyCode get_key() { return m_key_code; }
+  KeyPressedEvent(KeyCode key_code) : key_code(key_code), Event() {}
 
-protected:
-  KeyEvent(const KeyCode key_code) : m_key_code(key_code){};
-  KeyCode m_key_code;
+  BASE_FIELDS
+  EVENT_TYPE(KeyPressed)
 };
 
-class KeyPressedEvent : public KeyEvent {
+class KeyReleasedEvent : public Event {
 public:
-  KeyPressedEvent(const KeyCode key_code) : KeyEvent(key_code){};
-
-  EVENT_CLASS_TYPE(KeyPressed)
-};
-
-class KeyReleasedEvent : public KeyEvent {
-public:
-  KeyReleasedEvent(const KeyCode key_code) : KeyEvent(key_code){};
-
-  EVENT_CLASS_TYPE(KeyReleased)
+  BASE_FIELDS;
+  KeyReleasedEvent(KeyCode key_code) : key_code(key_code) {}
+  EVENT_TYPE(KeyReleased)
 };
 
 class KeyboardListener : public BaseListener {
 public:
-  KeyboardListener(KeyEvent *event, const std::function<void()> &callback)
-      : BaseListener(event), m_callback(callback) {}
+  KeyboardListener(const std::function<void(Event *)> &callback)
+      : m_callback(callback) {}
 
-  KeyEvent *get_event() override { return static_cast<KeyEvent *>(m_event); }
-
-  void dispatch() override { m_callback(); }
+  void dispatch(Event *event) override { m_callback(event); }
 
   LISTENER_CLASS_TYPE(Keyboard)
 
 private:
-  std::function<void()> m_callback;
+  std::function<void(Event *)> m_callback;
 };
-
 } // namespace astralix

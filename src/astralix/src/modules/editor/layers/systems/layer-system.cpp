@@ -44,10 +44,6 @@ namespace astralix {
 
     layer_manager->for_each([](Overlay* overlay) { overlay->update(); });
     layer_manager->for_each([](Layer* layer) { layer->update(); });
-  };
-
-  void LayerSystem::post_update(double dt) {
-    auto layer_manager = LayerManager::get();
 
     layer_manager->for_each([](Overlay* overlay) { overlay->post_update(); });
   };

@@ -28,10 +28,12 @@ using EntityTypeID = TypeID;
 
 using ComponentID = ObjectID;
 using ComponentTypeID = TypeID;
+using SchedulerID = Guid;
 
 using SystemTypeID = TypeID;
 using ResourceID = std::string;
 using ProjectID = Guid;
+using ListenerId = Guid;
 
 template <typename T> class FamilyTypeID {
 private:

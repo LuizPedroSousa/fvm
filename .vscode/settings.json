@@ -96,5 +96,8 @@
     "slist": "cpp",
     "ranges": "cpp",
     "scoped_allocator": "cpp"
-  }
+  },
+  "cSpell.words": [
+    "Unkown"
+  ]
 }

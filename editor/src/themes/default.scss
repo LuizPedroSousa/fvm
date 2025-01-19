@@ -1,9 +1,9 @@
 .splitlayers.default-theme {
   .splitlayers__layer {
-    background-color: #333;
+    background-color:  #383838;
   }
   .splitlayers__splitter {
-    background-color: #fff;
+    background-color: #383838;
     box-sizing: border-box;
     position: relative;
     flex-shrink: 0;
@@ -32,7 +32,7 @@
   &.splitlayers--vertical > .splitlayers__splitter,
   .splitlayers--vertical > .splitlayers__splitter {
     width: 7px;
-    border-left: 1px solid #eee;
+    border-left: 2px solid  #292828;
     cursor: col-resize;
     &:before,
     &:after {

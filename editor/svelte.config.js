@@ -11,6 +11,9 @@ const config = {
   preprocess: sveltePreprocess(),
   kit: {
     adapter: adapter(),
+    alias: {
+              "@/*": "./src",
+    }
   },
 };
 

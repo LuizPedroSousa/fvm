@@ -9,43 +9,39 @@
 
 namespace astralix {
 
-PhysicsSystem::PhysicsSystem(){};
+  PhysicsSystem::PhysicsSystem() {};
 
-void PhysicsSystem::start() {
-  auto entity_manager = EntityManager::get();
+  void PhysicsSystem::start() {
+    auto entity_manager = EntityManager::get();
 
-  entity_manager->for_each<Object>([](Object *object) {
-    auto mesh_collision_component =
+    entity_manager->for_each<Object>([](Object* object) {
+      auto mesh_collision_component =
         object->get_component<MeshCollisionComponent>();
 
-    if (mesh_collision_component != nullptr) {
-      mesh_collision_component->start();
-    }
-  });
-}
+      if (mesh_collision_component != nullptr) {
+        mesh_collision_component->start();
+      }
+      });
+  }
 
-void PhysicsSystem::fixed_update(double fixed_dt){
+  void PhysicsSystem::fixed_update(double fixed_dt) {
 
-};
+  };
 
-void PhysicsSystem::pre_update(double dt){
+  void PhysicsSystem::pre_update(double dt) {
 
-};
+  };
 
-void PhysicsSystem::update(double dt) {
-  auto component_manager = ComponentManager::get();
-  auto entity_manager = EntityManager::get();
+  void PhysicsSystem::update(double dt) {
+    auto component_manager = ComponentManager::get();
+    auto entity_manager = EntityManager::get();
 
-  entity_manager->for_each<Object>([dt](Object *object) {
-    auto rigidbody_component = object->get_component<RigidBodyComponent>();
+    entity_manager->for_each<Object>([dt](Object* object) {
+      auto rigidbody_component = object->get_component<RigidBodyComponent>();
 
-    if (rigidbody_component != nullptr) {
-      rigidbody_component->update(dt);
-    }
-  });
-};
-
-void PhysicsSystem::post_update(double dt){
-
-};
+      if (rigidbody_component != nullptr) {
+        rigidbody_component->update(dt);
+      }
+      });
+  };
 } // namespace astralix

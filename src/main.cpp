@@ -1,5 +1,10 @@
+#ifdef ASTRA_EDITOR
+#include "astralix/src/modules/editor/editor.hpp"
+#else
 #include "astralix/src/modules/application/application.hpp"
+#endif
 #include "astralix/src/shared/exceptions/base-exception.hpp"
+#include "iostream"
 #include "game/game.hpp"
 
 
@@ -10,14 +15,22 @@ int handleException(astralix::BaseException exception) {
 }
 
 
+#define INIT(runner) \
+auto app =  astralix::runner::init(); \
+game.start(); \
+app->start(); \
+app->run();
+
+
 int main(int argc, char** argv) {
   try {
     Game game;
-    astralix::Application* app = astralix::Application::init();
-    game.start();
-    app->start();
 
-    app->run();
+#ifdef ASTRA_EDITOR
+    INIT(Editor);
+#else
+    INIT(Application);
+#endif
   }
   catch (astralix::BaseException exception) {
     return handleException(exception);

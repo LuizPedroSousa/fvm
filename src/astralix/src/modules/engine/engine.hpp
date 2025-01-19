@@ -1,13 +1,6 @@
 #pragma once
-#include "ecs/entities/entity.hpp"
 
 #include "framebuffer.hpp"
-
-#include "ecs/managers/component-manager.hpp"
-#include "ecs/managers/entity-manager.hpp"
-#include "ecs/managers/system-manager.hpp"
-#include "managers/resource-manager.hpp"
-#include "managers/scene-manager.hpp"
 #include "renderer-api.hpp"
 
 namespace astralix {

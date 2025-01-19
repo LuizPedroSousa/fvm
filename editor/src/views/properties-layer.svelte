@@ -1,5 +1,16 @@
-<script>
-  import Layer from "../components/layers/layer.svelte";
+<script lang="ts">
+  import Layer, { type LayerProps } from "../components/layers/layer.svelte";
+
+  interface ViewportLayerProps {
+    layer: LayerProps | undefined;
+  }
+
+  const { layer }: ViewportLayerProps = $props();
+
+  const parsedLayer: LayerProps = {
+    title: "Properties",
+    ...layer,
+  };
 </script>
 
-<Layer></Layer>
+<Layer {...parsedLayer}>test</Layer>

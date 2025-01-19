@@ -27,48 +27,52 @@ void Prologue::load_resources() {
   auto manager = astralix::ResourceManager::get();
 
   manager->load_textures(
-    { astralix::Texture2D::create("textures::default", "textures/diffuse.png",
-                                 false),
-     astralix::Texture3D::create("cubemaps::skybox",
-                                 {
-                                     "textures/skybox/right.jpg",
-                                     "textures/skybox/left.jpg",
-                                     "textures/skybox/top.jpg",
-                                     "textures/skybox/bottom.jpg",
-                                     "textures/skybox/front.jpg",
-                                     "textures/skybox/back.jpg",
-                                 }) });
+      {astralix::Texture2D::create("textures::default", "textures/diffuse.png",
+                                   false),
+       astralix::Texture3D::create("cubemaps::skybox",
+                                   {
+                                       "textures/skybox/right.jpg",
+                                       "textures/skybox/left.jpg",
+                                       "textures/skybox/top.jpg",
+                                       "textures/skybox/bottom.jpg",
+                                       "textures/skybox/front.jpg",
+                                       "textures/skybox/back.jpg",
+                                   })});
 
   manager->load_shaders(
-    { astralix::Shader::create(
-         "shaders::visualize_normal", "fragment/normal_view.glsl",
-         "vertex/normal_view.glsl", "geometry/normal_view.glsl"),
-     astralix::Shader::create("shaders::lighting", "fragment/light.glsl",
-                              "vertex/light.glsl"),
-     astralix::Shader::create("shaders::skybox", "fragment/skybox.glsl",
-                              "vertex/skybox.glsl") });
+      {astralix::Shader::create(
+           "shaders::visualize_normal", "fragment/normal_view.glsl",
+           "vertex/normal_view.glsl", "geometry/normal_view.glsl"),
+       astralix::Shader::create("shaders::lighting", "fragment/light.glsl",
+                                "vertex/light.glsl"),
+       astralix::Shader::create("shaders::skybox", "fragment/skybox.glsl",
+                                "vertex/skybox.glsl")});
 }
 
 void Prologue::load_scene_components() {
   auto manager = astralix::EntityManager::get();
 
   auto camera = manager->add_entity<astralix::Object>("camera");
-  camera.add_component<astralix::CameraComponent>();
+  camera->add_component<astralix::CameraComponent>();
 
   auto strategy = astralix::create_scope<astralix::PointStrategy>();
 
   auto light = manager->add_entity<astralix::Object>("Light");
 
-  light.add_component<astralix::LightComponent>(std::move(strategy),
-    camera.get_entity_id());
+  light->add_component<astralix::LightComponent>(std::move(strategy),
+                                                 camera->get_entity_id());
 
   manager->add_entity<astralix::Object>("Skybox")
-    .add_component<astralix::SkyboxComponent>("cubemaps::skybox",
-      "shaders::skybox");
+      ->add_component<astralix::SkyboxComponent>("cubemaps::skybox",
+                                                 "shaders::skybox");
 
-  auto ground = manager->add_entity<astralix::Object>("Ground")
-    .add_component<astralix::SkyboxComponent>(
-      "cubemaps::skybox", "shaders::skybox");
+  auto block = manager->add_entity<astralix::Object>("Block");
+  block->add_component<astralix::MeshComponent>()->attach_mesh(
+      astralix::Mesh::cube());
+  block->get_component<astralix::ResourceComponent>()
+      ->set_shader("shaders::lighting")
+      ->attach_texture({"textures::default", "materials[0].diffuse"})
+      ->attach_texture({"textures::default", "materials[0].specular"});
 }
 
 void Prologue::start() {
