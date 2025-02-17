@@ -4,7 +4,7 @@
 #include "managers/resource-manager.hpp"
 #include "managers/scene-manager.hpp"
 #include "systems/physics-system.hpp"
-#include "systems/render-system.hpp"
+#include "systems/render-system/render-system.hpp"
 #include "systems/scene-system.hpp"
 
 namespace astralix {

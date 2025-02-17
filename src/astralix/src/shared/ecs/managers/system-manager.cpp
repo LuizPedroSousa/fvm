@@ -1,6 +1,8 @@
 #include "system-manager.hpp"
 #include "algorithm"
 #include "map"
+#include "time.hpp"
+#include <imgui.h>
 
 namespace astralix {
 
@@ -12,18 +14,33 @@ namespace astralix {
     for (ISystem_ptr system : m_system_work_order) {
       if (system->m_enabled) {
         system->start();
+
+        // auto subsystems = get_subsystems(system->get_system_type_id());
+
+        // for (auto subsystem : subsystems) {
+        //   if (system->m_enabled) {
+        //     subsystem->start();
+        //   }
+        // }
       }
     }
   }
 
-  void SystemManager::fixed_update(const double fixed_dt_ms) {
-    for (ISystem_ptr system : m_system_work_order) {
-      // increase interval since last update
-      system->m_time_since_last_update = fixed_dt_ms;
+  void SystemManager::fixed_update(const double step_size) {
+    m_accumulator_step += Time::get()->get_deltatime();
 
-      if (system->m_enabled) {
-        system->fixed_update(fixed_dt_ms);
+    while (m_accumulator_step >= step_size) {
+      for (ISystem_ptr system : m_system_work_order) {
+
+        // increase interval since last update
+        // system->m_time_since_last_update = step_size - accumulator_step;
+
+        if (system->m_enabled) {
+          system->fixed_update(step_size);
+        }
       }
+
+      m_accumulator_step -= step_size;
     }
   }
 
@@ -51,15 +68,9 @@ namespace astralix {
       if (system->m_enabled && system->m_needs_update) {
 
         system->update(dt_ms);
-        system->m_time_since_last_update = 0.0f;
+        system->m_time_since_last_update = dt_ms;
       }
     }
-
-    // for (ISystem_ptr system : this->m_system_work_order) {
-    //   if (system->m_enabled && system->m_needs_update) {
-    //     system->post_update(dt_ms);
-    //   }
-    // }
   }
 
   void SystemManager::update_system_work_order() {
@@ -67,6 +78,7 @@ namespace astralix {
 
     // create index array
     std::vector<int> indices(system_count);
+
     for (size_t i = 0; i < system_count; ++i)
       indices[i] = static_cast<int>(i);
 

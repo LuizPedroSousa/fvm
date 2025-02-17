@@ -5,6 +5,7 @@
 #include "events/event-dispatcher.hpp"
 #include "events/event.hpp"
 #include "vector"
+#include <iostream>
 
 #include "unordered_map"
 #include <algorithm>
@@ -104,6 +105,7 @@ public:
 
     auto it =
         std::find(scheduler_ids.begin(), scheduler_ids.end(), scheduler_id);
+
     if (it != scheduler_ids.end()) {
       scheduler_ids.erase(it);
     }

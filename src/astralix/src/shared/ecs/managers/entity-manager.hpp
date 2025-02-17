@@ -60,6 +60,8 @@ public:
 
   IEntity *get_entity(const EntityID &entity_id);
 
+  IEntity *get_entity_by_name(const std::string &name);
+
   template <typename T> bool has_entity_with_component() {
     auto entity = get_entity_with_component<T>();
 

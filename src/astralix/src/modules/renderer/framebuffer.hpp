@@ -10,6 +10,7 @@ enum class FramebufferTextureFormat {
 
   // Color
   RGBA8,
+  DEPTH_ONLY,
   RED_INTEGER,
 
   // Depth/stencil
@@ -41,7 +42,7 @@ struct FramebufferSpecification {
   FramebufferAttachmentSpecification attachments;
   uint32_t samples = 1;
 
-  bool swap_chain_target = false;
+  //  bool swap_chain_target = false;
 };
 
 enum class FramebufferBindType { Default = 0, Read = 1, Draw = 2 };

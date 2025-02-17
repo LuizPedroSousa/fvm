@@ -11,6 +11,7 @@ class RendererAPI {
 
 public:
   enum class API { None = 0, OpenGL = 1 };
+  enum DrawPrimitiveType { POINTS = 0, LINES = 1, TRIANGLES = 2 };
 
   virtual void init() = 0;
   virtual void set_viewport(uint32_t x, uint32_t y, uint32_t width,
@@ -19,8 +20,10 @@ public:
   virtual void clear_buffers() = 0;
   virtual void disable_buffer_testing() = 0;
   virtual void enable_buffer_testing() = 0;
-  virtual void draw_indexed(const Ref<VertexArray> &vertex_array,
-                            uint32_t index_count = -1) = 0;
+  virtual void
+  draw_indexed(const Ref<VertexArray> &vertex_array,
+               DrawPrimitiveType primitive_type = DrawPrimitiveType::TRIANGLES,
+               uint32_t index_count = -1) = 0;
 
   virtual void draw_lines(const Ref<VertexArray> &vertex_array,
                           uint32_t vertex_count) = 0;

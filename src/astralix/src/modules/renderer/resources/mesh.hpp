@@ -2,6 +2,7 @@
 #include "ecs/guid.hpp"
 #include "glm/glm.hpp"
 #include "memory"
+#include "renderer-api.hpp"
 #include "vector"
 #include "vertex-array.hpp"
 
@@ -29,6 +30,9 @@ public:
   static Mesh plane(float size = 2.0f);
   static Mesh quad(float size = 1.0f);
   static Mesh sphere();
+
+  RendererAPI::DrawPrimitiveType draw_type =
+      RendererAPI::DrawPrimitiveType::TRIANGLES;
 
   Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     this->vertices = vertices;

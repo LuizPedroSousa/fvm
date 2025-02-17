@@ -27,8 +27,9 @@ public:
   bool is_open();
   void close();
 
-  void attach_key(int key, SchedulerID scheduler_id);
   void destroy_key(int key);
+
+  void attach_key(int key, SchedulerID scheduler_id);
   SchedulerID get_key_scheduler_id(int key);
 
 protected:

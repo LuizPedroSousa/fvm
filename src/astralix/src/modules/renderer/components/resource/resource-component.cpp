@@ -1,6 +1,7 @@
 #include "resource-component.hpp"
 #include "components/resource/serializers/resource-component-serializer.hpp"
 #include "managers/resource-manager.hpp"
+#include "resources/shader.hpp"
 
 namespace astralix {
 
@@ -22,13 +23,24 @@ void ResourceComponent::update() {
   }
 }
 
-ResourceComponent *ResourceComponent::set_shader(ResourceID id) {
+ResourceComponent *ResourceComponent::attach_shader(ResourceID id) {
   auto resource_manager = ResourceManager::get();
   auto shader_ptr = resource_manager->get_shader_by_id(id);
 
   ASTRA_ASSERT_THROW(shader_ptr == nullptr, "Shader not found");
 
   shader_ptr->attach();
+
+  m_shader = shader_ptr;
+
+  return this;
+}
+
+ResourceComponent *ResourceComponent::set_shader(ResourceID id) {
+  auto resource_manager = ResourceManager::get();
+  auto shader_ptr = resource_manager->get_shader_by_id(id);
+
+  ASTRA_ASSERT_THROW(shader_ptr == nullptr, "Shader not found");
 
   m_shader = shader_ptr;
 

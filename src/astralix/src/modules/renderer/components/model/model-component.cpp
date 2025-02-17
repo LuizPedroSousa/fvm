@@ -20,6 +20,7 @@ Model *ModelComponent::attach_model(ResourceID id) {
   auto owner = get_owner();
 
   owner->get_or_add_component<MeshComponent>()->attach_meshes(model->meshes);
+
   owner->get_or_add_component<MaterialComponent>()->attach_materials(
       model->materials);
 

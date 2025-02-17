@@ -8,12 +8,13 @@ Game::Game() {}
 
 void Game::start() {
 
-  auto dir = std::filesystem::current_path().parent_path().append("game");
+  auto dir = std::filesystem::current_path().parent_path().append("src").append(
+      "game");
 
   astralix::ProjectManager::get()->add_project(astralix::Project::create(
       {.name = "Game",
        .directory = dir,
-       .resources = {.directory = dir.append("resources")}
+       .resources = {.directory = dir.append("assets")}
 
       }));
 

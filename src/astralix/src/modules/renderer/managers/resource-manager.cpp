@@ -1,5 +1,4 @@
 #include "resource-manager.hpp"
-#include "engine.hpp"
 #include "glad/glad.h"
 
 namespace astralix {
@@ -23,6 +22,8 @@ void ResourceManager::load_textures(
 Ref<Shader> ResourceManager::load_shader(Ref<Shader> shader) {
   auto shader_id = shader->get_resource_id();
 
+  shader->attach();
+
   auto inserted_shader = m_shader_table.emplace(shader_id, std::move(shader));
 
   ASTRA_ASSERT_THROW(!inserted_shader.second, "can't insert shader");
@@ -36,84 +37,19 @@ void ResourceManager::load_shaders(std::initializer_list<Ref<Shader>> shaders) {
   }
 }
 
-Material *ResourceManager::load_material(ResourceID material_id,
-                                         aiMaterial *ai_material) {
-  auto material_exists = get_material_by_id(material_id);
+Ref<Model> ResourceManager::load_model(Ref<Model> model) {
+  auto model_id = model->get_resource_id();
 
-  if (material_exists != nullptr) {
-    return material_exists;
-  }
+  auto inserted_model = m_model_table.emplace(model_id, std::move(model));
 
-  auto get_texture = [&](aiTextureType type) {
-    std::vector<ResourceID> textures;
-    for (unsigned int i = 0; i < ai_material->GetTextureCount(type); i++) {
-      aiString filename_str;
-      ai_material->GetTexture(type, i, &filename_str);
+  ASTRA_ASSERT_THROW(!inserted_model.second, "can't insert model");
 
-      const char *filename = filename_str.C_Str();
-
-      ResourceID texture_id = "textures::" + material_id + "::" + filename;
-
-      auto get_name = [type]() -> std::string {
-        std::string prefix = "materials[0].";
-
-        std::string type_str =
-            type == aiTextureType_DIFFUSE ? "diffuse" : "specular";
-
-        std::string name = prefix + type_str;
-
-        return name;
-      };
-
-      std::string path = "models/" + std::string(filename);
-      Ref<Texture> texture_ptr =
-          load_texture(Texture2D::create(texture_id, path));
-
-      textures.push_back(texture_ptr->get_resource_id());
-    };
-
-    return textures;
-  };
-
-  auto diffuses = get_texture(aiTextureType_DIFFUSE);
-  auto speculars = get_texture(aiTextureType_SPECULAR);
-
-  auto created_material = Material::create(material_id, diffuses, speculars);
-
-  Scope<Material> material_ptr = create_scope<Material>(created_material);
-
-  auto inserted_material =
-      m_material_table.emplace(material_id, std::move(material_ptr));
-
-  ASTRA_ASSERT_THROW(!inserted_material.second, "Can't insert material");
-
-  return m_material_table[material_id].get();
+  return m_model_table[model_id];
 }
 
-Model *ResourceManager::load_model(ResourceID id, const char *filename) {
-  auto model_exists = get_model_by_id(id);
-
-  if (model_exists != nullptr) {
-    return model_exists;
-  }
-
-  auto model = Model::create(id, filename);
-
-  ASTRA_ASSERT_EITHER_THROW(model);
-
-  Scope<Model> model_ptr = create_scope<Model>(model.right());
-
-  auto inserted_moel = m_model_table.emplace(id, std::move(model_ptr));
-
-  ASTRA_ASSERT_THROW(!inserted_moel.second, "Can't insert model");
-
-  return model_ptr.get();
-}
-
-void ResourceManager::load_models(
-    std::initializer_list<std::pair<ResourceID, const char *>> models) {
+void ResourceManager::load_models(std::initializer_list<Ref<Model>> models) {
   for (auto &model : models) {
-    load_model(model.first, model.second);
+    load_model(model);
   }
 }
 
@@ -162,11 +98,22 @@ ResourceManager::get_models_by_ids(std::initializer_list<ResourceID> ids) {
   return models;
 }
 
-Material *ResourceManager::get_material_by_id(ResourceID id) {
+Ref<Material> ResourceManager::load_material(Ref<Material> material) {
+  auto material_id = material->get_resource_id();
+
+  auto inserted_material =
+      m_material_table.emplace(material_id, std::move(material));
+
+  ASTRA_ASSERT_THROW(!inserted_material.second, "Can't insert material");
+
+  return m_material_table[material_id];
+}
+
+Ref<Material> ResourceManager::get_material_by_id(ResourceID id) {
   auto it = m_material_table.find(id);
 
   if (it != m_material_table.end()) {
-    return it->second.get();
+    return it->second;
   }
 
   return nullptr;

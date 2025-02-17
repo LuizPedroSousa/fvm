@@ -13,6 +13,7 @@
 #include "iostream"
 #include "stdio.h"
 #include "window.hpp"
+#include <GLFW/glfw3.h>
 
 namespace astralix {
 
@@ -89,13 +90,13 @@ void Window::open(const char *title, int width, int height, bool offscreen) {
         ASTRA_BIND_EVENT_FN(Window::toggle_view_mouse));
 
     glfwSetCursorPosCallback(m_value, mouse_callback);
+
     glfwSetKeyCallback(m_value, key_callback);
   }
 }
 
 void Window::toggle_view_mouse(KeyReleasedEvent *event) {
   if (event->key_code == KeyCode::Escape) {
-    std::cout << "test" << "\n";
     has_pressed = !has_pressed;
 
     auto window = Window::get();
@@ -109,8 +110,8 @@ void Window::toggle_view_mouse(KeyReleasedEvent *event) {
 }
 
 void Window::mouse_callback(GLFWwindow *window, double x, double y) {
-  std::cout << "x " << x << "\n";
-  std::cout << "y " << y << "\n";
+  // std::cout << "x " << x << "\n";
+  // std::cout << "y " << y << "\n";
   if (!has_pressed) {
     EventDispatcher::get()->dispatch(new MouseEvent(x, y));
   }
@@ -127,7 +128,8 @@ SchedulerID Window::get_key_scheduler_id(int key) {
   auto key_scheduler = m_key_pressed_scheduler.find(key);
 
   if (key_scheduler == m_key_pressed_scheduler.end()) {
-    ASTRA_ASSERT_THROW(true, "Key not found in scheduler");
+    return -1;
+    // ASTRA_ASSERT_THROW(true, "Key not found in scheduler");
   }
 
   return key_scheduler->second;
@@ -149,19 +151,6 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
 
     break;
   }
-  case GLFW_RELEASE: {
-    std::cout << "KeyReleased " << key << "\n";
-    auto keycode = KeyReleasedEvent(KeyCode(key));
-
-    auto window = Window::get();
-    auto scheduler_id = window->get_key_scheduler_id(key);
-    scheduler->destroy(scheduler_id);
-    window->destroy_key(key);
-
-    EventDispatcher::get()->dispatch(&keycode);
-
-    break;
-  }
   default:
     break;
   }
@@ -169,13 +158,31 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
 
 void Window::update() {
   glfwPollEvents();
-  // EventDispatcher::get()->for_each<KeyboardListener, KeyPressedEvent>(
-  //   [](KeyboardListener& listener) {
-  //     if (glfwGetKey(Window::get()->get_value(),
-  //       listener.get_event()->get_key())) {
-  //       listener.dispatch();
-  //     }
-  //   });
+  auto scheduler = EventScheduler::get();
+
+  auto it = m_key_pressed_scheduler.begin();
+
+  for (; it != m_key_pressed_scheduler.end();) {
+
+    auto state = glfwGetKey(m_value, it->first);
+
+    std::cout << " key " << it->first << " state " << state << "\n";
+
+    if (state == GLFW_RELEASE) {
+
+      if (it->first == 341) {
+      }
+      std::cout << "KeyReleased " << it->first << "\n";
+      auto keycode = KeyReleasedEvent(KeyCode(it->first));
+
+      scheduler->destroy(it->second);
+
+      EventDispatcher::get()->dispatch(&keycode);
+      it = m_key_pressed_scheduler.erase(it);
+    } else {
+      it++;
+    }
+  }
 }
 
 void Window::swap() { glfwSwapBuffers(m_value); }

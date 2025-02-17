@@ -39,10 +39,10 @@ void Application::run() {
 
   while (window->is_open()) {
     time->update();
-    system->update(Time::get()->get_deltatime());
     window->update();
     scheduler->bind(SchedulerType::POST_FRAME);
-    engine->update();
+    system->fixed_update(1 / 60.0f);
+    system->update(Time::get()->get_deltatime());
     scheduler->bind(SchedulerType::IMMEDIATE);
     window->swap();
   }
