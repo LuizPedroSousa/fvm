@@ -95,7 +95,8 @@
     "csetjmp": "cpp",
     "slist": "cpp",
     "ranges": "cpp",
-    "scoped_allocator": "cpp"
+    "scoped_allocator": "cpp",
+    "filesystem": "cpp"
   },
   "cSpell.words": [
     "Unkown"

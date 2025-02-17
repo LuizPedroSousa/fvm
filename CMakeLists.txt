@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(fvm)
 
+add_definitions(-DPX_PHYSX_STATIC_LIB)
+
 if(DEFINED ENV{MODE})
   set(MODE $ENV{MODE})
 else()
@@ -18,12 +20,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 add_compile_options(-fPIC)
 
-add_definitions(-DASTRA_EDITOR)
+# add_definitions(-DASTRA_EDITOR)
 find_package(OpenGL REQUIRED)
 find_package(assimp REQUIRED)
 
 set(VCPKG_INSTALLED_ROOT "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux")
 set(jsoncpp_DIR "${VCPKG_INSTALLED_ROOT}/share/jsoncpp")
+set(freetype_DIR "${VCPKG_INSTALLED_ROOT}/share/freetype")
 set(imgui_DIR "${VCPKG_INSTALLED_ROOT}/share/imgui")
 set(imguizmo_DIR "${VCPKG_INSTALLED_ROOT}/share/imguizmo")
 set(glfw3_DIR "${VCPKG_INSTALLED_ROOT}/share/glfw3")
@@ -38,6 +41,7 @@ find_package(ZLIB REQUIRED)
 
 # set(gtk4 "${VCPKG_INSTALLED_ROOT}/share/gtk-4.0")
 find_package(jsoncpp CONFIG REQUIRED)
+find_package(freetype CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
 # find_package(boost CONFIG REQUIRED)
@@ -95,14 +99,16 @@ endif(WIN32)
 
 add_executable(fvm src/main.cpp)
 
-include_directories(${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS}
-                    ${ASSIMP_INCLUDE_DIRS} ${GTK4_INCLUDE_DIRS})
+include_directories(
+  ${OPENGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${ASSIMP_INCLUDE_DIRS}
+  ${GTK4_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/external/PhysX/physx/include)
+
+link_directories(external/PhysX/physx/bin/linux.x86_64/release)
 
 add_library(glad "external/glad/glad.c")
 add_library(glm "external/glm/detail/glm.cpp")
 add_library(stb_image "external/stb_image/stb_image.cpp")
 
-# add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui)
 add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui/impl)
 set(LIBS ${LIBS} glad)
 
@@ -124,5 +130,12 @@ include_directories(${LIB_INCLUDE_DIR})
 link_directories(${VCPKG_INSTALLED_ROOT}/lib)
 
 target_link_libraries(
-  fvm PRIVATE game editor application
-              "${VCPKG_INSTALLED_ROOT}/lib/libuSockets.a" ZLIB::ZLIB)
+  fvm
+  PRIVATE
+    game
+    editor
+    application
+    "${VCPKG_INSTALLED_ROOT}/lib/libuSockets.a"
+    ZLIB::ZLIB
+    ${PROJECT_SOURCE_DIR}/external/PhysX/physx/bin/linux.x86_64/release/libPhysXFoundation_static_64.a
+)
