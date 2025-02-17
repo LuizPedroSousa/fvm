@@ -3,9 +3,8 @@
 #include "components/material/material-component.hpp"
 #include "components/mesh/mesh-component.hpp"
 #include "components/resource/resource-component.hpp"
-#include "components/skybox/skybox-component.hpp"
 #include "components/transform/transform-component.hpp"
-#include "engine.hpp"
+#include "ecs/entities/ientity.hpp"
 
 namespace astralix {
 Object::Object(ENTITY_INIT_PARAMS, glm::vec3 position, glm::vec3 scale)
@@ -14,18 +13,25 @@ Object::Object(ENTITY_INIT_PARAMS, glm::vec3 position, glm::vec3 scale)
   add_component<TransformComponent>(position, scale);
 }
 
+Object::Object(ObjectDTO dto) : ENTITY_INIT_DTO(dto) {
+  add_component<ResourceComponent>();
+  add_component<TransformComponent>(dto.position, dto.scale);
+}
+
 void Object::start() {
   if (is_active()) {
     auto resource = get_component<ResourceComponent>();
     auto mesh = get_component<MeshComponent>();
     auto transform = get_component<TransformComponent>();
-    auto skybox = get_component<SkyboxComponent>();
 
     if (resource != nullptr && resource->is_active())
       resource->start();
 
-    if (skybox != nullptr && skybox->is_active()) {
-      skybox->start();
+    auto shader = resource->get_shader();
+
+    if (shader != nullptr) {
+      shader->bind();
+      shader->set_int("shadowMap", 1);
     }
 
     if (transform != nullptr && transform->is_active())
@@ -36,16 +42,7 @@ void Object::start() {
   };
 }
 
-void Object::pre_update() {
-  if (is_active()) {
-
-    auto skybox = get_component<SkyboxComponent>();
-
-    if (skybox != nullptr && skybox->is_active()) {
-      skybox->pre_update();
-    }
-  }
-}
+void Object::pre_update() {}
 
 void Object::update() {
   if (is_active()) {
@@ -56,7 +53,6 @@ void Object::update() {
     auto mesh = get_component<MeshComponent>();
     auto transform = get_component<TransformComponent>();
 
-    auto skybox = get_component<SkyboxComponent>();
     auto material = get_component<MaterialComponent>();
 
     resource->update();
@@ -67,12 +63,10 @@ void Object::update() {
 
     if (entity_manager->has_entity_with_component<CameraComponent>() &&
         resource->has_shader()) {
-      component_manager->get_component<CameraComponent>()->update(
-          resource->get_shader());
-    }
+      auto shader = resource->get_shader();
+      auto camera = component_manager->get_component<CameraComponent>();
 
-    if (skybox != nullptr && skybox->is_active()) {
-      skybox->update();
+      camera->update(shader);
     }
 
     if (transform != nullptr && transform->is_active())
@@ -88,14 +82,6 @@ void Object::update() {
   }
 }
 
-void Object::post_update() {
-  if (is_active()) {
-    auto skybox = get_component<SkyboxComponent>();
-
-    if (skybox != nullptr) {
-      skybox->post_update();
-    }
-  }
-}
+void Object::post_update() {}
 
 } // namespace astralix

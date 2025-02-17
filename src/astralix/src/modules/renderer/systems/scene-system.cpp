@@ -9,31 +9,29 @@
 
 namespace astralix {
 
-void SceneSystem::start() {
-  auto scene = SceneManager::get()->get_active_scene();
+  void SceneSystem::start() {
+    auto scene = SceneManager::get()->get_active_scene();
 
-  if (scene != nullptr) {
-    scene->start();
+    if (scene != nullptr) {
+      scene->start();
+    }
   }
-}
 
-void SceneSystem::fixed_update(double fixed_dt){
+  void SceneSystem::fixed_update(double fixed_dt) {
 
-};
+  };
 
-void SceneSystem::pre_update(double dt){
+  void SceneSystem::pre_update(double dt) {
 
-};
+  };
 
-void SceneSystem::update(double dt) {
-  auto scene = SceneManager::get()->get_active_scene();
+  void SceneSystem::update(double dt) {
+    auto scene = SceneManager::get()->get_active_scene();
 
-  if (scene != nullptr) {
+    if (scene != nullptr) {
 
-    scene->update();
-  }
-};
-
-void SceneSystem::post_update(double dt){};
+      scene->update();
+    }
+  };
 
 } // namespace astralix

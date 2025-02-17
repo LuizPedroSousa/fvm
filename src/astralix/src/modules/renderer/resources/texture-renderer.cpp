@@ -1,7 +1,5 @@
 #include "texture-renderer.hpp"
-#include "either.hpp"
-#include "engine.hpp"
-#include "exceptions/base-exception.hpp"
+#include "managers/resource-manager.hpp"
 
 namespace astralix {
 

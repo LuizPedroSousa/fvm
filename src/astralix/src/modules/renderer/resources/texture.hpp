@@ -1,10 +1,7 @@
 #pragma once
 #include "base.hpp"
-#include "either.hpp"
-#include "exceptions/base-exception.hpp"
 #include "filesystem"
 #include "resource.hpp"
-#include "shader.hpp"
 #include "string"
 #include "vector"
 
@@ -19,7 +16,7 @@ struct Image {
 
 class Texture : public Resource {
 public:
-  Texture(const ResourceID &resource_id) : Resource(resource_id){};
+  Texture(const ResourceID &resource_id) : Resource(resource_id) {};
   virtual void bind() const = 0;
   virtual void active(uint32_t slot) const = 0;
   virtual uint32_t get_renderer_id() const = 0;
@@ -41,7 +38,7 @@ public:
                                const bool flip_image_on_loading = false);
 
 protected:
-  Texture2D(const ResourceID &resource_id) : Texture(resource_id){};
+  Texture2D(const ResourceID &resource_id) : Texture(resource_id) {};
 };
 
 class Texture3D : public Texture {
@@ -50,7 +47,7 @@ public:
                                const std::vector<std::string> &faces_path);
 
 protected:
-  Texture3D(const ResourceID &resource_id) : Texture(resource_id){};
+  Texture3D(const ResourceID &resource_id) : Texture(resource_id) {};
 };
 
 } // namespace astralix

@@ -1,7 +1,6 @@
 #pragma once
 #include "ecs/guid.hpp"
 #include "shader.hpp"
-#include "texture.hpp"
 #include "vector"
 
 namespace astralix {
@@ -13,7 +12,7 @@ struct TextureRenderData {
 
 class TextureRenderer {
 public:
-  TextureRenderer(){};
+  TextureRenderer() {};
   void render(Ref<Shader> shader);
 
   void attach(TextureRenderData data);

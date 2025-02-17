@@ -1,6 +1,7 @@
 #include "material-component.hpp"
 #include "components/material/serializers/material-component-serializer.hpp"
 #include "components/resource/resource-component.hpp"
+#include "managers/resource-manager.hpp"
 
 namespace astralix {
 
@@ -38,7 +39,7 @@ namespace astralix {
   std::string MaterialComponent::get_name(const char* prefix, int count) {
     std::string result =
       std::string("materials" + std::string("[") + std::to_string(count) +
-        std::string("]") + prefix);
+        std::string("]") + "." + prefix);
 
     return result;
   }

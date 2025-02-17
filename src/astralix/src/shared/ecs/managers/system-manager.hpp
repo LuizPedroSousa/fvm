@@ -1,5 +1,6 @@
 #pragma once
 
+#include "assert.hpp"
 #include "ecs/guid.hpp"
 
 #include "base-manager.hpp"
@@ -8,6 +9,7 @@
 #include "memory"
 #include "unordered_map"
 #include "vector"
+#include <vector>
 
 namespace astralix {
 class SystemManager : public BaseManager<SystemManager> {
@@ -35,6 +37,33 @@ public:
 
     // add to work list
     this->m_system_work_order.push_back(system);
+
+    return system.get();
+  }
+
+  template <class System_, class Target_, class... Args>
+  System_ *add_subsystem(Target_ parent_system, Args &&...params) {
+    const SystemTypeID type_id = System_::system_type_id();
+
+    auto it = this->m_system_table.find(type_id);
+    if ((this->m_system_table.find(type_id) != this->m_system_table.end()) &&
+        (it->second != nullptr))
+      return reinterpret_cast<System_ *>(it->second.get());
+
+    auto system = std::make_shared<System_>(std::forward<Args>(params)...);
+    system->m_system_manager = this;
+    this->m_system_table[type_id] = system;
+
+    auto subsystems =
+        m_subsystem_table.find(parent_system->get_system_type_id());
+
+    if (subsystems == m_subsystem_table.end()) {
+      std::vector<SystemTypeID> subsystem_ids{system->get_system_type_id()};
+      m_subsystem_table[parent_system->get_system_type_id()] = subsystem_ids;
+
+    } else {
+      subsystems->second.push_back(system->get_system_type_id());
+    }
 
     return system.get();
   }
@@ -73,6 +102,56 @@ public:
     auto it = this->m_system_table.find(T::system_type_id());
 
     return it != this->m_system_table.end() ? (T *)it->second.get() : nullptr;
+  }
+
+  template <class SubSystem_>
+  SubSystem_ *get_subsystem(SystemTypeID parent_system_id) {
+    auto it = this->m_subsystem_table.find(parent_system_id);
+
+    if (it == this->m_subsystem_table.end()) {
+      return nullptr;
+    }
+
+    SystemTypeID system_id = -1;
+
+    for (auto subsystem_id : it->second) {
+
+      if (subsystem_id == SubSystem_::system_type_id()) {
+        system_id = subsystem_id;
+      }
+    }
+
+    if (system_id == -1) {
+      return nullptr;
+    }
+
+    auto system = m_system_table.find(system_id);
+
+    return system != m_system_table.end()
+               ? dynamic_cast<SubSystem_ *>(system->second.get())
+               : nullptr;
+  }
+
+  std::vector<std::shared_ptr<ISystem>> get_subsystems(SystemTypeID type_id) {
+    std::vector<std::shared_ptr<ISystem>> subsystems;
+
+    auto it = m_subsystem_table.find(type_id);
+
+    if (it != m_subsystem_table.end()) {
+      auto subsystem_ids = it->second;
+
+      for (auto subsystem_id : subsystem_ids) {
+        auto sub_system = m_system_table.find(subsystem_id);
+
+        if (sub_system == m_system_table.end()) {
+          continue;
+        }
+
+        subsystems.push_back(sub_system->second);
+      }
+    }
+
+    return subsystems;
   }
 
   template <class T> void enable_system() {
@@ -158,7 +237,10 @@ private:
   //     2    | false | true  | false |
 
   std::vector<std::vector<bool>> m_system_dependency_table;
+  std::unordered_map<SystemTypeID, std::vector<SystemTypeID>> m_subsystem_table;
+
   std::vector<ISystem_ptr> m_system_work_order;
+  double m_accumulator_step = 0;
 };
 
 } // namespace astralix

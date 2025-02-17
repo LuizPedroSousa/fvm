@@ -1,5 +1,6 @@
 #include "opengl-renderer-api.hpp"
 #include "glad/glad.h"
+#include <iostream>
 
 namespace astralix {
 void OpenGLRendererAPI::init() { enable_buffer_testing(); }
@@ -30,14 +31,29 @@ void OpenGLRendererAPI::clear_buffers() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
+uint32_t
+OpenGLRendererAPI::map_draw_primitive_type(DrawPrimitiveType primitive_type) {
+  switch (primitive_type) {
+  case DrawPrimitiveType::POINTS:
+    return GL_POINTS;
+  case DrawPrimitiveType::LINES:
+    return GL_LINES;
+  default:
+    return GL_TRIANGLES;
+  }
+}
+
 void OpenGLRendererAPI::draw_indexed(const Ref<VertexArray> &vertex_array,
+                                     DrawPrimitiveType primitive_type,
                                      uint32_t index_count) {
   vertex_array->bind();
 
   uint32_t count = index_count != -1
                        ? index_count
                        : vertex_array->get_index_buffer()->get_count();
-  glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+
+  glDrawElements(map_draw_primitive_type(primitive_type), count,
+                 GL_UNSIGNED_INT, 0);
 
   vertex_array->unbind();
 }

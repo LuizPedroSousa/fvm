@@ -1,8 +1,10 @@
 #pragma once
 
+#include "ecs/entities/events/entity-events.hpp"
 #include "ecs/entities/ientity.hpp"
 #include "ecs/guid.hpp"
 #include "ecs/managers/component-manager.hpp"
+#include "events/event-dispatcher.hpp"
 #include "functional"
 #include "unordered_map"
 
@@ -16,7 +18,7 @@ class EntityManager : public BaseManager<EntityManager> {
 
 public:
   template <typename T, typename... Args>
-  T &add_entity(const std::string &&name = "GameObject", Args &&...params) {
+  T *add_entity(const std::string &&name = "GameObject", Args &&...params) {
     EntityID id = EntityID();
     EntityFamilyID family_id = FamilyObjectID<IEntity>::get();
 
@@ -40,16 +42,25 @@ public:
     Scope<T> entity_ptr = create_scope<T>(id, family_id, unique_name,
                                           std::forward<Args>(params)...);
 
-    auto created_entity = m_entity_table.emplace(id, std::move(entity_ptr));
+    auto emplaced_entity = m_entity_table.emplace(id, std::move(entity_ptr));
 
-    ASTRA_ASSERT_THROW(!created_entity.second, "Error creating new Entity!");
+    ASTRA_ASSERT_THROW(!emplaced_entity.second, "Error creating new Entity!");
 
-    return dynamic_cast<T &>(*m_entity_table[id].get());
+    auto dispatcher = EventDispatcher::get();
+
+    auto created_entity = m_entity_table[id].get();
+
+    auto event = EntityCreatedEvent(created_entity);
+    dispatcher->dispatch(&event);
+
+    return static_cast<T *>(created_entity);
   }
 
   void destroy_entity(const EntityID &entity_id);
 
   IEntity *get_entity(const EntityID &entity_id);
+
+  IEntity *get_entity_by_name(const std::string &name);
 
   template <typename T> bool has_entity_with_component() {
     auto entity = get_entity_with_component<T>();

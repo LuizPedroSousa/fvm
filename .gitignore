@@ -9,7 +9,8 @@ vcpkg
 vcpkg_installed
 
 external/PhysX
-
+editor/build
+editor/dist-electron
 # Compiled binary files
 *.o
 *.obj
@@ -25,3 +26,6 @@ external/PhysX
 # Other generated files
 *.user
 *.swp
+.cache
+
+.compile_commands.json

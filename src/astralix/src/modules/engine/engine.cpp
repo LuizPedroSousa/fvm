@@ -1,10 +1,11 @@
 #include "engine.hpp"
+#include "ecs/managers/entity-manager.hpp"
 #include "managers/project-manager.hpp"
-#include "systems/layer-system.hpp"
+#include "managers/resource-manager.hpp"
+#include "managers/scene-manager.hpp"
 #include "systems/physics-system.hpp"
-#include "systems/render-system.hpp"
+#include "systems/render-system/render-system.hpp"
 #include "systems/scene-system.hpp"
-#include "time.hpp"
 
 namespace astralix {
 Engine *Engine::m_instance = nullptr;
@@ -26,7 +27,6 @@ Engine::Engine() {
   ProjectManager::init();
   SceneManager::init();
   ResourceManager::init();
-  SystemManager::init();
 
   this->renderer_api = std::move(RendererAPI::create(RendererAPI::API::OpenGL));
 }
@@ -45,12 +45,8 @@ void Engine::start() {
   system_manager->add_system<SceneSystem>();
   system_manager->add_system<RenderSystem>();
   system_manager->add_system<PhysicsSystem>();
-  system_manager->add_system<LayerSystem>();
-  system_manager->start();
 }
 
-void Engine::update() {
-  SystemManager::get()->update(Time::get()->get_deltatime());
-}
+void Engine::update() {}
 
 } // namespace astralix

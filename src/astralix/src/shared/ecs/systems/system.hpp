@@ -41,11 +41,20 @@ public:
         this, std::forward<Dependencies>(dependencies)...);
   }
 
+  template <typename Subsystem_, typename... Args>
+  Subsystem_ *add_subsystem(Args &&...params) {
+    return m_system_manager->add_subsystem<Subsystem_>(
+        this, std::forward<Args>(params)...);
+  }
+
+  template <typename SubSystem_> SubSystem_ *get_subsystem() {
+    return m_system_manager->get_subsystem<SubSystem_>(get_system_type_id());
+  };
+
   virtual void start() override = 0;
   virtual void fixed_update(double fixed_dt) override = 0;
   virtual void pre_update(double dt) override = 0;
   virtual void update(double dt) override = 0;
-  virtual void post_update(double dt) override = 0;
 };
 
 template <typename T>

@@ -1,6 +1,9 @@
 #include "opengl-framebuffer.hpp"
 #include "either.hpp"
 #include "engine.hpp"
+#include "framebuffer.hpp"
+#include <GL/gl.h>
+#include <GL/glext.h>
 
 namespace astralix {
 
@@ -38,8 +41,15 @@ static void attach_color_texture(uint32_t id, int samples,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   }
 
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
-                         get_texture_target(multisampled), id, 0);
+  switch (internal_format) {
+  case GL_DEPTH_COMPONENT:
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                           id, 0);
+    break;
+  default:
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
+                           get_texture_target(multisampled), id, 0);
+  }
 }
 
 static void attach_depth(uint32_t id, int samples, GLenum format,
@@ -168,7 +178,7 @@ void OpenGLFramebuffer::clear_attachment(uint32_t attachment_index, int value) {
 }
 
 void OpenGLFramebuffer::invalidate() {
-  if (m_renderer_id) {
+  if (m_renderer_id != 0) {
     glDeleteFramebuffers(1, &m_renderer_id);
     glDeleteTextures(m_color_attachments.size(), m_color_attachments.data());
     glDeleteTextures(1, &m_depth_attachment);
@@ -202,6 +212,16 @@ void OpenGLFramebuffer::invalidate() {
             m_color_attachments[i], m_specification.samples, GL_R32I,
             GL_RED_INTEGER, m_specification.width, m_specification.height, i);
         break;
+
+      case FramebufferTextureFormat::None:
+      case FramebufferTextureFormat::DEPTH24STENCIL8:
+        break;
+      case FramebufferTextureFormat::DEPTH_ONLY:
+        utils::attach_color_texture(m_color_attachments[i],
+                                    m_specification.samples, GL_DEPTH_COMPONENT,
+                                    GL_DEPTH_COMPONENT, m_specification.width,
+                                    m_specification.height, i);
+        break;
       }
     }
   }
@@ -216,6 +236,9 @@ void OpenGLFramebuffer::invalidate() {
                           GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT,
                           m_specification.width, m_specification.height);
       break;
+
+    default:
+      break;
     }
   }
 
@@ -223,10 +246,25 @@ void OpenGLFramebuffer::invalidate() {
     ASTRA_ASSERT_THROW(m_color_attachments.size() > 4,
                        "invalid color attachments");
 
-    GLenum buffers[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                         GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    auto is_depth_only = false;
 
-    glDrawBuffers(m_color_attachments.size(), buffers);
+    for (auto color_attachment : m_color_attachment_specifications) {
+      if (color_attachment.format == FramebufferTextureFormat::DEPTH_ONLY) {
+        is_depth_only = true;
+        break;
+      }
+    }
+
+    if (is_depth_only) {
+      glDrawBuffer(GL_NONE);
+      glReadBuffer(GL_NONE);
+    } else {
+      GLenum buffers[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+                           GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+
+      glDrawBuffers(m_color_attachments.size(), buffers);
+    }
+
   } else if (m_color_attachments.empty()) {
     // Only depth-pass
     glDrawBuffer(GL_NONE);

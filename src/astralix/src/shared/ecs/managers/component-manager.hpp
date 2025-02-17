@@ -80,7 +80,7 @@ namespace astralix {
 
     template <typename T, typename... Args>
     T* get_or_add_component(const EntityID& entity_id, Args &&...params) {
-      T* component_exists = get_component<T>();
+      T* component_exists = get_component<T>(entity_id);
 
       if (component_exists == nullptr) {
         return add_component<T>(entity_id, std::forward<Args>(params)...);

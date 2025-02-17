@@ -2,17 +2,18 @@
   "name": "fvm",
   "version": "1.0",
   "dependencies": [
+    "glfw3",
     {
       "name": "imgui",
-      "platform": "linux",
       "features": [
         "docking-experimental",
-        "opengl3-binding",
-        "vulkan-binding",
-        "glfw-binding"
-      ]
+        "glfw-binding",
+        "opengl3-binding"
+      ],
+      "platform": "linux"
     },
     "imguizmo",
-    "jsoncpp"
+    "jsoncpp",
+    "uwebsockets"
   ]
 }

@@ -24,4 +24,16 @@ IEntity *EntityManager::get_entity(const EntityID &entity_id) {
   return nullptr;
 }
 
+IEntity *EntityManager::get_entity_by_name(const std::string &name) {
+  for (const auto &pair : m_entity_table) {
+    const Scope<IEntity> &entity = pair.second;
+
+    if (entity->name == name) {
+      return entity.get();
+    }
+  }
+
+  return nullptr;
+}
+
 }; // namespace astralix

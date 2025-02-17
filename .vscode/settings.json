@@ -78,6 +78,27 @@
     "*.inc": "cpp",
     "forward_list": "cpp",
     "text_encoding": "cpp",
-    "cassert": "cpp"
-  }
+    "cassert": "cpp",
+    "any": "cpp",
+    "strstream": "cpp",
+    "bitset": "cpp",
+    "coroutine": "cpp",
+    "expected": "cpp",
+    "regex": "cpp",
+    "source_location": "cpp",
+    "rope": "cpp",
+    "future": "cpp",
+    "stdfloat": "cpp",
+    "cfenv": "cpp",
+    "typeindex": "cpp",
+    "*.ipp": "cpp",
+    "csetjmp": "cpp",
+    "slist": "cpp",
+    "ranges": "cpp",
+    "scoped_allocator": "cpp",
+    "filesystem": "cpp"
+  },
+  "cSpell.words": [
+    "Unkown"
+  ]
 }

@@ -15,11 +15,16 @@ public:
 
   void clear_buffers() override;
 
-  void draw_indexed(const Ref<VertexArray> &vertex_array,
-                    uint32_t index_count = -1) override;
+  void
+  draw_indexed(const Ref<VertexArray> &vertex_array,
+               DrawPrimitiveType primitive_type = DrawPrimitiveType::TRIANGLES,
+               uint32_t index_count = -1) override;
 
   void draw_lines(const Ref<VertexArray> &vertex_array,
                   uint32_t vertex_count) override;
+
+private:
+  uint32_t map_draw_primitive_type(DrawPrimitiveType primitive_type);
 };
 
 } // namespace astralix
