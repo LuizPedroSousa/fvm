@@ -8,6 +8,8 @@ Makefile
 vcpkg
 vcpkg_installed
 
+external/PhysX
+
 # Compiled binary files
 *.o
 *.obj
