@@ -14,123 +14,123 @@
 
 namespace astralix {
 
-class EntityManager : public BaseManager<EntityManager> {
+  class EntityManager : public BaseManager<EntityManager> {
 
-public:
-  template <typename T, typename... Args>
-  T *add_entity(const std::string &&name = "GameObject", Args &&...params) {
-    EntityID id = EntityID();
-    EntityFamilyID family_id = FamilyObjectID<IEntity>::get();
+  public:
+    template <typename T, typename... Args>
+    T* add_entity(const std::string&& name = "GameObject", Args &&...params) {
+      EntityID id = EntityID();
+      EntityFamilyID family_id = FamilyObjectID<IEntity>::get();
 
-    int count = 1;
-    std::string unique_name = name;
+      int count = 1;
+      std::string unique_name = name;
 
-    bool name_exists = true;
-    while (name_exists) {
-      name_exists = false;
-      for (const auto &pair : m_entity_table) {
-        const Scope<IEntity> &entity = pair.second;
-        if (entity->name == unique_name) {
-          name_exists = true;
-          unique_name = name + " (" + std::to_string(count) + ")";
-          count++;
-          break;
+      bool name_exists = true;
+      while (name_exists) {
+        name_exists = false;
+        for (const auto& pair : m_entity_table) {
+          const Scope<IEntity>& entity = pair.second;
+          if (entity->name == unique_name) {
+            name_exists = true;
+            unique_name = name + " (" + std::to_string(count) + ")";
+            count++;
+            break;
+          }
         }
       }
+
+      Scope<T> entity_ptr = create_scope<T>(id, family_id, unique_name,
+        std::forward<Args>(params)...);
+
+      auto emplaced_entity = m_entity_table.emplace(id, std::move(entity_ptr));
+
+      ASTRA_EXCEPTION(!emplaced_entity.second, "Error creating new Entity!");
+
+      auto dispatcher = EventDispatcher::get();
+
+      auto created_entity = m_entity_table[id].get();
+
+      auto event = EntityCreatedEvent(created_entity);
+      dispatcher->dispatch(&event);
+
+      return static_cast<T*>(created_entity);
     }
 
-    Scope<T> entity_ptr = create_scope<T>(id, family_id, unique_name,
-                                          std::forward<Args>(params)...);
+    void destroy_entity(const EntityID& entity_id);
 
-    auto emplaced_entity = m_entity_table.emplace(id, std::move(entity_ptr));
+    IEntity* get_entity(const EntityID& entity_id);
 
-    ASTRA_ASSERT_THROW(!emplaced_entity.second, "Error creating new Entity!");
+    IEntity* get_entity_by_name(const std::string& name);
 
-    auto dispatcher = EventDispatcher::get();
+    template <typename T> bool has_entity_with_component() {
+      auto entity = get_entity_with_component<T>();
 
-    auto created_entity = m_entity_table[id].get();
+      return entity != nullptr;
+    }
 
-    auto event = EntityCreatedEvent(created_entity);
-    dispatcher->dispatch(&event);
+    template <typename T> IEntity* get_entity_with_component() {
+      for (const auto& pair : m_entity_table) {
+        const Scope<IEntity>& entity = pair.second;
+        if (entity->has_component<T>()) {
+          return entity.get();
+        }
+      }
 
-    return static_cast<T *>(created_entity);
-  }
+      return nullptr;
+    }
 
-  void destroy_entity(const EntityID &entity_id);
+    template <typename T> T* get_entity() {
+      EntityTypeID type_id = T::entity_type_id();
 
-  IEntity *get_entity(const EntityID &entity_id);
+      for (const auto& pair : m_entity_table) {
+        const Scope<IEntity>& entity = pair.second;
+        if (entity->get_entity_type_id() == type_id) {
+          return dynamic_cast<T*>(entity.get());
+        }
+      }
 
-  IEntity *get_entity_by_name(const std::string &name);
+      return nullptr;
+    }
 
-  template <typename T> bool has_entity_with_component() {
-    auto entity = get_entity_with_component<T>();
+    template <typename T> T* get_entity(const EntityID& entity_id) {
+      return dynamic_cast<T*>(get_entity(entity_id));
+    }
 
-    return entity != nullptr;
-  }
+    void for_each(std::function<void(IEntity*)> fn) {
+      for (const auto& pair : m_entity_table) {
+        const Scope<IEntity>& entity = pair.second;
 
-  template <typename T> IEntity *get_entity_with_component() {
-    for (const auto &pair : m_entity_table) {
-      const Scope<IEntity> &entity = pair.second;
-      if (entity->has_component<T>()) {
-        return entity.get();
+        fn(entity.get());
       }
     }
 
-    return nullptr;
-  }
+    template <typename T> void for_each(std::function<void(T*)> fn) {
+      std::vector<T*> entities = get_entities<T>();
 
-  template <typename T> T *get_entity() {
-    EntityTypeID type_id = T::entity_type_id();
-
-    for (const auto &pair : m_entity_table) {
-      const Scope<IEntity> &entity = pair.second;
-      if (entity->get_entity_type_id() == type_id) {
-        return dynamic_cast<T *>(entity.get());
+      for (auto entity = entities.begin(); entity != entities.end(); entity++) {
+        fn(*entity);
       }
     }
 
-    return nullptr;
-  }
+    template <typename T> std::vector<T*> get_entities() {
+      std::vector<T*> result;
+      EntityTypeID type_id = T::entity_type_id();
 
-  template <typename T> T *get_entity(const EntityID &entity_id) {
-    return dynamic_cast<T *>(get_entity(entity_id));
-  }
-
-  void for_each(std::function<void(IEntity *)> fn) {
-    for (const auto &pair : m_entity_table) {
-      const Scope<IEntity> &entity = pair.second;
-
-      fn(entity.get());
-    }
-  }
-
-  template <typename T> void for_each(std::function<void(T *)> fn) {
-    std::vector<T *> entities = get_entities<T>();
-
-    for (auto entity = entities.begin(); entity != entities.end(); entity++) {
-      fn(*entity);
-    }
-  }
-
-  template <typename T> std::vector<T *> get_entities() {
-    std::vector<T *> result;
-    EntityTypeID type_id = T::entity_type_id();
-
-    for (const auto &pair : m_entity_table) {
-      const Scope<IEntity> &entity = pair.second;
-      if (entity->get_entity_type_id() == type_id) {
-        result.push_back(dynamic_cast<T *>(entity.get()));
+      for (const auto& pair : m_entity_table) {
+        const Scope<IEntity>& entity = pair.second;
+        if (entity->get_entity_type_id() == type_id) {
+          result.push_back(dynamic_cast<T*>(entity.get()));
+        }
       }
+
+      return result;
     }
 
-    return result;
-  }
+    explicit EntityManager();
+    ~EntityManager();
 
-  explicit EntityManager();
-  ~EntityManager();
-
-private:
-  std::unordered_map<EntityID, Scope<IEntity>> m_entity_table;
-};
+  private:
+    std::unordered_map<EntityID, Scope<IEntity>> m_entity_table;
+  };
 
 }; // namespace astralix

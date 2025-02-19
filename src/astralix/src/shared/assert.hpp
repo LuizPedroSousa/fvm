@@ -9,7 +9,7 @@ namespace astralix {
   if (EXPRESSION)                                                              \
   return BaseException(__FILE__, __LINE__, MESSAGE)
 
-#define ASTRA_ASSERT_THROW(EXPRESSION, MESSAGE)                                \
+#define ASTRA_EXCEPTION(EXPRESSION, MESSAGE)                                \
   if (EXPRESSION) {                                                            \
     throw BaseException(__FILE__, __LINE__, MESSAGE);                          \
   }

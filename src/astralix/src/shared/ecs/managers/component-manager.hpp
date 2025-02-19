@@ -32,7 +32,7 @@ namespace astralix {
       auto created_component =
         m_component_table.emplace(component_id, std::move(component_ptr));
 
-      ASTRA_ASSERT_THROW(!created_component.second,
+      ASTRA_EXCEPTION(!created_component.second,
         "Can't create a new Component !");
 
       return dynamic_cast<T*>(m_component_table[component_id].get());
