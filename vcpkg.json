@@ -14,6 +14,7 @@
     },
     "imguizmo",
     "jsoncpp",
-    "uwebsockets"
+    "uwebsockets",
+    "freetype"
   ]
 }

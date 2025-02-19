@@ -9,9 +9,10 @@ Ref<VertexBuffer> VertexBuffer::create(uint32_t size) {
       Engine::get()->renderer_api->get_api(), size);
 };
 
-Ref<VertexBuffer> VertexBuffer::create(const void *vertices, uint32_t size) {
+Ref<VertexBuffer> VertexBuffer::create(const void *vertices, uint32_t size,
+                                       DrawType draw_type) {
   return create_renderer_component_ref<VertexBuffer, OpenGLVertexBuffer>(
-      Engine::get()->renderer_api->get_api(), vertices, size);
+      Engine::get()->renderer_api->get_api(), vertices, size, draw_type);
 };
 
 } // namespace astralix

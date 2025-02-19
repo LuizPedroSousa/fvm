@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "base.hpp"
 #include "components/light/light-component.hpp"
 #include "components/material/material-component.hpp"
 #include "components/mesh/mesh-component.hpp"
@@ -19,66 +20,66 @@ Object::Object(ObjectDTO dto) : ENTITY_INIT_DTO(dto) {
 }
 
 void Object::start() {
-  if (is_active()) {
-    auto resource = get_component<ResourceComponent>();
-    auto mesh = get_component<MeshComponent>();
-    auto transform = get_component<TransformComponent>();
+  CHECK_ACTIVE(this);
 
-    if (resource != nullptr && resource->is_active())
-      resource->start();
+  auto resource = get_component<ResourceComponent>();
+  auto mesh = get_component<MeshComponent>();
+  auto transform = get_component<TransformComponent>();
 
-    auto shader = resource->get_shader();
+  if (resource != nullptr && resource->is_active())
+    resource->start();
 
-    if (shader != nullptr) {
-      shader->bind();
-      shader->set_int("shadowMap", 1);
-    }
+  auto shader = resource->get_shader();
 
-    if (transform != nullptr && transform->is_active())
-      transform->start();
+  if (shader != nullptr) {
+    shader->bind();
+    shader->set_int("shadowMap", 1);
+  }
 
-    if (mesh != nullptr && mesh->is_active())
-      mesh->start();
-  };
+  if (transform != nullptr && transform->is_active())
+    transform->start();
+
+  if (mesh != nullptr && mesh->is_active())
+    mesh->start();
 }
 
 void Object::pre_update() {}
 
 void Object::update() {
-  if (is_active()) {
-    auto entity_manager = EntityManager::get();
-    auto component_manager = ComponentManager::get();
+  CHECK_ACTIVE(this);
 
-    auto resource = get_component<ResourceComponent>();
-    auto mesh = get_component<MeshComponent>();
-    auto transform = get_component<TransformComponent>();
+  auto entity_manager = EntityManager::get();
+  auto component_manager = ComponentManager::get();
 
-    auto material = get_component<MaterialComponent>();
+  auto resource = get_component<ResourceComponent>();
+  auto mesh = get_component<MeshComponent>();
+  auto transform = get_component<TransformComponent>();
 
-    resource->update();
+  auto material = get_component<MaterialComponent>();
 
-    if (entity_manager->has_entity_with_component<LightComponent>()) {
-      component_manager->get_component<LightComponent>()->update(this);
-    }
+  resource->update();
 
-    if (entity_manager->has_entity_with_component<CameraComponent>() &&
-        resource->has_shader()) {
-      auto shader = resource->get_shader();
-      auto camera = component_manager->get_component<CameraComponent>();
+  if (entity_manager->has_entity_with_component<LightComponent>()) {
+    component_manager->get_component<LightComponent>()->update(this);
+  }
 
-      camera->update(shader);
-    }
+  if (entity_manager->has_entity_with_component<CameraComponent>() &&
+      resource->has_shader()) {
+    auto shader = resource->get_shader();
+    auto camera = component_manager->get_component<CameraComponent>();
 
-    if (transform != nullptr && transform->is_active())
-      transform->update();
+    camera->update(shader);
+  }
 
-    if (material != nullptr && material->is_active()) {
-      material->update();
-    }
+  if (transform != nullptr && transform->is_active())
+    transform->update();
 
-    if (mesh != nullptr && mesh->is_active()) {
-      mesh->update();
-    }
+  if (material != nullptr && material->is_active()) {
+    material->update();
+  }
+
+  if (mesh != nullptr && mesh->is_active()) {
+    mesh->update();
   }
 }
 

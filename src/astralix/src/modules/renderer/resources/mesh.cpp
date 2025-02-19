@@ -28,7 +28,7 @@ Mesh Mesh::plane(float size) {
 }
 
 Mesh Mesh::cube(float size) {
-  float half_length = size;
+  float half_length = size / 2.0f;
 
   std::vector<Vertex> vertices = {
       // Front face

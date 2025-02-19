@@ -5,8 +5,9 @@
 namespace astralix {
 class OpenGLTexture2D : public Texture2D {
 public:
-  OpenGLTexture2D(const ResourceID &resource_id, const std::string &path,
-                  const bool flip_image_on_loading = false);
+  OpenGLTexture2D(const ResourceID &resource_id, TextureConfig config);
+
+  static Ref<Texture2D> create(const ResourceID &resource_id);
 
   ~OpenGLTexture2D();
 
@@ -20,6 +21,13 @@ private:
   uint32_t m_width;
   uint32_t m_height;
   uint32_t m_renderer_id;
-  std::string m_path;
+  int m_format;
+  unsigned char *m_buffer;
+
+  unsigned int textureParameterToGL(TextureParameter param);
+
+  int textureParameterValueToGL(TextureValue value);
+
+  int formatToGl(TextureFormat format);
 };
 } // namespace astralix

@@ -10,6 +10,8 @@ public:
   void bind() const override;
   void unbind() const override;
 
+  void set_data(const void *data, uint32_t size) const override;
+
   uint32_t get_count() const override { return m_count; };
 
 private:

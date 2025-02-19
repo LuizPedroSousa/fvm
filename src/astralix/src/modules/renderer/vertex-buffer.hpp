@@ -135,7 +135,9 @@ private:
 };
 
 class VertexBuffer {
+
 public:
+  enum DrawType { Static = 0, Dynamic = 1 };
   virtual ~VertexBuffer() = default;
 
   virtual void bind() const = 0;
@@ -147,7 +149,8 @@ public:
   virtual void set_layout(const BufferLayout &layout) = 0;
 
   static Ref<VertexBuffer> create(uint32_t size);
-  static Ref<VertexBuffer> create(const void *vertices, uint32_t size);
+  static Ref<VertexBuffer> create(const void *vertices, uint32_t size,
+                                  DrawType draw_type);
 };
 
 } // namespace astralix

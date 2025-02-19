@@ -5,12 +5,14 @@
 #include "engine.hpp"
 #include "vector"
 #include "vertex-array.hpp"
+#include "vertex-buffer.hpp"
 
 namespace astralix {
 
 MeshComponent::MeshComponent(COMPONENT_INIT_PARAMS)
     : COMPONENT_INIT(MeshComponent, "Mesh Renderer", true,
-                     create_ref<MeshComponentSerializer>(this)) {
+                     create_ref<MeshComponentSerializer>(this)),
+      m_draw_type(VertexBuffer::DrawType::Static) {
 
       };
 
@@ -18,8 +20,8 @@ void MeshComponent::start() {
   for (auto &mesh : m_meshes) {
     mesh.vertex_array = VertexArray::create();
 
-    auto vertex_buffer = VertexBuffer::create(
-        &mesh.vertices[0], mesh.vertices.size() * sizeof(Vertex));
+    Ref<VertexBuffer> vertex_buffer = VertexBuffer::create(
+        &mesh.vertices[0], mesh.vertices.size() * sizeof(Vertex), m_draw_type);
 
     BufferLayout layout({
         BufferElement(ShaderDataType::Float3, "position"),

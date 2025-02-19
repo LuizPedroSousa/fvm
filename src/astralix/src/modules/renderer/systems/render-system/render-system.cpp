@@ -20,6 +20,7 @@
 #include "entities/object.hpp"
 #include "entities/post-processing.hpp"
 #include "entities/skybox.hpp"
+#include "entities/text.hpp"
 #include "iostream"
 #include "managers/resource-manager.hpp"
 #include "renderer-api.hpp"
@@ -43,6 +44,8 @@ void RenderSystem::start() {
   entity_manager->for_each<Object>([](Object *object) { object->start(); });
   entity_manager->for_each<PostProcessing>(
       [](PostProcessing *post_processing) { post_processing->start(); });
+
+  entity_manager->for_each<Text>([&](Text *text) { text->start(); });
 
   add_subsystem<ShadowMappingSystem>()->start();
   add_subsystem<DebugSystem>()->start();
@@ -97,31 +100,27 @@ void RenderSystem::update(double dt) {
   auto shadow_mapping = get_subsystem<ShadowMappingSystem>();
   auto debug = get_subsystem<DebugSystem>();
 
-  shadow_mapping->update(dt);
+  if (shadow_mapping != nullptr) {
+    shadow_mapping->update(dt);
+  }
 
   EntityManager::get()->for_each<Skybox>(
       [&](Skybox *skybox) { skybox->update(); });
 
   entity_manager->for_each<Object>([&](Object *object) {
-    auto resource = object->get_component<ResourceComponent>();
-
-    if (resource != nullptr) {
-      if (resource->has_shader()) {
-
-        resource->set_shader("shaders::lighting");
-        auto shader = resource->get_shader();
-
-        shader->bind();
-
-        shadow_mapping->bind_depth();
-      }
+    if (shadow_mapping != nullptr) {
+      shadow_mapping->bind_depth(object);
     }
+
     object->update();
   });
 
+  entity_manager->for_each<Text>([&](Text *text) { text->update(); });
+
   auto scheduler = EventScheduler::get();
 
-  debug->update(dt);
+  if (debug != nullptr)
+    debug->update(dt);
 
   scheduler->bind(SchedulerType::REALTIME);
 
@@ -133,13 +132,8 @@ void RenderSystem::update(double dt) {
   entity_manager->for_each<Object>(
       [&](Object *object) { object->post_update(); });
 
-  // entity_manager->for_each<PostProcessing>(
-  // [&](PostProcessing *post_processing) {
-  //   if (post_processing->is_active()) {
-  //
-  //     post_processing->post_update();
-  //   }
-  // });
+  entity_manager->for_each<PostProcessing>(
+      [&](PostProcessing *post_processing) { post_processing->post_update(); });
 };
 
 RenderSystem::~RenderSystem() {}

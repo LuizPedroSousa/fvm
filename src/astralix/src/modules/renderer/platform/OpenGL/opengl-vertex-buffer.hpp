@@ -4,7 +4,7 @@ namespace astralix {
 
 class OpenGLVertexBuffer : public VertexBuffer {
 public:
-  OpenGLVertexBuffer(const void *vertices, uint32_t size);
+  OpenGLVertexBuffer(const void *vertices, uint32_t size, DrawType draw_type);
   OpenGLVertexBuffer(uint32_t size);
   ~OpenGLVertexBuffer();
 
@@ -20,6 +20,8 @@ public:
 private:
   uint32_t m_renderer_id;
   BufferLayout m_layout;
+
+  int drawTypeToGL(DrawType draw_type);
 };
 
 } // namespace astralix

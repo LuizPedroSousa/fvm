@@ -1,4 +1,5 @@
 #include "debug-system.hpp"
+#include "base.hpp"
 #include "components/mesh/mesh-component.hpp"
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
@@ -31,6 +32,8 @@ void DebugSystem::pre_update(double dt) {}
 void DebugSystem::fixed_update(double fixed_dt) {}
 
 void DebugNormal::update() {
+  CHECK_ACTIVE(this);
+
   auto resource = get_component<ResourceComponent>();
   auto mesh = get_component<MeshComponent>();
 
@@ -96,6 +99,7 @@ void DebugDepth::start() {
 };
 
 void DebugDepth::update() {
+  CHECK_ACTIVE(this);
   auto system_manager = SystemManager::get();
 
   auto shadow_mapping = system_manager->get_system<ShadowMappingSystem>();
@@ -153,19 +157,16 @@ void DebugSystem::start() {
       });
 }
 
-#define UPDATE_ACTIVE(entity)                                                  \
-  if (entity->is_active()) {                                                   \
-    entity->update();                                                          \
-  }
-
 #define GET_ENTITY(T) m_entity_manager->get_entity<T>();
 
 void DebugSystem::update(double dt) {
+  CHECK_ACTIVE(this);
+
   auto depth = GET_ENTITY(DebugDepth);
   auto normal = GET_ENTITY(DebugNormal);
 
-  UPDATE_ACTIVE(depth);
-  UPDATE_ACTIVE(normal);
+  depth->update();
+  normal->update();
 }
 
 DebugSystem::~DebugSystem() { delete m_entity_manager; }

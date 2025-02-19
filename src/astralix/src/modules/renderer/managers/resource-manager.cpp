@@ -53,6 +53,12 @@ void ResourceManager::load_models(std::initializer_list<Ref<Model>> models) {
   }
 }
 
+void ResourceManager::load_fonts(std::initializer_list<Ref<Font>> fonts) {
+  for (auto font : fonts) {
+    load_font(font);
+  }
+}
+
 Ref<Shader> ResourceManager::get_shader_by_id(ResourceID id) {
   auto it = m_shader_table.find(id);
 
@@ -109,10 +115,30 @@ Ref<Material> ResourceManager::load_material(Ref<Material> material) {
   return m_material_table[material_id];
 }
 
+Ref<Font> ResourceManager::load_font(Ref<Font> font) {
+  auto font_id = font->get_resource_id();
+
+  auto inserted_font = m_font_table.emplace(font_id, std::move(font));
+
+  ASTRA_ASSERT_THROW(!inserted_font.second, "Can't insert font");
+
+  return m_font_table[font_id];
+}
+
 Ref<Material> ResourceManager::get_material_by_id(ResourceID id) {
   auto it = m_material_table.find(id);
 
   if (it != m_material_table.end()) {
+    return it->second;
+  }
+
+  return nullptr;
+}
+
+Ref<Font> ResourceManager::get_font_by_id(ResourceID id) {
+  auto it = m_font_table.find(id);
+
+  if (it != m_font_table.end()) {
     return it->second;
   }
 

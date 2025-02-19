@@ -9,6 +9,7 @@
 #include "resources/texture-renderer.hpp"
 #include "resources/texture.hpp"
 #include "vector"
+#include "vertex-buffer.hpp"
 
 namespace astralix {
 
@@ -20,7 +21,7 @@ public:
   void start();
   void update();
 
-  std::vector<Mesh> *get_meshes() { return &m_meshes; }
+  std::vector<Mesh> get_meshes() { return m_meshes; }
 
   void change_draw_type(RendererAPI::DrawPrimitiveType primitive_type) {
     for (auto &mesh : m_meshes) {
@@ -34,8 +35,13 @@ public:
 
   void attach_mesh(Mesh mesh) { m_meshes.push_back(mesh); };
 
+  void set_draw_type(VertexBuffer::DrawType draw_type) {
+    m_draw_type = draw_type;
+  };
+
 private:
   std::vector<Mesh> m_meshes;
+  VertexBuffer::DrawType m_draw_type;
 };
 
 } // namespace astralix

@@ -1,5 +1,7 @@
 #include "systems/render-system/shadow-mapping-system.hpp"
+#include "base.hpp"
 #include "components/resource/resource-component.hpp"
+#include "ecs/guid.hpp"
 #include "ecs/managers/entity-manager.hpp"
 #include "engine.hpp"
 #include "entities/object.hpp"
@@ -33,9 +35,25 @@ void ShadowMappingSystem::start() {
   shader->attach();
 }
 
-void ShadowMappingSystem::bind_depth() {
+void ShadowMappingSystem::bind_depth(Object *object) {
+  CHECK_ACTIVE(this);
+
+  auto resource = object->get_component<ResourceComponent>();
+
+  if (resource == nullptr || !resource->has_shader()) {
+    return;
+  }
+
+  auto shader = resource->get_shader();
+
+  shader->bind();
+
+  shader->set_int("depthMap", 1);
+
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, m_framebuffer->get_color_attachment_id());
+
+  shader->unbind();
 }
 
 void ShadowMappingSystem::pre_update(double dt) {}
@@ -43,6 +61,8 @@ void ShadowMappingSystem::pre_update(double dt) {}
 void ShadowMappingSystem::fixed_update(double fixed_dt) {}
 
 void ShadowMappingSystem::update(double dt) {
+  CHECK_ACTIVE(this);
+
   auto engine = Engine::get();
 
   auto entity_manager = EntityManager::get();
@@ -58,13 +78,20 @@ void ShadowMappingSystem::update(double dt) {
   entity_manager->for_each<Object>([&](Object *object) {
     auto resource = object->get_component<ResourceComponent>();
 
-    if (resource != nullptr) {
-      if (resource->has_shader()) {
-        resource->set_shader("shadow_mapping_depth");
-      }
+    ResourceID older_shader_id;
+
+    if (resource != nullptr && resource->has_shader()) {
+      auto current_shader = resource->get_shader();
+      older_shader_id = current_shader->get_resource_id();
+
+      resource->set_shader("shadow_mapping_depth");
     }
 
     object->update();
+
+    if (!older_shader_id.empty()) {
+      resource->set_shader(older_shader_id);
+    }
   });
 
   glCullFace(GL_BACK);

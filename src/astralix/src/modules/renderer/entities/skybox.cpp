@@ -1,5 +1,6 @@
 
 #include "skybox.hpp"
+#include "base.hpp"
 #include "components/light/light-component.hpp"
 #include "components/material/material-component.hpp"
 #include "components/mesh/mesh-component.hpp"
@@ -24,6 +25,7 @@ void Skybox::start() {
   resource->attach_cubemap({m_cubemap_id, "_skybox"});
   resource->set_shader(m_shader_id);
 
+  resource->start();
   mesh->attach_mesh(Mesh::cube(2.0f));
   mesh->start();
 }
@@ -31,6 +33,7 @@ void Skybox::start() {
 void Skybox::pre_update() { glDepthFunc(GL_LEQUAL); }
 
 void Skybox::update() {
+  CHECK_ACTIVE(this);
   auto entity_manager = EntityManager::get();
 
   if (!entity_manager->has_entity_with_component<CameraComponent>()) {

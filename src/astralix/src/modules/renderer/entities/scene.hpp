@@ -1,10 +1,12 @@
 #pragma once
+#include "ecs/managers/entity-manager.hpp"
 #include "either.hpp"
 
 #include "ecs/guid.hpp"
 #include "exceptions/base-exception.hpp"
 #include "serializers/scene-serializer.hpp"
 #include "string"
+#include <utility>
 
 namespace astralix {
 
@@ -19,6 +21,12 @@ public:
 
   void save();
   void load();
+
+  template <typename T, typename... Args> T *add_entity(Args &&...params) {
+    auto manager = EntityManager::get();
+
+    return manager->add_entity<T>(std::forward<Args>(params)...);
+  }
 
   SceneID get_id() const { return m_id; }
   std::string get_name() const { return m_name; }

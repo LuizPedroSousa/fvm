@@ -1,4 +1,6 @@
+#pragma once
 #include "ecs/systems/system.hpp"
+#include "entities/object.hpp"
 #include "framebuffer.hpp"
 namespace astralix {
 
@@ -12,7 +14,7 @@ public:
   void pre_update(double dt) override;
   void update(double dt) override;
 
-  void bind_depth();
+  void bind_depth(Object *object);
 
   Ref<Framebuffer> m_framebuffer;
 };

@@ -1,9 +1,8 @@
 #pragma once
-#include "assimp/scene.h"
 #include "base-manager.hpp"
 #include "base.hpp"
 #include "ecs/guid.hpp"
-#include "memory"
+#include "resources/font.hpp"
 #include "resources/material.hpp"
 #include "resources/model.hpp"
 #include "resources/shader.hpp"
@@ -26,14 +25,18 @@ public:
   Ref<Model> load_model(Ref<Model> model);
   void load_models(std::initializer_list<Ref<Model>> models);
 
+  void load_fonts(std::initializer_list<Ref<Font>> fonts);
+
   Ref<Shader> get_shader_by_id(ResourceID id);
   Ref<Texture> get_texture_by_id(ResourceID id);
 
   Model *get_model_by_id(ResourceID id);
   std::vector<Model *> get_models_by_ids(std::initializer_list<ResourceID> ids);
   Ref<Material> get_material_by_id(ResourceID id);
+  Ref<Font> get_font_by_id(ResourceID id);
 
   Ref<Material> load_material(Ref<Material> material);
+  Ref<Font> load_font(Ref<Font> font);
 
   ResourceManager() = default;
 
@@ -42,5 +45,6 @@ private:
   std::unordered_map<ResourceID, Ref<Shader>> m_shader_table;
   std::unordered_map<ResourceID, Ref<Model>> m_model_table;
   std::unordered_map<ResourceID, Ref<Material>> m_material_table;
+  std::unordered_map<ResourceID, Ref<Font>> m_font_table;
 };
 } // namespace astralix

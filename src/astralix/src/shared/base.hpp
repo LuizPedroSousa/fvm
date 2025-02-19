@@ -9,6 +9,10 @@ namespace astralix {
     return this->fn(std::forward<decltype(args)>(args)...);                    \
   }
 
+#define CHECK_ACTIVE(t)                                                        \
+  if (!t->is_active())                                                         \
+  return
+
 template <typename T> using Scope = std::unique_ptr<T>;
 template <typename T, typename... Args>
 constexpr Scope<T> create_scope(Args &&...args) {
