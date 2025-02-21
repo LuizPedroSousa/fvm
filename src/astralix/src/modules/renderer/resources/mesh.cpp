@@ -135,7 +135,7 @@ Mesh Mesh::sphere() {
       Vertex vertex;
       vertex.position = glm::vec3(x, y, z);
       vertex.normal = glm::normalize(vertex.position);
-      vertex.texture_cordinates =
+      vertex.texture_coordinates =
           glm::vec2(static_cast<float>(segment) / segments,
                     static_cast<float>(ring) / rings);
 
@@ -198,7 +198,7 @@ Mesh Mesh::capsule(float radius, float height, int segments, int rings) {
       vertex.position =
           glm::vec3(x * radius, y * radius * halfHeight, z * radius);
       vertex.normal = glm::normalize(vertex.position);
-      vertex.texture_cordinates =
+      vertex.texture_coordinates =
           glm::vec2(static_cast<float>(segment) / segments,
                     static_cast<float>(ring) / rings);
 

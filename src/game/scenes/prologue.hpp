@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/rigidbody/rigidbody-component.hpp"
+#include "entities/object.hpp"
 #include "entities/scene.hpp"
 
 using namespace astralix;

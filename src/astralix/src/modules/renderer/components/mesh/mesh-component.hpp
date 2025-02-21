@@ -6,7 +6,6 @@
 #include "glm/glm.hpp"
 #include "renderer-api.hpp"
 #include "resources/mesh.hpp"
-#include "resources/texture-renderer.hpp"
 #include "resources/texture.hpp"
 #include "vector"
 #include "vertex-buffer.hpp"

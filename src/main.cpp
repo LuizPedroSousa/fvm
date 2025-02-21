@@ -4,9 +4,8 @@
 #include "astralix/src/modules/application/application.hpp"
 #endif
 #include "astralix/src/shared/exceptions/base-exception.hpp"
-#include "iostream"
 #include "game/game.hpp"
-
+#include "iostream"
 
 int handleException(astralix::BaseException exception) {
   std::cout << exception.what() << std::endl;
@@ -14,15 +13,13 @@ int handleException(astralix::BaseException exception) {
   return -1;
 }
 
+#define INIT(runner)                                                           \
+  auto app = astralix::runner::init();                                         \
+  game.start();                                                                \
+  app->start();                                                                \
+  app->run();
 
-#define INIT(runner) \
-auto app =  astralix::runner::init(); \
-game.start(); \
-app->start(); \
-app->run();
-
-
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   try {
     Game game;
 
@@ -31,8 +28,7 @@ int main(int argc, char** argv) {
 #else
     INIT(Application);
 #endif
-  }
-  catch (astralix::BaseException exception) {
+  } catch (astralix::BaseException exception) {
     return handleException(exception);
   }
 

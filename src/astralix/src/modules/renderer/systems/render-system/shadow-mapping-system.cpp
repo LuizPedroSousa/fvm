@@ -15,7 +15,6 @@ ShadowMappingSystem::ShadowMappingSystem() {}
 ShadowMappingSystem::~ShadowMappingSystem() {}
 
 void ShadowMappingSystem::start() {
-  glEnable(GL_DEPTH_TEST);
 
   auto resource_manager = ResourceManager::get();
 
@@ -48,9 +47,9 @@ void ShadowMappingSystem::bind_depth(Object *object) {
 
   shader->bind();
 
-  shader->set_int("depthMap", 1);
+  shader->set_int("depthMap", 6);
 
-  glActiveTexture(GL_TEXTURE1);
+  glActiveTexture(GL_TEXTURE6);
   glBindTexture(GL_TEXTURE_2D, m_framebuffer->get_color_attachment_id());
 
   shader->unbind();
@@ -68,6 +67,8 @@ void ShadowMappingSystem::update(double dt) {
   auto entity_manager = EntityManager::get();
 
   m_framebuffer->bind();
+
+  glEnable(GL_DEPTH_TEST);
 
   engine->renderer_api->enable_buffer_testing();
   engine->renderer_api->clear_buffers();

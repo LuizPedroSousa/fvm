@@ -77,7 +77,7 @@ void TransformComponent::set_position(glm::vec3 new_pos) {
   m_dirty = true;
 }
 
-void TransformComponent::set_rotation(glm::vec3 axis, float degrees) {
+void TransformComponent::rotate(glm::vec3 axis, float degrees) {
   rotation = glm::length(axis) > 0 ? glm::normalize(axis)
                                    : glm::vec3(0.0f, 0.0f, 1.0f);
   rotation_angle = degrees;

@@ -114,7 +114,7 @@ void Text::update() {
     for (int i = 0; i < 6; i++) {
       m_mesh.vertices[i].position =
           glm::vec3(vertices[i].x, vertices[i].y, 0.0f);
-      m_mesh.vertices[i].texture_cordinates = texCoords[i];
+      m_mesh.vertices[i].texture_coordinates = texCoords[i];
     }
 
     glBindTexture(GL_TEXTURE_2D, texture->get_renderer_id());

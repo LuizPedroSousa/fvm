@@ -14,6 +14,7 @@ public:
 
   void set_scale(glm::vec3 p_scale);
   void translate(glm::vec3 p_position);
+  void rotate(glm::vec3 axis, float degrees);
   void start();
   void update();
   void reset_transform();
@@ -28,8 +29,6 @@ public:
   glm::mat4 matrix;
 
   void set_position(glm::vec3 new_pos);
-
-  void set_rotation(glm::vec3 axis, float degrees);
 
 private:
   void recalculate_transform();

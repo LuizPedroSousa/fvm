@@ -8,6 +8,7 @@
 #include "resources/shader.hpp"
 #include "resources/texture.hpp"
 #include "unordered_map"
+#include <initializer_list>
 
 namespace astralix {
 
@@ -36,6 +37,7 @@ public:
   Ref<Font> get_font_by_id(ResourceID id);
 
   Ref<Material> load_material(Ref<Material> material);
+  void load_materials(std::initializer_list<Ref<Material>> materials);
   Ref<Font> load_font(Ref<Font> font);
 
   ResourceManager() = default;

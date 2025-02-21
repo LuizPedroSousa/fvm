@@ -23,11 +23,13 @@ void MeshComponent::start() {
     Ref<VertexBuffer> vertex_buffer = VertexBuffer::create(
         &mesh.vertices[0], mesh.vertices.size() * sizeof(Vertex), m_draw_type);
 
-    BufferLayout layout({
-        BufferElement(ShaderDataType::Float3, "position"),
-        BufferElement(ShaderDataType::Float3, "normal"),
-        BufferElement(ShaderDataType::Float2, "texture_coordinates"),
-    });
+    BufferLayout layout(
+        {BufferElement(ShaderDataType::Float3, "position"),
+         BufferElement(ShaderDataType::Float3, "normal"),
+         BufferElement(ShaderDataType::Float2, "texture_coordinates"),
+         BufferElement(ShaderDataType::Float3, "tangent")}
+
+    );
 
     vertex_buffer->set_layout(layout);
 

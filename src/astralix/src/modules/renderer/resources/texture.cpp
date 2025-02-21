@@ -56,16 +56,21 @@ Image Texture::load_image(std::string filename, bool flip_image_on_loading) {
   return Image{width, height, nr_channels, data};
 };
 
-Ref<Texture2D> Texture2D::create(const ResourceID &resource_id,
-                                 const std::string &path,
-                                 const bool flip_image_on_loading) {
+Ref<Texture2D> Texture2D::create(
+    const ResourceID &resource_id, const std::string &path,
+    const bool flip_image_on_loading,
+    std::unordered_map<TextureParameter, TextureValue> parameters) {
 
   return create_renderer_component_ref<Texture2D, OpenGLTexture2D>(
       Engine::get()->renderer_api->get_api(), resource_id,
-      TextureConfig{.load_image = LoadImageConfig{
-                        .path = path,
-                        .flip_image_on_loading = flip_image_on_loading,
-                    }});
+      TextureConfig{
+          .load_image =
+              LoadImageConfig{
+                  .path = path,
+                  .flip_image_on_loading = flip_image_on_loading,
+              },
+          .parameters = parameters,
+      });
 };
 
 Ref<Texture2D> Texture2D::create(const ResourceID &resource_id,

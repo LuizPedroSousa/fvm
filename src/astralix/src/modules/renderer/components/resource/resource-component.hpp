@@ -1,9 +1,13 @@
 #pragma once
 #include "ecs/components/component.hpp"
 #include "resources/shader.hpp"
-#include "resources/texture-renderer.hpp"
 
 namespace astralix {
+
+struct TextureRenderData {
+  ResourceID id;
+  std::string name;
+};
 
 class ResourceComponent : public Component<ResourceComponent> {
 public:
@@ -23,8 +27,9 @@ public:
   Ref<Shader> &get_shader() { return m_shader; }
 
 private:
-  TextureRenderer m_texture_renderer;
   Ref<Shader> m_shader;
+  std::vector<TextureRenderData> m_textures;
+  std::vector<TextureRenderData> m_cubemaps;
 };
 
 } // namespace astralix

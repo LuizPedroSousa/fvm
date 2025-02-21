@@ -24,7 +24,7 @@ void DirectionalStrategy::update(Object *source, Object *object,
 
   auto trans = light_entity->get_component<TransformComponent>();
 
-  float near_plane = -1.0f, far_plane = 7.5f;
+  float near_plane = -10.0f, far_plane = 7.5f;
 
   glm::mat4 lightProjection, lightView;
   glm::mat4 lightSpaceMatrix;
@@ -33,8 +33,11 @@ void DirectionalStrategy::update(Object *source, Object *object,
 
   auto front = glm::vec3(0.0f);
 
-  lightProjection =
-      glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+  auto distance = 6.0f;
+
+  lightProjection = glm::ortho(-distance, distance, -distance, distance,
+                               near_plane, far_plane);
+
   lightView = glm::lookAt(trans->position, front, up);
 
   lightSpaceMatrix = lightProjection * lightView;
@@ -45,7 +48,7 @@ void DirectionalStrategy::update(Object *source, Object *object,
   shader->set_vec3("directional_light.direction", transform->forward());
   shader->set_vec3("directional_light.position", transform->position);
   shader->set_vec3("directional_light.exposure.ambient", glm::vec3(0.2f));
-  shader->set_vec3("directional_light.exposure.diffuse", glm::vec3(0.5f));
+  shader->set_vec3("directional_light.exposure.diffuse", glm::vec3(2.0f));
   shader->set_vec3("directional_light.exposure.specular", glm::vec3(0.5f));
 
   shader->set_matrix("light_space_matrix", lightSpaceMatrix);

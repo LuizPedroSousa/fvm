@@ -17,6 +17,19 @@ OpenGLTexture2D::OpenGLTexture2D(const ResourceID &resource_id,
 
     m_format = get_image_format(image.nr_channels);
 
+    for (const auto &[param, value] : config.parameters) {
+
+      if (param == TextureParameter::WrapS ||
+          param == TextureParameter::WrapT) {
+
+        if (m_format == 4) {
+          config.parameters[param] = TextureValue::Repeat;
+        } else {
+          config.parameters[param] = TextureValue::ClampToEdge;
+        }
+      }
+    }
+
     this->m_width = image.width;
     this->m_height = image.height;
 
@@ -66,6 +79,8 @@ GLint OpenGLTexture2D::textureParameterValueToGL(TextureValue value) {
     return GL_CLAMP_TO_EDGE;
   case TextureValue::ClampToBorder:
     return GL_CLAMP_TO_BORDER;
+  case TextureValue::LinearMipMap:
+    return GL_LINEAR_MIPMAP_LINEAR;
   case TextureValue::Linear:
     return GL_LINEAR;
   case TextureValue::Nearest:
