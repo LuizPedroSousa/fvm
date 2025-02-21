@@ -143,9 +143,9 @@ void PropertiesLayer::draw_components(IEntity *entity) {
   draw_component<TransformComponent>(
       entity, "icons::transform", [](TransformComponent *component) {
         UI::draw_vec3_control("Translation", component->position);
-        glm::vec3 rotation = glm::degrees(component->rotation);
-        UI::draw_vec3_control("Rotation", rotation);
-        component->rotation = glm::radians(rotation);
+        // glm::vec3 rotation = glm::degrees(component->rotation);
+        // UI::draw_vec3_control("Rotation", rotation);
+        // component->rotation = glm::radians(rotation);
         UI::draw_vec3_control("Scale", component->scale, 1.0f);
       });
 

@@ -6,6 +6,11 @@
 
 using namespace astralix;
 
+struct Tile {
+  Object *object;
+  glm::vec3 position;
+};
+
 class Prologue : public Scene {
 public:
   Prologue();

@@ -11,8 +11,10 @@
 #include "entities/object.hpp"
 #include "entities/skybox.hpp"
 #include "entities/text.hpp"
+#include "events/key-event.hpp"
 #include "glad/glad.h"
 #include "glm/fwd.hpp"
+#include "log.hpp"
 #include "managers/resource-manager.hpp"
 #include "resources/material.hpp"
 #include "resources/model.hpp"
@@ -115,6 +117,8 @@ void Prologue::load_resources() {
   //     });
 }
 
+static std::vector<Tile> tiles;
+
 void Prologue::create_tile_grid(int columns, int rows, float tile_size,
                                 RigidType type, float y, glm::vec3 scale) {
   float offset_x = (columns * tile_size) / 2.0f - tile_size / 2.0f;
@@ -125,7 +129,8 @@ void Prologue::create_tile_grid(int columns, int rows, float tile_size,
       float x = col * tile_size - offset_x;
       float z = row * tile_size - offset_z;
 
-      auto tile = add_entity<Object>("tile", glm::vec3(x, y, z));
+      auto position = glm::vec3(x, y, z);
+      auto tile = add_entity<Object>("tile", position);
 
       ATTACH_MESH(tile);
       ATTACH_LIGHTING_SHADER(tile);
@@ -135,7 +140,13 @@ void Prologue::create_tile_grid(int columns, int rows, float tile_size,
       tile->get_component<TransformComponent>()->set_scale(scale);
 
       tile->add_component<MeshCollisionComponent>();
-      // tile->add_component<RigidBodyComponent>(type);
+      tile->add_component<RigidBodyComponent>(type);
+
+      tiles.push_back(
+          Tile{.object = tile,
+               .position = tile->get_component<TransformComponent>()->position}
+
+      );
     }
   }
 }
@@ -161,20 +172,38 @@ void Prologue::load_scene_components() {
   add_entity<Skybox>("skybox", "cubemaps::skybox", "shaders::skybox");
 
   create_tile_grid(6, 6, 1.0f, RigidType::Static);
-  create_tile_grid(6, 6, 1.5f, RigidType::Dynamic, 2.0f, glm::vec3(0.25f));
 
-  auto block = add_entity<astralix::Object>("block", glm::vec3(0, 1.0f, -4.0f));
+  create_tile_grid(2, 2, 0.25f, RigidType::Dynamic, 2.0f, glm::vec3(0.25f));
+  create_tile_grid(2, 2, 0.5f, RigidType::Dynamic, 10.0f, glm::vec3(0.25f));
+  create_tile_grid(2, 2, 1.0f, RigidType::Dynamic, 20.0f, glm::vec3(0.25f));
+  create_tile_grid(4, 4, 1.0f, RigidType::Dynamic, 20.0f, glm::vec3(0.25f));
 
-  block->get_component<TransformComponent>()->set_scale(glm::vec3(0.5f));
-
-  block->add_component<MeshCollisionComponent>();
-  // block->add_component<RigidBodyComponent>();
-
-  ATTACH_MESH(block);
-  ATTACH_LIGHTING_SHADER(block);
   // add_entity<Text>("text", "Text", glm::vec2(540.0f, 570.0f), 5.0f,
   //                  glm::vec3(0.3, 0.7f, 0.9f));
   // add_entity<PostProcessing>("Post Processing", "shaders::post_processing");
+
+  auto event_dispatcher = EventDispatcher::get();
+
+  event_dispatcher->attach<KeyboardListener, KeyReleasedEvent>(
+      [&](KeyReleasedEvent *event) {
+        switch (event->key_code) {
+        case KeyCode::F5: {
+
+          for (auto tile : tiles) {
+            auto transform = tile.object->get_component<TransformComponent>();
+
+            transform->translate(tile.position);
+
+            LOG_DEBUG(transform->position.y);
+          }
+
+          break;
+        }
+
+        default:
+          return;
+        }
+      });
 }
 
 void Prologue::start() {

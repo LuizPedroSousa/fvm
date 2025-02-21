@@ -12,6 +12,15 @@
 #include "foundation/PxVec3.h"
 
 namespace astralix {
+
+inline physx::PxVec3 GlmVec3ToPxVec3(const glm::vec3 &vec) {
+  return physx::PxVec3(vec.x, vec.y, vec.z);
+}
+
+inline physx::PxQuat GlmQuatToPxQuat(const glm::quat &quat) {
+  return physx::PxQuat(quat.x, quat.y, quat.z, quat.w);
+}
+
 inline glm::mat4 PxMat44ToGlmMat4(physx::PxMat44 pxMatrix) {
   glm::mat4 matrix;
   for (int x = 0; x < 4; x++)
@@ -20,9 +29,9 @@ inline glm::mat4 PxMat44ToGlmMat4(physx::PxMat44 pxMatrix) {
   return matrix;
 }
 
-inline physx::PxQuat GlmQuatToPxQuat(glm::quat quat) {
-  return {quat.x, quat.y, quat.z, quat.w};
-}
+// inline physx::PxQuat GlmQuatToPxQuat(glm::quat quat) {
+//   return {quat.x, quat.y, quat.z, quat.w};
+// }
 
 inline physx::PxMat44 GlmMat4ToPxMat44(glm::mat4 glmMatrix) {
   physx::PxMat44 matrix;

@@ -5,6 +5,7 @@
 #include "ecs/managers/entity-manager.hpp"
 #include "engine.hpp"
 #include "entities/object.hpp"
+#include "log.hpp"
 #include "managers/resource-manager.hpp"
 
 #include "glad/glad.h"
@@ -47,9 +48,14 @@ void ShadowMappingSystem::bind_depth(Object *object) {
 
   shader->bind();
 
-  shader->set_int("depthMap", 6);
+  auto manager = ResourceManager::get();
 
-  glActiveTexture(GL_TEXTURE6);
+  int slot = manager->get_texture_slot() + 1;
+
+  shader->set_int("depthMap", slot);
+
+  glActiveTexture(GL_TEXTURE0 + slot);
+
   glBindTexture(GL_TEXTURE_2D, m_framebuffer->get_color_attachment_id());
 
   shader->unbind();

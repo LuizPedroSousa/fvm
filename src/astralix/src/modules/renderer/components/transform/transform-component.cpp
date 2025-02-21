@@ -2,6 +2,7 @@
 #include "components/resource/resource-component.hpp"
 #include "components/transform/serializers/transform-component-serializer.hpp"
 #include "engine.hpp"
+#include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "iostream"
 
@@ -9,11 +10,10 @@ namespace astralix {
 
 TransformComponent::TransformComponent(COMPONENT_INIT_PARAMS,
                                        glm::vec3 position, glm::vec3 scale,
-                                       glm::vec3 rotation, float rotation_angle)
+                                       glm::quat rotation)
     : COMPONENT_INIT(TransformComponent, "Transform", false,
                      create_ref<TransformComponentSerializer>(this)),
-      position(position), scale(scale), rotation(rotation),
-      rotation_angle(rotation_angle), m_dirty(true) {}
+      position(position), scale(scale), rotation(rotation), m_dirty(true) {}
 
 void TransformComponent::start() { recalculate_transform(); }
 
@@ -27,10 +27,10 @@ void TransformComponent::recalculate_transform() {
 
   glm::mat4 translation_matrix = glm::translate(glm::mat4(1.0f), position);
   glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), scale);
-  glm::mat4 rotatation_matrix =
-      glm::rotate(glm::mat4(1.0f), glm::radians(rotation_angle), rotation);
 
-  matrix = translation_matrix * rotatation_matrix * scale_matrix;
+  glm::mat4 rotation_matrix = glm::toMat4(rotation);
+
+  matrix = translation_matrix * rotation_matrix * scale_matrix;
 }
 
 void TransformComponent::update() {
@@ -64,11 +64,10 @@ glm::vec3 TransformComponent::forward() {
 }
 
 void TransformComponent::reset_transform() {
-  this->position = glm::vec3(0.0f);
-  this->scale = glm::vec3(1.0f);
-  this->rotation = glm::vec3(0.0f, 0.0f, 1.0f);
-  this->rotation_angle = 0.0f;
-  this->matrix = glm::mat4(1.0f);
+  position = glm::vec3(0.0f);
+  scale = glm::vec3(1.0f);
+  rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+  matrix = glm::mat4(1.0f);
   m_dirty = true;
   recalculate_transform();
 }
@@ -78,9 +77,16 @@ void TransformComponent::set_position(glm::vec3 new_pos) {
 }
 
 void TransformComponent::rotate(glm::vec3 axis, float degrees) {
-  rotation = glm::length(axis) > 0 ? glm::normalize(axis)
-                                   : glm::vec3(0.0f, 0.0f, 1.0f);
-  rotation_angle = degrees;
+  if (glm::length(axis) > 0) {
+    glm::quat rotationQuat =
+        glm::angleAxis(glm::radians(degrees), glm::normalize(axis));
+    rotation = rotationQuat * rotation;
+  }
+  m_dirty = true;
+}
+
+void TransformComponent::rotate(glm::quat rotation) {
+  rotation = rotation;
   m_dirty = true;
 }
 

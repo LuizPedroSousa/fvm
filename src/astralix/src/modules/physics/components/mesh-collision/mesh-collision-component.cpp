@@ -18,19 +18,13 @@ MeshCollisionComponent::MeshCollisionComponent(COMPONENT_INIT_PARAMS)
 
 void MeshCollisionComponent::start() {}
 
-inline physx::PxShape *create_box_shape(float width, float height, float depth,
-                                        glm::mat4 transform_matrix,
+inline physx::PxShape *create_box_shape(float half_width, float half_height,
+                                        float half_depth,
                                         physx::PxPhysics *physics) {
-
-  auto _defaultMaterial = physics->createMaterial(0.5f, 0.5f, 0.6f);
-
+  auto material = physics->createMaterial(0.5f, 0.5f, 0.6f);
   physx::PxShape *shape = physics->createShape(
-      physx::PxBoxGeometry(width, height, depth), *_defaultMaterial, true);
-
-  physx::PxMat44T localShapeMatrix = GlmMat4ToPxMat44(transform_matrix);
-
-  physx::PxTransform localShapeTransform(localShapeMatrix);
-  shape->setLocalPose(localShapeTransform);
+      physx::PxBoxGeometry(half_width, half_height, half_depth), *material,
+      true);
 
   return shape;
 }
@@ -41,7 +35,30 @@ void MeshCollisionComponent::attach_shape(physx::PxRigidActor *body,
 
   auto transform = get_owner()->get_component<TransformComponent>();
 
-  auto shape = create_box_shape(1.0f, 1.0f, 1.0f, transform->matrix, physics);
+  auto mesh_component = get_owner()->get_component<MeshComponent>();
+
+  if (!mesh_component) {
+    return;
+  }
+
+  glm::vec3 min_bounds(FLT_MAX);
+  glm::vec3 max_bounds(-FLT_MAX);
+
+  for (const auto &mesh : mesh_component->get_meshes()) {
+    for (const auto &vertex : mesh.vertices) {
+      min_bounds = glm::min(min_bounds, vertex.position);
+      max_bounds = glm::max(max_bounds, vertex.position);
+    }
+  }
+
+  glm::vec3 extents = (max_bounds - min_bounds) * 0.5f * transform->scale;
+
+  glm::vec3 center = (max_bounds + min_bounds) * 0.5f;
+
+  auto shape = create_box_shape(extents.x, extents.y, extents.z, physics);
+
+  physx::PxTransform localPose(GlmVec3ToPxVec3(center));
+  shape->setLocalPose(localPose);
 
   body->attachShape(*shape);
 
