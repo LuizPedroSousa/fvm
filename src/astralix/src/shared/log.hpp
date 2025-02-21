@@ -85,7 +85,7 @@ private:
   void render_log(Log *log) {
     std::ostringstream log_stream;
 
-    log_stream << BOLD << "[" << log->timestamp << "] - ";
+    log_stream << BOLD << "[" << log->timestamp << "] :: ";
 
     switch (log->level) {
     case LogLevel::INFO:
@@ -105,7 +105,7 @@ private:
     log_stream << RESET << BOLD << "[" << log->file << "::" << log->line << "]";
     log_stream << " [" << log->caller << "]";
 
-    log_stream << RESET << "-" << log->message << "\n";
+    log_stream << RESET << " :: " << log->message << "\n";
 
 #ifdef LOG_TO_CONSOLE
     std::cout << log_stream.str();

@@ -42,6 +42,8 @@ int OpenGLVertexBuffer::drawTypeToGL(DrawType draw_type) {
     return GL_STATIC_DRAW;
   }
   }
+
+  return 0;
 }
 
 } // namespace astralix

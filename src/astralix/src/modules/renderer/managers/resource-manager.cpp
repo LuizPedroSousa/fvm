@@ -1,12 +1,17 @@
 #include "resource-manager.hpp"
 #include "glad/glad.h"
+#include "log.hpp"
+#include <numeric>
 
 namespace astralix {
+static int count = 0;
+
 Ref<Texture> ResourceManager::load_texture(Ref<Texture> texture) {
+  LOG_DEBUG(texture->get_resource_id());
+
   auto texture_id = texture->get_resource_id();
 
-  texture->set_slot(m_texture_table.size() == 0 ? 0
-                                                : m_texture_table.size() + 1);
+  texture->set_slot(m_texture_table.size());
   auto inserted_texture =
       m_texture_table.emplace(texture_id, std::move(texture));
 
@@ -62,51 +67,6 @@ void ResourceManager::load_fonts(std::initializer_list<Ref<Font>> fonts) {
   }
 }
 
-Ref<Shader> ResourceManager::get_shader_by_id(ResourceID id) {
-  auto it = m_shader_table.find(id);
-
-  if (it != m_shader_table.end()) {
-    return it->second;
-  }
-
-  return nullptr;
-}
-
-Ref<Texture> ResourceManager::get_texture_by_id(ResourceID id) {
-  auto it = m_texture_table.find(id);
-
-  if (it != m_texture_table.end()) {
-    return it->second;
-  }
-
-  return nullptr;
-}
-
-Model *ResourceManager::get_model_by_id(ResourceID id) {
-  auto it = m_model_table.find(id);
-
-  if (it != m_model_table.end()) {
-    return it->second.get();
-  }
-
-  return nullptr;
-}
-
-std::vector<Model *>
-ResourceManager::get_models_by_ids(std::initializer_list<ResourceID> ids) {
-  std::vector<Model *> models;
-
-  for (auto id : ids) {
-    auto model = get_model_by_id(id);
-
-    if (model != nullptr) {
-      models.push_back(model);
-    }
-  }
-
-  return models;
-}
-
 Ref<Material> ResourceManager::load_material(Ref<Material> material) {
   auto material_id = material->get_resource_id();
 
@@ -138,21 +98,60 @@ Ref<Font> ResourceManager::load_font(Ref<Font> font) {
 Ref<Material> ResourceManager::get_material_by_id(ResourceID id) {
   auto it = m_material_table.find(id);
 
-  if (it != m_material_table.end()) {
-    return it->second;
-  }
+  ASTRA_NOT_FOUND_EXCEPTION(it == m_material_table.end(), m_material_table, id,
+                            "Material");
 
-  return nullptr;
+  return it->second;
+}
+
+Ref<Shader> ResourceManager::get_shader_by_id(ResourceID id) {
+  auto it = m_shader_table.find(id);
+
+  ASTRA_NOT_FOUND_EXCEPTION(it == m_shader_table.end(), m_shader_table, id,
+                            "Shader");
+
+  return it->second;
+}
+
+Ref<Texture> ResourceManager::get_texture_by_id(ResourceID id) {
+  auto it = m_texture_table.find(id);
+
+  ASTRA_NOT_FOUND_EXCEPTION(it == m_texture_table.end(), m_texture_table, id,
+                            "Texture");
+
+  return it->second;
+}
+
+Model *ResourceManager::get_model_by_id(ResourceID id) {
+  auto it = m_model_table.find(id);
+
+  ASTRA_NOT_FOUND_EXCEPTION(it == m_model_table.end(), m_model_table, id,
+                            "Model");
+
+  return it->second.get();
 }
 
 Ref<Font> ResourceManager::get_font_by_id(ResourceID id) {
   auto it = m_font_table.find(id);
 
-  if (it != m_font_table.end()) {
-    return it->second;
+  ASTRA_NOT_FOUND_EXCEPTION(it == m_font_table.end(), m_font_table, id,
+                            "Model");
+  return it->second;
+}
+
+std::vector<Model *>
+ResourceManager::get_models_by_ids(std::initializer_list<ResourceID> ids) {
+  std::vector<Model *> models;
+
+  for (auto id : ids) {
+    auto model = get_model_by_id(id);
+
+    if (model != nullptr) {
+      models.push_back(model);
+    }
   }
 
-  return nullptr;
+  return models;
 }
 
 } // namespace astralix

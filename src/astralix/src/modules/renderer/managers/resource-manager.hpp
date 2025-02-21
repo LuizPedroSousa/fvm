@@ -40,6 +40,8 @@ public:
   void load_materials(std::initializer_list<Ref<Material>> materials);
   Ref<Font> load_font(Ref<Font> font);
 
+  int get_texture_slot() { return m_texture_table.size(); };
+
   ResourceManager() = default;
 
 private:

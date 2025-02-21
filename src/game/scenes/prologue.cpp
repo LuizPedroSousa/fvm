@@ -44,6 +44,12 @@ void Prologue::load_resources() {
                          }),
        ///
 
+       Texture2D::create("textures::block::diffuse", "textures/diffuse.png",
+                         false
+
+                         //
+                         ),
+
        Texture2D::create(
            "textures::brick::diffuse", "textures/brickwall.jpg", false,
 
@@ -78,6 +84,9 @@ void Prologue::load_resources() {
       {Material::create("materials::brick", {"textures::brick::diffuse"}, {},
                         "textures::brick::normal")});
 
+  manager->load_materials(
+      {Material::create("materials::diffuse", {"textures::block::diffuse"})});
+
   manager->load_models(
       {Model::create("module::grass::flat", "models/Grass_Flat.obj")});
 
@@ -98,12 +107,12 @@ void Prologue::load_resources() {
 
   );
 
-  manager->load_fonts(
-      ///
-      {
-          Font::create("roboto", "fonts/roboto.ttf"),
-          ///
-      });
+  // manager->load_fonts(
+  //     ///
+  //     {
+  //         Font::create("roboto", "fonts/roboto.ttf"),
+  //         ///
+  //     });
 }
 
 void Prologue::create_tile_grid(int columns, int rows, float tile_size,
@@ -118,12 +127,10 @@ void Prologue::create_tile_grid(int columns, int rows, float tile_size,
 
       auto tile = add_entity<Object>("tile", glm::vec3(x, y, z));
 
-      tile->get_component<ResourceComponent>()->attach_shader(
-          "shaders::lighting");
+      ATTACH_MESH(tile);
+      ATTACH_LIGHTING_SHADER(tile);
 
       tile->get_component<TransformComponent>()->set_scale(glm::vec3(0.5f));
-
-      ATTACH_MESH(tile);
 
       tile->get_component<TransformComponent>()->set_scale(scale);
 
@@ -154,7 +161,7 @@ void Prologue::load_scene_components() {
   add_entity<Skybox>("skybox", "cubemaps::skybox", "shaders::skybox");
 
   create_tile_grid(6, 6, 1.0f, RigidType::Static);
-  create_tile_grid(4, 4, 1.5f, RigidType::Dynamic, 2.0f, glm::vec3(0.25f));
+  create_tile_grid(6, 6, 1.5f, RigidType::Dynamic, 2.0f, glm::vec3(0.25f));
 
   auto block = add_entity<astralix::Object>("block", glm::vec3(0, 1.0f, -4.0f));
 

@@ -25,11 +25,6 @@ void ResourceComponent::update() {
     for (auto cubemap : m_cubemaps) {
       auto cubemap_ptr = resource_manager->get_texture_by_id(cubemap.id);
 
-      ASTRA_EXCEPTION(cubemap_ptr == nullptr,
-                      "ResourceComponent::update() ERROR: Failed to render - "
-                      "Texture3D with ID [" +
-                          cubemap.id + "] not found in ResourceManager.");
-
       cubemap_ptr->active(cubemap_ptr->get_slot());
 
       m_shader->set_int(cubemap.name, cubemap_ptr->get_slot());
@@ -39,11 +34,6 @@ void ResourceComponent::update() {
 
     for (auto texture : m_textures) {
       auto texture_ptr = resource_manager->get_texture_by_id(texture.id);
-
-      ASTRA_EXCEPTION(texture_ptr == nullptr,
-                      "ResourceComponent::update() ERROR: Failed to render - "
-                      "Texture2D with ID [" +
-                          texture.id + "] not found in ResourceManager.");
 
       texture_ptr->active(texture_ptr->get_slot());
 
@@ -58,10 +48,6 @@ ResourceComponent *ResourceComponent::attach_shader(ResourceID id) {
   auto resource_manager = ResourceManager::get();
   auto shader_ptr = resource_manager->get_shader_by_id(id);
 
-  ASTRA_EXCEPTION(shader_ptr == nullptr,
-                  "Failed to set shader: Shader with ID [" + id +
-                      "] not found in ResourceManager.");
-
   shader_ptr->attach();
 
   m_shader = shader_ptr;
@@ -73,24 +59,16 @@ ResourceComponent *ResourceComponent::set_shader(ResourceID id) {
   auto resource_manager = ResourceManager::get();
   auto shader_ptr = resource_manager->get_shader_by_id(id);
 
-  ASTRA_EXCEPTION(shader_ptr == nullptr,
-                  "Failed to set shader: Shader with ID [" + id +
-                      "] not found in ResourceManager.");
-
   m_shader = shader_ptr;
 
   return this;
 }
 
 ResourceComponent *ResourceComponent::attach_texture(TextureRenderData data) {
-  LOG_INFO("Attaching texture with ID: " + data.id);
+  LOG_INFO("Attaching texture with ID: ", data.id);
 
   auto resource_manager = ResourceManager::get();
   auto texture_ptr = resource_manager->get_texture_by_id(data.id);
-
-  ASTRA_EXCEPTION(texture_ptr == nullptr,
-                  "Failed to attach texture: Texture with ID [" + data.id +
-                      "] not found in ResourceManager.");
 
   m_textures.push_back(data);
 

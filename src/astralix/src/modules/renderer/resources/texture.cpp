@@ -50,7 +50,7 @@ Image Texture::load_image(std::string filename, bool flip_image_on_loading) {
 
   if (!data) {
     free_image(data);
-    ASTRA_EXCEPTION(true, "Cant't load image");
+    ASTRA_EXCEPTION(true, "Cant't load image: ", path);
   }
 
   return Image{width, height, nr_channels, data};
