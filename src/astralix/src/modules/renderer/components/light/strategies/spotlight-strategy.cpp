@@ -5,7 +5,7 @@
 
 namespace astralix {
 
-SpotLightStrategy::SpotLightStrategy() : LightStrategy(){};
+SpotLightStrategy::SpotLightStrategy() : LightStrategy() {};
 
 void SpotLightStrategy::update(Object *source, Object *object, Object *camera) {
   auto resource = object->get_component<ResourceComponent>();

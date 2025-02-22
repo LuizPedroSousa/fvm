@@ -23,24 +23,10 @@ public:
 
   glm::vec3 direction;
 
-  float yaw = -90.0f;
-  float pitch = 0.0f;
-
-  float last_offset_x, last_offset_y;
-
-  float offset_x, offset_y;
-
-  bool is_first_recalculation = true;
-
-  float speed = 5.0f;
-  float sensitivity = 0.1f;
-
-  void recalculate_camera_rotation(float x, float y);
-
-private:
   void recalculate_projection_matrix();
   void recalculate_view_matrix();
 
+private:
   glm::mat4 m_view_matrix;
   glm::mat4 m_projection_matrix;
 

@@ -22,7 +22,8 @@ public:
 
   void start();
   void pre_update();
-  void update();
+  virtual void update();
+  virtual void fixed_update(float dt) {};
   void post_update();
 
   void on_enable() override {};

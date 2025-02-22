@@ -186,15 +186,16 @@ void PropertiesLayer::draw_components(IEntity *entity) {
         ImGui::PushFont(bold_font);
 
         if (ImGui::Button("Sensibility", button_size)) {
-          component->sensitivity = 0.1f;
+          // component->sensitivity = 0.1f;
         }
 
         ImGui::PopFont();
         ImGui::PopStyleColor(3);
 
         ImGui::SameLine();
-        ImGui::DragFloat("##Sensibility", &component->sensitivity, 0.1f, 0.0f,
-                         0.0f, "%.2f");
+        // ImGui::DragFloat("##Sensibility", &component->sensitivity, 0.1f,
+        // 0.0f,
+        //                  0.0f, "%.2f");
         ImGui::PopItemWidth();
 
         ImGui::PopStyleVar();

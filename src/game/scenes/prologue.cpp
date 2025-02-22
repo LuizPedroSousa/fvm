@@ -8,10 +8,13 @@
 #include "components/resource/resource-component.hpp"
 #include "components/rigidbody/rigidbody-component.hpp"
 #include "components/transform/transform-component.hpp"
+#include "entities/camera.hpp"
 #include "entities/object.hpp"
 #include "entities/skybox.hpp"
 #include "entities/text.hpp"
+#include "events/key-codes.hpp"
 #include "events/key-event.hpp"
+#include "events/keyboard.hpp"
 #include "glad/glad.h"
 #include "glm/fwd.hpp"
 #include "log.hpp"
@@ -152,13 +155,13 @@ void Prologue::create_tile_grid(int columns, int rows, float tile_size,
 }
 
 void Prologue::load_scene_components() {
+  auto camera = add_entity<Camera>("camera", CameraMode::Free,
+                                   glm::vec3(0.0f, 4.0f, 0.0f));
 
-  auto camera =
-      add_entity<astralix::Object>("camera", glm::vec3(0.0f, 4.0f, 0.0f));
+  // auto camera = add_entity<Object>("camera", glm::vec3(0.0f, 4.0f, 0.0f));
+  // camera->add_component<CameraComponent>();
 
-  camera->add_component<CameraComponent>();
-
-  auto strategy = astralix::create_scope<astralix::DirectionalStrategy>();
+  auto strategy = create_scope<DirectionalStrategy>();
 
   auto light =
       add_entity<astralix::Object>("Light", glm::vec3(-2.0f, 4.0f, -1.0f));
@@ -181,29 +184,6 @@ void Prologue::load_scene_components() {
   // add_entity<Text>("text", "Text", glm::vec2(540.0f, 570.0f), 5.0f,
   //                  glm::vec3(0.3, 0.7f, 0.9f));
   // add_entity<PostProcessing>("Post Processing", "shaders::post_processing");
-
-  auto event_dispatcher = EventDispatcher::get();
-
-  event_dispatcher->attach<KeyboardListener, KeyReleasedEvent>(
-      [&](KeyReleasedEvent *event) {
-        switch (event->key_code) {
-        case KeyCode::F5: {
-
-          for (auto tile : tiles) {
-            auto transform = tile.object->get_component<TransformComponent>();
-
-            transform->translate(tile.position);
-
-            LOG_DEBUG(transform->position.y);
-          }
-
-          break;
-        }
-
-        default:
-          return;
-        }
-      });
 }
 
 void Prologue::start() {
@@ -211,4 +191,15 @@ void Prologue::start() {
   load_scene_components();
 }
 
-void Prologue::update() {}
+void Prologue::update() {
+
+  if (IS_KEY_DOWN(KeyCode::F5)) {
+    for (auto tile : tiles) {
+      auto transform = tile.object->get_component<TransformComponent>();
+
+      transform->translate(tile.position);
+
+      LOG_DEBUG(transform->position.y);
+    }
+  }
+}

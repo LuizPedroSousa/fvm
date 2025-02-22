@@ -21,6 +21,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 add_compile_options(-fPIC)
 
 # add_definitions(-DASTRA_EDITOR)
+add_definitions(-DENABLE_LOGS)
+add_definitions(-DLOG_TO_CONSOLE)
+
 find_package(OpenGL REQUIRED)
 find_package(assimp REQUIRED)
 

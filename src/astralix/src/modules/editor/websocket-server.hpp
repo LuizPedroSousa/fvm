@@ -85,7 +85,8 @@ public:
                        auto scheduler_id = scheduler->schedule<KeyPressedEvent>(
                            SchedulerType::POST_FRAME, event);
 
-                       Window::get()->attach_key(keyCode, scheduler_id);
+                       //                      Window::get()->attach_key(keyCode,
+                       //                      scheduler_id);
                        return;
                      }
 
@@ -93,9 +94,10 @@ public:
                      auto keycode = KeyReleasedEvent(KeyCode(keyCode));
 
                      auto window = Window::get();
-                     auto scheduler_id = window->get_key_scheduler_id(keyCode);
-                     scheduler->destroy(scheduler_id);
-                     window->destroy_key(keyCode);
+                     // auto scheduler_id =
+                     // window->get_key_scheduler_id(keyCode);
+                     // scheduler->destroy(scheduler_id);
+                     // window->destroy_key(keyCode);
 
                      EventDispatcher::get()->dispatch(&keycode);
                      return;
