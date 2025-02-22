@@ -30,7 +30,7 @@ Prologue::Prologue() : Scene("prologue") {}
 #define ATTACH_LIGHTING_SHADER(var)                                            \
   var->get_component<ResourceComponent>()->attach_shader("shaders::lighting"); \
   var->get_or_add_component<MaterialComponent>()->attach_material(             \
-      "materials::brick")
+      "materials::stone")
 
 void Prologue::load_resources() {
   auto manager = ResourceManager::get();
@@ -38,56 +38,114 @@ void Prologue::load_resources() {
   manager->load_textures(
       ///
 
-      {Texture3D::create("cubemaps::skybox",
-                         {
-                             "textures/skybox/right.jpg",
-                             "textures/skybox/left.jpg",
-                             "textures/skybox/top.jpg",
-                             "textures/skybox/bottom.jpg",
-                             "textures/skybox/front.jpg",
-                             "textures/skybox/back.jpg",
-                         }),
-       ///
+      {
+          Texture3D::create("cubemaps::skybox",
+                            {
+                                "textures/skybox/right.jpg",
+                                "textures/skybox/left.jpg",
+                                "textures/skybox/top.jpg",
+                                "textures/skybox/bottom.jpg",
+                                "textures/skybox/front.jpg",
+                                "textures/skybox/back.jpg",
+                            }),
+          ///
 
-       Texture2D::create("textures::block::diffuse", "textures/diffuse.png",
-                         false
+          Texture2D::create("textures::block::diffuse", "textures/diffuse.png",
+                            false
 
-                         //
-                         ),
+                            //
+                            ),
 
-       Texture2D::create(
-           "textures::brick::diffuse", "textures/brickwall.jpg", false,
+          Texture2D::create(
+              "textures::stone::diffuse", "textures/stone.png", false,
 
-           {//
-            {TextureParameter::WrapS, TextureValue::Linear},
-            {TextureParameter::WrapT, TextureValue::Linear},
+              {//
+               {TextureParameter::WrapS, TextureValue::Linear},
+               {TextureParameter::WrapT, TextureValue::Linear},
 
-            {TextureParameter::MagFilter, TextureValue::LinearMipMap},
-            {TextureParameter::MinFilter, TextureValue::Linear}
+               {TextureParameter::MagFilter, TextureValue::LinearMipMap},
+               {TextureParameter::MinFilter, TextureValue::Linear}
 
-           }
+              }
 
-           //
-           ),
+              //
+              ),
 
-       Texture2D::create(
-           "textures::brick::normal", "textures/brickwall_normal.jpg", false,
+          Texture2D::create(
+              "textures::stone::normal", "textures/stone_normal.png", false,
 
-           {//
-            {TextureParameter::WrapS, TextureValue::Linear},
-            {TextureParameter::WrapT, TextureValue::Linear},
-            {TextureParameter::MagFilter, TextureValue::LinearMipMap},
-            {TextureParameter::MinFilter, TextureValue::Linear}
+              {//
+               {TextureParameter::WrapS, TextureValue::Linear},
+               {TextureParameter::WrapT, TextureValue::Linear},
+               {TextureParameter::MagFilter, TextureValue::LinearMipMap},
+               {TextureParameter::MinFilter, TextureValue::Linear}
 
-           }
+              }
 
-           )
+              ),
+          Texture2D::create(
+              "textures::stone::displacement",
+              "textures/stone_displacement.png", false,
+
+              {//
+               {TextureParameter::WrapS, TextureValue::Linear},
+               {TextureParameter::WrapT, TextureValue::Linear},
+               {TextureParameter::MagFilter, TextureValue::LinearMipMap},
+               {TextureParameter::MinFilter, TextureValue::Linear}
+
+              }
+
+              ),
+
+          // Texture2D::create(
+          //     "textures::wood::diffuse", "textures/wood.png", false,
+          //
+          //     {//
+          //      {TextureParameter::WrapS, TextureValue::Linear},
+          //      {TextureParameter::WrapT, TextureValue::Linear},
+          //
+          //      {TextureParameter::MagFilter, TextureValue::LinearMipMap},
+          //      {TextureParameter::MinFilter, TextureValue::Linear}
+          //
+          //     }
+          //
+          //     //
+          //     ),
+          //
+          // Texture2D::create(
+          //     "textures::wood::normal", "textures/wood_normal.png", false,
+          //
+          //     {//
+          //      {TextureParameter::WrapS, TextureValue::Linear},
+          //      {TextureParameter::WrapT, TextureValue::Linear},
+          //      {TextureParameter::MagFilter, TextureValue::LinearMipMap},
+          //      {TextureParameter::MinFilter, TextureValue::Linear}
+          //
+          //     }
+          //
+          //     ),
+          // Texture2D::create(
+          //     "textures::wood::displacement",
+          //     "textures/wood_displacement.png",
+          //     false,
+          //
+          //     {//
+          //      {TextureParameter::WrapS, TextureValue::Linear},
+          //      {TextureParameter::WrapT, TextureValue::Linear},
+          //      {TextureParameter::MagFilter, TextureValue::LinearMipMap},
+          //      {TextureParameter::MinFilter, TextureValue::Linear}
+          //
+          //     })
 
       });
 
-  manager->load_materials(
-      {Material::create("materials::brick", {"textures::brick::diffuse"}, {},
-                        "textures::brick::normal")});
+  // manager->load_materials({Material::create(
+  //     "materials::wood", {"textures::wood::diffuse"}, {},
+  //     "textures::wood::normal", "textures::wood::displacement")});
+
+  manager->load_materials({Material::create(
+      "materials::stone", {"textures::stone::diffuse"}, {},
+      "textures::stone::normal", "textures::stone::displacement")});
 
   manager->load_materials(
       {Material::create("materials::diffuse", {"textures::block::diffuse"})});
@@ -135,12 +193,12 @@ void Prologue::create_tile_grid(int columns, int rows, float tile_size,
       auto position = glm::vec3(x, y, z);
       auto tile = add_entity<Object>("tile", position);
 
-      ATTACH_MESH(tile);
+      tile->add_component<MeshComponent>()->attach_mesh(Mesh::cube(1.0f));
       ATTACH_LIGHTING_SHADER(tile);
 
-      tile->get_component<TransformComponent>()->set_scale(glm::vec3(0.5f));
-
-      tile->get_component<TransformComponent>()->set_scale(scale);
+      auto transform = tile->get_component<TransformComponent>();
+      transform->rotate(glm::vec3(1.0, 0.0, 0.0), -90);
+      transform->set_scale(scale);
 
       tile->add_component<MeshCollisionComponent>();
       tile->add_component<RigidBodyComponent>(type);

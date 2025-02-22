@@ -1,6 +1,7 @@
 #include "material-component.hpp"
 #include "components/material/serializers/material-component-serializer.hpp"
 #include "components/resource/resource-component.hpp"
+#include "log.hpp"
 #include "managers/resource-manager.hpp"
 
 namespace astralix {
@@ -32,6 +33,10 @@ void MaterialComponent::attach_material(ResourceID material_id) {
 
   if (material->normal_map) {
     resource->attach_texture({*material->normal_map, "normal_map"});
+  }
+
+  if (material->displacement_map) {
+    resource->attach_texture({*material->displacement_map, "displacement_map"});
   }
 
   for (int i = 0; i < material->speculars.size(); i++) {

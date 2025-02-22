@@ -48,7 +48,7 @@ void DirectionalStrategy::update(Object *source, Object *object,
   shader->set_vec3("directional_light.direction", transform->forward());
   shader->set_vec3("directional_light.position", transform->position);
   shader->set_vec3("directional_light.exposure.ambient", glm::vec3(0.2f));
-  shader->set_vec3("directional_light.exposure.diffuse", glm::vec3(0.5f));
+  shader->set_vec3("directional_light.exposure.diffuse", glm::vec3(100.0f));
   shader->set_vec3("directional_light.exposure.specular", glm::vec3(0.5f));
 
   shader->set_matrix("light_space_matrix", lightSpaceMatrix);
