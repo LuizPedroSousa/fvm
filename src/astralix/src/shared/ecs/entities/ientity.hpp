@@ -8,6 +8,8 @@
   astralix::EntityFamilyID &family_id;                                         \
   const std::string &name;
 
+#define ENTITY_PARAM_NAMES id, family_id, name
+
 #define ENTITY_INIT_PARAMS                                                     \
   const astralix::EntityID &id, astralix::EntityFamilyID &family_id,           \
       const std::string &name
