@@ -1,8 +1,10 @@
 #include "assert.hpp"
 #include "ecs/guid.hpp"
 #include "events/event-scheduler.hpp"
+#include "events/keyboard.hpp"
 
 #include "events/key-codes.hpp"
+#include "events/mouse.hpp"
 #include "glad/glad.h"
 
 #include "base.hpp"
@@ -25,7 +27,6 @@ void Window::handle_errors(int, const char *description) {
 }
 
 void Window::init() {
-
   if (m_instance == nullptr) {
     m_instance = new Window;
   }
@@ -34,6 +35,7 @@ void Window::init() {
 Window *Window::get() { return m_instance; }
 
 Window::Window() {
+
   glfwSetErrorCallback(handle_errors);
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -94,6 +96,9 @@ void Window::open(const char *title, int width, int height, bool offscreen) {
 
     glfwSetKeyCallback(m_value, key_callback);
   }
+
+  Keyboard::init();
+  Mouse::init();
 }
 
 void Window::toggle_view_mouse(KeyReleasedEvent *event) {
@@ -111,30 +116,12 @@ void Window::toggle_view_mouse(KeyReleasedEvent *event) {
 }
 
 void Window::mouse_callback(GLFWwindow *window, double x, double y) {
-  // std::cout << "x " << x << "\n";
-  // std::cout << "y " << y << "\n";
   if (!has_pressed) {
+    Mouse::get()->set_position(Mouse::Position{.x = x, .y = y});
+
     EventDispatcher::get()->dispatch(new MouseEvent(x, y));
   }
 };
-
-void Window::attach_key(int key, SchedulerID scheduler_id) {
-  auto emplaced = m_key_pressed_scheduler.emplace(key, scheduler_id);
-  // ASTRA_EXCEPTION(!emplaced.second, "Error while attaching key pressed");
-}
-
-void Window::destroy_key(int key) { m_key_pressed_scheduler.erase(key); }
-
-SchedulerID Window::get_key_scheduler_id(int key) {
-  auto key_scheduler = m_key_pressed_scheduler.find(key);
-
-  if (key_scheduler == m_key_pressed_scheduler.end()) {
-    return -1;
-    // ASTRA_EXCEPTION(true, "Key not found in scheduler");
-  }
-
-  return key_scheduler->second;
-}
 
 void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
                           int mods) {
@@ -142,14 +129,14 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
 
   switch (action) {
   case GLFW_PRESS: {
-    LOG_INFO("KeyPressed ", key);
     auto event = KeyCode(key);
 
     auto scheduler_id =
         scheduler->schedule<KeyPressedEvent>(SchedulerType::POST_FRAME, event);
 
-    Window::get()->attach_key(key, scheduler_id);
-
+    Keyboard::get()->attach_key(
+        event, Keyboard::KeyState{.event = Keyboard::KeyEvent::KeyDown,
+                                  .scheduler_id = scheduler_id});
     break;
   }
   default:
@@ -159,31 +146,16 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
 
 void Window::update() {
   glfwPollEvents();
-  auto scheduler = EventScheduler::get();
 
-  auto it = m_key_pressed_scheduler.begin();
-
-  for (; it != m_key_pressed_scheduler.end();) {
-
-    auto state = glfwGetKey(m_value, it->first);
-
-    LOG_INFO(" key ", it->first, " state ");
-
-    if (state == GLFW_RELEASE) {
-      LOG_INFO("KeyReleased");
-      auto keycode = KeyReleasedEvent(KeyCode(it->first));
-
-      scheduler->destroy(it->second);
-
-      EventDispatcher::get()->dispatch(&keycode);
-      it = m_key_pressed_scheduler.erase(it);
-    } else {
-      it++;
-    }
-  }
+  Keyboard::get()->release_keys();
 }
 
-void Window::swap() { glfwSwapBuffers(m_value); }
+void Window::swap() {
+  Mouse::get()->reset_delta();
+  Keyboard::get()->destroy_release_keys();
+
+  glfwSwapBuffers(m_value);
+}
 
 void Window::close() {
   glfwTerminate();

@@ -29,9 +29,6 @@ public:
 
   void destroy_key(int key);
 
-  void attach_key(int key, SchedulerID scheduler_id);
-  SchedulerID get_key_scheduler_id(int key);
-
 protected:
   Window();
 
@@ -50,7 +47,8 @@ private:
   int m_width = 0;
   std::string m_title;
   bool m_offscreen;
-  std::unordered_map<int, SchedulerID> m_key_pressed_scheduler;
 };
 
+#define WINDOW_WIDTH() Window::get()->get_width()
+#define WINDOW_HEIGHT() Window::get()->get_height()
 } // namespace astralix

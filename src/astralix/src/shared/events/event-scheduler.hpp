@@ -35,6 +35,8 @@ public:
 
   static EventScheduler *get();
 
+  bool has_schedulers() { return m_schedulers.size() > 0; }
+
   template <typename E, typename... Args>
   SchedulerID schedule(SchedulerType type, Args &&...args) {
     auto event = create_ref<E>(std::forward<Args>(args)...);

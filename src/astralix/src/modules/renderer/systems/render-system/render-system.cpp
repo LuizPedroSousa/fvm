@@ -8,6 +8,7 @@
 #include "ecs/entities/entity.hpp"
 #include "ecs/entities/ientity.hpp"
 #include "ecs/managers/entity-manager.hpp"
+#include "entities/camera.hpp"
 #include "events/event-dispatcher.hpp"
 #include "events/event-scheduler.hpp"
 #include "events/key-codes.hpp"
@@ -22,6 +23,7 @@
 #include "entities/skybox.hpp"
 #include "entities/text.hpp"
 #include "iostream"
+#include "log.hpp"
 #include "managers/resource-manager.hpp"
 #include "renderer-api.hpp"
 #include "resources/shader.hpp"
@@ -52,7 +54,10 @@ void RenderSystem::start() {
 }
 
 void RenderSystem::fixed_update(double fixed_dt) {
+  auto entity_manager = EntityManager::get();
 
+  entity_manager->for_each<Object>(
+      [&](Object *object) { object->fixed_update(fixed_dt); });
 };
 
 void RenderSystem::pre_update(double dt) {
@@ -106,6 +111,8 @@ void RenderSystem::update(double dt) {
 
   EntityManager::get()->for_each<Skybox>(
       [&](Skybox *skybox) { skybox->update(); });
+
+  entity_manager->for_each<Camera>([&](Camera *object) { object->update(); });
 
   entity_manager->for_each<Object>([&](Object *object) {
     if (shadow_mapping != nullptr) {

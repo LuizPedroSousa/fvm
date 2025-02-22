@@ -6,7 +6,9 @@
 #include "ecs/guid.hpp"
 #include "ecs/managers/system-manager.hpp"
 #include "entities/object.hpp"
+#include "events/key-codes.hpp"
 #include "events/key-event.hpp"
+#include "events/keyboard.hpp"
 #include "glad//glad.h"
 #include "managers/resource-manager.hpp"
 #include "resources/shader.hpp"
@@ -140,16 +142,6 @@ void DebugSystem::start() {
   event_dispatcher->attach<KeyboardListener, KeyReleasedEvent>(
       [&](KeyReleasedEvent *event) {
         switch (event->key_code) {
-        case KeyCode::F2: {
-          auto debug_depth = m_entity_manager->get_entity<DebugDepth>();
-          debug_depth->set_active(!debug_depth->is_active());
-          break;
-        }
-        case KeyCode::F3: {
-          auto debug_normal = m_entity_manager->get_entity<DebugNormal>();
-          debug_normal->set_active(!debug_normal->is_active());
-          break;
-        }
 
         default:
           return;
@@ -164,6 +156,14 @@ void DebugSystem::update(double dt) {
 
   auto depth = GET_ENTITY(DebugDepth);
   auto normal = GET_ENTITY(DebugNormal);
+
+  if (IS_KEY_RELEASED(KeyCode::F2)) {
+    depth->set_active(!depth->is_active());
+  }
+
+  if (IS_KEY_RELEASED(KeyCode::F3)) {
+    normal->set_active(!normal->is_active());
+  }
 
   depth->update();
   normal->update();

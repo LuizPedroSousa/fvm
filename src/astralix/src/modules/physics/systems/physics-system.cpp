@@ -6,6 +6,8 @@
 #include "components/rigidbody/rigidbody-component.hpp"
 #include "components/transform/transform-component.hpp"
 #include "ecs/managers/entity-manager.hpp"
+#include "events/key-codes.hpp"
+#include "events/keyboard.hpp"
 
 #include "engine.hpp"
 #include "entities/object.hpp"
@@ -80,21 +82,6 @@ void PhysicsSystem::start() {
       rigid_body_component->start(gPhysics, gScene);
     }
   });
-
-  auto event_dispatcher = EventDispatcher::get();
-
-  event_dispatcher->attach<KeyboardListener, KeyReleasedEvent>(
-      [&](KeyReleasedEvent *event) {
-        switch (event->key_code) {
-        case KeyCode::F4: {
-          gSimulate = !gSimulate;
-          break;
-        }
-
-        default:
-          return;
-        }
-      });
 }
 
 void PhysicsSystem::fixed_update(double fixed_dt) {
@@ -177,6 +164,10 @@ void PhysicsSystem::pre_update(double dt) {
 };
 
 void PhysicsSystem::update(double dt) {
+  if (IS_KEY_RELEASED(KeyCode::F4)) {
+    gSimulate = !gSimulate;
+  }
+
   auto component_manager = ComponentManager::get();
   auto entity_manager = EntityManager::get();
 
