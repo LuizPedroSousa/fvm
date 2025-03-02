@@ -11,7 +11,7 @@
 </script>
 
 <Pane
-  class="bg-background flex flex-col w-full h-full relative overflow-hidden"
+  class="bg-cinder-950 flex flex-col w-full h-full relative overflow-hidden"
   {...$$restProps}
 >
   {#if title}

@@ -1,10 +1,19 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
   import Layer, { type LayerProps } from "../components/layers/layer.svelte";
-  import * as api from "@tauri-apps/api";
+  import type { EngineContext } from "../contexts/engine.context";
 
-  let canvas: any;
-  let ws: WebSocket;
+  let canvas: HTMLCanvasElement;
+  let fps = $state(0);
+  let resize = false;
+
+  const framebuffer = {
+    width: 1920,
+    height: 1080,
+  };
+
+  let frameCount = 0;
+  let lastTime = performance.now();
 
   interface ViewportLayerProps {
     layer: LayerProps | undefined;
@@ -12,143 +21,213 @@
 
   export const layer: ViewportLayerProps["layer"] = { title: "Viewport" };
 
-  onMount(() => {
-    const startTime = performance.now();
+  let engine = getContext<EngineContext>("engine");
 
-    const framebuffer = {
-      width: 1920,
-      height: 1080,
-    };
+  let gl: WebGLRenderingContext;
+  let newFrameAvailable = false;
+  let updateInterval = 1000;
+  let latestFramebufferBinary: Uint8Array | null = null;
+  let texture: WebGLTexture;
 
-    const aspectRatio = framebuffer.width / framebuffer.height;
-
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) {
-      console.error("Canvas 2D context not supported");
+  function setupWebGL() {
+    gl = canvas.getContext("webgl") as WebGLRenderingContext;
+    if (!gl) {
+      console.error("WebGL not supported");
       return;
     }
 
-    function resizeCanvas() {
-      const container = canvas.parentElement;
-      if (!container) return;
+    // Vertex shader
+    const vsSource = `
+    attribute vec2 position;
+    varying vec2 texture_coordinates;
+    void main() {
+      gl_Position = vec4(position, 0.0, 1.0);
+      texture_coordinates = (position + 1.0) / 2.0; // 0 to 1 range
+    }
+  `;
 
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientWidth;
+    // Fragment shader
+    const fsSource = `
+    precision mediump float;
+    varying vec2 texture_coordinates;
+    uniform sampler2D u_texture;
+    void main() {
+      gl_FragColor = texture2D(u_texture, texture_coordinates);
+    }
+  `;
 
-      //console.log(container.width, container.height);
-      //console.log(`Container: ${containerWidth}x${containerHeight}`);
-      //console.log(`Canvas: ${canvas.style.width}x${canvas.style.height}`);
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
 
-      const containerAspectRatio = containerWidth / containerHeight;
-
-      ctx.canvas.width = framebuffer.width;
-      ctx.canvas.height = framebuffer.height;
-
-      // if (containerAspectRatio > aspectRatio) {
-      //   // Container é mais largo, limitar pela altura
-      //   canvas.style.width = `${containerHeight * aspectRatio}px`;
-      //   canvas.style.height = `${containerHeight}px`;
-      // } else {
-      //   // Container é mais alto, limitar pela largura
-      //   canvas.style.width = `${containerWidth}px`;
-      //   canvas.style.height = `${containerWidth / aspectRatio}px`;
-      // }
+    if (!vertexShader) {
+      return;
     }
 
-    // Create an ImageData object to hold the pixel data
-    const imageData = ctx.createImageData(
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+    if (!fragmentShader) {
+      return;
+    }
+
+    gl.shaderSource(vertexShader, vsSource);
+    gl.compileShader(vertexShader);
+
+    gl.shaderSource(fragmentShader, fsSource);
+    gl.compileShader(fragmentShader);
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    // Quad vertices (-1 to 1)
+    const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+
+    const buffer = gl.createBuffer();
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    const positionLoc = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(positionLoc);
+    gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+
+    // Texture setup
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    return { program, texture };
+  }
+
+  function resizeCanvas() {
+    const container = canvas.parentElement;
+    if (!container) return;
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const framebufferRatio = framebuffer.width / framebuffer.height;
+    const containerRatio = containerWidth / containerHeight;
+
+    let canvasWidth, canvasHeight;
+
+    if (containerRatio > framebufferRatio) {
+      canvasHeight = containerHeight;
+      canvasWidth = canvasHeight * framebufferRatio;
+    } else {
+      canvasWidth = containerWidth;
+      canvasHeight = canvasWidth / framebufferRatio;
+    }
+
+    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.height = `${canvasHeight}px`;
+
+    gl.canvas.width = framebuffer.width;
+    gl.canvas.height = framebuffer.height;
+  }
+
+  function renderFrame() {
+    if (!latestFramebufferBinary) return;
+
+    if (
+      latestFramebufferBinary.length !==
+      framebuffer.width * framebuffer.height * 4
+    ) {
+      console.error(
+        "Invalid framebuffer data length:",
+        latestFramebufferBinary.length,
+      );
+      latestFramebufferBinary = null;
+      newFrameAvailable = false;
+      return;
+    }
+
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
       framebuffer.width,
       framebuffer.height,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      latestFramebufferBinary,
     );
 
-    // Function to update the framebuffer
-    function updateFramebuffer(framebufferBinary: any) {
-      resizeCanvas();
-      const uint8Array = new Uint8Array(framebufferBinary);
+    gl.viewport(0, 0, framebuffer.width, framebuffer.height);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-      if (uint8Array.length !== framebuffer.width * framebuffer.height * 4) {
-        console.error("Invalid framebuffer data length:", uint8Array.length);
-        return;
-      }
-
-      const invertedData = new Uint8Array(uint8Array.length);
-      const rowSize = framebuffer.width * 4;
-
-      for (let y = 0; y < framebuffer.height; y++) {
-        const srcIndex = y * rowSize;
-        const destIndex = (framebuffer.height - 1 - y) * rowSize;
-        invertedData.set(
-          uint8Array.subarray(srcIndex, srcIndex + rowSize),
-          destIndex,
-        );
-      }
-
-      // Atualizar o ImageData com os dados invertidos
-      for (let i = 0; i < invertedData.length; i++) {
-        imageData.data[i] = invertedData[i];
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-
-      const endTime = performance.now();
-      //     console.log(`Frame rendered in ${(endTime - startTime).toFixed(2)} ms`);
+    // FPS calculation
+    frameCount++;
+    const currentTime = performance.now();
+    const elapsedTime = currentTime - lastTime;
+    if (elapsedTime >= updateInterval) {
+      fps = Math.round((frameCount * 1000) / elapsedTime);
+      frameCount = 0;
+      lastTime = currentTime;
     }
 
-    // Set up WebSocket connection
-    ws = new WebSocket("ws://localhost:9001");
-    ws.binaryType = "arraybuffer";
-    ws.onopen = () => {
-      console.log("WebSocket connection established");
-    };
+    latestFramebufferBinary = null;
+    newFrameAvailable = false;
+  }
 
-    ws.onmessage = (event: any) => {
-      console.log(event);
-      if (event.data instanceof ArrayBuffer) {
-        updateFramebuffer(event.data);
-      } else {
-        console.warn("Received non-binary data");
-      }
-    };
+  onMount(() => {
+    const webgl = setupWebGL();
+    if (!webgl) return;
+    texture = webgl.texture;
 
-    ws.onerror = (error: any) => {
-      console.error("WebSocket error:", error);
-    };
+    resizeCanvas();
 
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+    window.addEventListener("resize", () => {
+      resize = false;
+    });
 
     return () => {
-      ws.close();
+      window.removeEventListener("resize", resizeCanvas);
     };
+  });
+
+  engine.socket_event.subscribe((event) => {
+    if (event && event.topic === "framebuffer") {
+      latestFramebufferBinary = event.content;
+      if (!newFrameAvailable) {
+        newFrameAvailable = true;
+
+        resizeCanvas();
+
+        if (!resize) {
+          resizeCanvas();
+          resize = true;
+        }
+        renderFrame();
+      }
+    }
   });
 
   let key_events: any = $state({});
   let isCanvasActive = $state(false);
-  let isMouseVisible = true;
-
-  let isCursorVisible = true;
-
-  const toggleMouseVisibility = () => {};
 
   const handleKeydown = (event: KeyboardEvent) => {
     if (!isCanvasActive) return;
 
     const key = key_events?.[event.keyCode];
-    if ((ws.readyState === WebSocket.OPEN && !key) || key.state !== "press") {
+
+    if (!key || key?.state !== "press") {
       key_events[event.keyCode] = {
         ...key_events[event.keyCode],
         state: "press",
       };
 
-      ws.send(
-        JSON.stringify({
-          keyCode: event.keyCode,
-          type: "keyboard",
-          action: "press",
-        }),
-      );
+      engine?.send_event({
+        keyCode: event.keyCode,
+        type: "keyboard",
+        action: "press",
+      });
     }
   };
 
@@ -157,60 +236,72 @@
 
     const key = key_events?.[event.keyCode];
 
-    if (ws.readyState === WebSocket.OPEN && (!key || key !== "release")) {
+    if (!key || key !== "release") {
       key_events[event.keyCode] = {
         ...key_events[event.keyCode],
         state: "release",
       };
 
-      ws.send(
-        JSON.stringify({
-          keyCode: event.keyCode,
-          type: "keyboard",
-          action: "release",
-        }),
-      );
+      engine?.send_event({
+        keyCode: event.keyCode,
+        type: "keyboard",
+        action: "release",
+      });
     }
   };
 
   document.addEventListener("mousemove", (event) => {
-    //   if (!isCanvasActive) return;
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(
-        JSON.stringify({
-          type: "mouse",
-          action: "move",
-          x: event.offsetX,
-          y: event.offsetY,
-        }),
-      );
-    }
+    if (!isCanvasActive || document.pointerLockElement !== canvas) return;
+
+    engine.send_event({
+      type: "mouse",
+      action: "move",
+      x: event.movementX,
+      y: event.movementY,
+    });
   });
 
   window.addEventListener("keydown", handleKeydown);
-
   window.addEventListener("keyup", handleKeyup);
 
   const handleActivateCanvas = async () => {
     isCanvasActive = true;
 
-    console.log("test");
-
-    const current = api.window.getCurrentWindow();
-
-    await current.setCursorVisible(false);
+    canvas.requestPointerLock({});
   };
 </script>
 
 <Layer {...layer}>
-  <canvas onclick={handleActivateCanvas} bind:this={canvas}></canvas>
+  <div class="viewport-container">
+    <canvas onclick={handleActivateCanvas} bind:this={canvas}></canvas>
+    <div class="fps-counter">FPS: {fps}</div>
+  </div>
 </Layer>
 
 <style>
+  .viewport-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   canvas {
     width: 100%;
-    margin: auto;
     height: 100%;
-    object-fit: stretch;
+    margin: auto;
+  }
+
+  .fps-counter {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-family: monospace;
   }
 </style>
