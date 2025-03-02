@@ -2,7 +2,7 @@
 #include "ecs/components/icomponent.hpp"
 
 namespace astralix {
-  Json::Value ComponentSerializer::parse() {
+  Json::Value ComponentSerializer::serialize() {
     Json::Value root;
 
     root["name"] = m_component->name;

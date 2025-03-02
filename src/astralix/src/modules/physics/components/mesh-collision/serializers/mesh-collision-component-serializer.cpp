@@ -12,14 +12,14 @@ namespace astralix {
 
   MeshCollisionComponentSerializer::MeshCollisionComponentSerializer() {}
 
-  Json::Value MeshCollisionComponentSerializer::parse() {
-    ComponentSerializer::parse();
-    Json::Value root = ComponentSerializer::parse();
+  Json::Value MeshCollisionComponentSerializer::serialize() {
+    ComponentSerializer::serialize();
+    Json::Value root = ComponentSerializer::serialize();
 
     return root;
   }
 
-  void MeshCollisionComponentSerializer::serialize() {}
+  void MeshCollisionComponentSerializer::save() {}
 
   void MeshCollisionComponentSerializer::deserialize() {}
 

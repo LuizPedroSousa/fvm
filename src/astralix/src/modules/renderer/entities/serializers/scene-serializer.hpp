@@ -4,19 +4,20 @@
 #include "serializer.hpp"
 
 namespace astralix {
-  class Scene;
-  class SceneSerializer : public Serializer {
+class Scene;
 
-  public:
-    SceneSerializer(Ref<Scene> scene);
-    SceneSerializer();
+class SceneSerializer : public Serializer {
 
-    void serialize() override;
-    Json::Value parse() override;
-    void deserialize() override;
+public:
+  SceneSerializer(Ref<Scene> scene);
+  SceneSerializer();
 
-  private:
-    Ref<Scene> m_scene = nullptr;
-  };
+  void save() override;
+  Json::Value serialize() override;
+  void deserialize() override;
+
+private:
+  Ref<Scene> m_scene = nullptr;
+};
 
 } // namespace astralix

@@ -15,8 +15,8 @@ namespace astralix {
     LightComponentSerializer(LightComponent* light_component);
     LightComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

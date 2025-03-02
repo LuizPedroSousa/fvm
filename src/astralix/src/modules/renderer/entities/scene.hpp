@@ -14,13 +14,19 @@ class SceneSerializer;
 
 class Scene {
 public:
-  Scene(std::string name) : m_name{name} {};
+  Scene(std::string name);
 
   virtual void start() = 0;
   virtual void update() = 0;
 
+  Json::Value serialize();
+
   void save();
   void load();
+
+  void set_serializer(Ref<SceneSerializer> scene_serializer) {
+    m_serializer = scene_serializer;
+  }
 
   template <typename T, typename... Args> T *add_entity(Args &&...params) {
     auto manager = EntityManager::get();
@@ -36,7 +42,7 @@ public:
   friend class SceneManager;
 
 protected:
-  Scope<SceneSerializer> m_serializer;
+  Ref<SceneSerializer> m_serializer;
   SceneID m_id;
   std::string m_name;
 };

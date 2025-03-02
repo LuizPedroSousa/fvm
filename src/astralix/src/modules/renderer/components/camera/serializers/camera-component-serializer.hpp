@@ -15,8 +15,8 @@ namespace astralix {
     CameraComponentSerializer(CameraComponent* camera_component);
     CameraComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

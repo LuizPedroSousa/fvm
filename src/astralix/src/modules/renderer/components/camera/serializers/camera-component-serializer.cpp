@@ -10,15 +10,15 @@ namespace astralix {
 
   CameraComponentSerializer::CameraComponentSerializer() {}
 
-  Json::Value CameraComponentSerializer::parse() {
-    ComponentSerializer::parse();
+  Json::Value CameraComponentSerializer::serialize() {
+    ComponentSerializer::serialize();
 
-    Json::Value root = ComponentSerializer::parse();
+    Json::Value root = ComponentSerializer::serialize();
 
     return root;
   }
 
-  void CameraComponentSerializer::serialize() {}
+  void CameraComponentSerializer::save() {}
 
   void CameraComponentSerializer::deserialize() {}
 

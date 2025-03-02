@@ -15,8 +15,8 @@ namespace astralix {
     MaterialComponentSerializer(MaterialComponent* material_component);
     MaterialComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

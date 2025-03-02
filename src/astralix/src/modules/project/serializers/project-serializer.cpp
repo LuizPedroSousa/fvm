@@ -4,43 +4,42 @@
 
 namespace astralix {
 
-  ProjectSerializer::ProjectSerializer(Ref<Project> project)
-    : m_project(project) {
-  }
+ProjectSerializer::ProjectSerializer(Ref<Project> project)
+    : m_project(project) {}
 
-  ProjectSerializer::ProjectSerializer() {}
+ProjectSerializer::ProjectSerializer() {}
 
-  void ProjectSerializer::serialize() {
-    Json::Value root = parse();
+void ProjectSerializer::save() {
+  Json::Value root = serialize();
 
-    auto& config = m_project->get_config();
+  auto &config = m_project->get_config();
 
-    auto path =
+  auto path =
       std::filesystem::path(config.directory).append("project_meta.json");
 
-    write(path, root);
-  }
+  write(path, root);
+}
 
-  Json::Value ProjectSerializer::parse() {
-    Json::Value root;
+Json::Value ProjectSerializer::serialize() {
+  Json::Value root;
 
-    auto& config = m_project->get_config();
-    root["config"]["name"] = config.name;
-    root["config"]["directory"] = config.directory;
-    root["config"]["resources"]["directory"] = config.resources.directory;
+  auto &config = m_project->get_config();
+  root["config"]["name"] = config.name;
+  root["config"]["directory"] = config.directory;
+  root["config"]["resources"]["directory"] = config.resources.directory;
 
-    return root;
-  }
+  return root;
+}
 
-  void ProjectSerializer::deserialize() {
-    auto& config = m_project->get_config();
+void ProjectSerializer::deserialize() {
+  auto &config = m_project->get_config();
 
-    auto data = read(config.directory);
+  auto data = read(config.directory);
 
-    config.name = data["config"]["name"].as<std::string>();
-    config.directory = data["config"]["directory"].as<std::string>();
-    config.resources.directory =
+  config.name = data["config"]["name"].as<std::string>();
+  config.directory = data["config"]["directory"].as<std::string>();
+  config.resources.directory =
       data["config"]["resourcess"]["directory"].as<std::string>();
-  }
+}
 
 } // namespace astralix

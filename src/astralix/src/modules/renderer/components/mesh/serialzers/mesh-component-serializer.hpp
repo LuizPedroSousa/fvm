@@ -13,8 +13,8 @@ namespace astralix {
 
     MeshComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

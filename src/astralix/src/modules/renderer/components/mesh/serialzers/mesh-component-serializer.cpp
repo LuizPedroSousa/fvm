@@ -12,13 +12,13 @@ namespace astralix {
 
   MeshComponentSerializer::MeshComponentSerializer() {}
 
-  Json::Value MeshComponentSerializer::parse() {
-    Json::Value root = ComponentSerializer::parse();
+  Json::Value MeshComponentSerializer::serialize() {
+    Json::Value root = ComponentSerializer::serialize();
 
     return root;
   }
 
-  void MeshComponentSerializer::serialize() {}
+  void MeshComponentSerializer::save() {}
 
   void MeshComponentSerializer::deserialize() {}
 

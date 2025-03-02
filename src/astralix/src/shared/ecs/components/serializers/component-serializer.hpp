@@ -7,7 +7,7 @@ namespace astralix {
   class IComponent;
   class ComponentSerializer : public Serializer {
   public:
-    Json::Value virtual parse();
+    Json::Value virtual serialize();
 
     ComponentSerializer(IComponent* component) : m_component(component) {}
     ComponentSerializer() = default;

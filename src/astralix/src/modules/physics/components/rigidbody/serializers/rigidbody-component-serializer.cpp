@@ -5,23 +5,22 @@
 
 namespace astralix {
 
-  RigidBodyComponentSerializer::RigidBodyComponentSerializer(
-    RigidBodyComponent* rigidbody_component)
-    : ComponentSerializer(rigidbody_component) {
-  }
+RigidBodyComponentSerializer::RigidBodyComponentSerializer(
+    RigidBodyComponent *rigidbody_component)
+    : ComponentSerializer(rigidbody_component) {}
 
-  RigidBodyComponentSerializer::RigidBodyComponentSerializer() {}
+RigidBodyComponentSerializer::RigidBodyComponentSerializer() {}
 
-  Json::Value RigidBodyComponentSerializer::parse() {
-    ComponentSerializer::parse();
+Json::Value RigidBodyComponentSerializer::serialize() {
+  ComponentSerializer::serialize();
 
-    Json::Value root = ComponentSerializer::parse();
+  Json::Value root = ComponentSerializer::serialize();
 
-    return root;
-  }
+  return root;
+}
 
-  void RigidBodyComponentSerializer::serialize() {}
+void RigidBodyComponentSerializer::save() {}
 
-  void RigidBodyComponentSerializer::deserialize() {}
+void RigidBodyComponentSerializer::deserialize() {}
 
 } // namespace astralix

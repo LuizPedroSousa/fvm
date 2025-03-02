@@ -16,8 +16,8 @@ namespace astralix {
       PostProcessingComponent* post_processing_component);
     PostProcessingComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

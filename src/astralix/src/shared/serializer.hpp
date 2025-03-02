@@ -7,8 +7,8 @@ namespace astralix {
 
 class Serializer {
 public:
-  Json::Value virtual parse() = 0;
-  void virtual serialize() = 0;
+  Json::Value virtual serialize() = 0;
+  void virtual save() = 0;
   void virtual deserialize() = 0;
 
 protected:

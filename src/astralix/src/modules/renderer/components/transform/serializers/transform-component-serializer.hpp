@@ -14,8 +14,8 @@ namespace astralix {
     TransformComponentSerializer(TransformComponent* transform_component);
     TransformComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

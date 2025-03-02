@@ -15,8 +15,8 @@ namespace astralix {
     ResourceComponentSerializer(ResourceComponent* resource_component);
     ResourceComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

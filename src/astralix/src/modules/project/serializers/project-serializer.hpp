@@ -5,21 +5,21 @@
 
 namespace astralix {
 
-class Project;
+  class Project;
 
-class ProjectSerializer : public Serializer {
+  class ProjectSerializer : public Serializer {
 
-public:
-  ProjectSerializer(Ref<Project> project);
+  public:
+    ProjectSerializer(Ref<Project> project);
 
-  ProjectSerializer();
+    ProjectSerializer();
 
-  void serialize() override;
-  Json::Value parse() override;
-  void deserialize() override;
+    void save() override;
+    Json::Value serialize() override;
+    void deserialize() override;
 
-private:
-  Ref<Project> m_project = nullptr;
-};
+  private:
+    Ref<Project> m_project = nullptr;
+  };
 
 } // namespace astralix

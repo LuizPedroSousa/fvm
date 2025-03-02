@@ -12,15 +12,15 @@ namespace astralix {
 
   ModelComponentSerializer::ModelComponentSerializer() {}
 
-  Json::Value ModelComponentSerializer::parse() {
-    ComponentSerializer::parse();
+  Json::Value ModelComponentSerializer::serialize() {
+    ComponentSerializer::serialize();
 
-    Json::Value root = ComponentSerializer::parse();
+    Json::Value root = ComponentSerializer::serialize();
 
     return root;
   }
 
-  void ModelComponentSerializer::serialize() {}
+  void ModelComponentSerializer::save() {}
 
   void ModelComponentSerializer::deserialize() {}
 

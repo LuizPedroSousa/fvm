@@ -14,8 +14,8 @@ namespace astralix {
       MeshCollisionComponent* mesh_collision_component);
     MeshCollisionComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix

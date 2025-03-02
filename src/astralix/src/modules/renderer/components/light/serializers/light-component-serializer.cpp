@@ -12,15 +12,15 @@ namespace astralix {
 
   LightComponentSerializer::LightComponentSerializer() {}
 
-  Json::Value LightComponentSerializer::parse() {
-    ComponentSerializer::parse();
+  Json::Value LightComponentSerializer::serialize() {
+    ComponentSerializer::serialize();
 
-    Json::Value root = ComponentSerializer::parse();
+    Json::Value root = ComponentSerializer::serialize();
 
     return root;
   }
 
-  void LightComponentSerializer::serialize() {}
+  void LightComponentSerializer::save() {}
 
   void LightComponentSerializer::deserialize() {}
 

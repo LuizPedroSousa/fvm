@@ -14,8 +14,8 @@ namespace astralix {
     RigidBodyComponentSerializer(RigidBodyComponent* rigidbody_component);
     RigidBodyComponentSerializer();
 
-    Json::Value parse() override;
-    void serialize() override;
+    Json::Value serialize() override;
+    void save() override;
     void deserialize() override;
   };
 } // namespace astralix
