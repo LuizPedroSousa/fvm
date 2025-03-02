@@ -1,5 +1,6 @@
 #include "events/event-dispatcher.hpp"
 #include "events/event-scheduler.hpp"
+#include "events/mouse.hpp"
 #include "glad/glad.h"
 
 #include "editor.hpp"
@@ -53,7 +54,9 @@ void Editor::run() {
 
   us_timer_set(
       delayTimer,
-      [](struct us_timer_t * /*t*/) {
+      [](struct us_timer_t *t) {
+        ASTRA_PROFILE_N("Editor run");
+
         Engine *engine = Engine::get();
         auto system = SystemManager::get();
         Time *time = Time::get();
@@ -63,14 +66,14 @@ void Editor::run() {
         auto scheduler = EventScheduler::get();
 
         time->update();
-        system->update(Time::get()->get_deltatime());
         window->update();
         scheduler->bind(SchedulerType::POST_FRAME);
-        engine->update();
+        system->fixed_update(1 / 60.0f);
+        system->update(Time::get()->get_deltatime());
         scheduler->bind(SchedulerType::IMMEDIATE);
         window->swap();
       },
-      8, 8);
+      16, 16);
 
   server->update();
 }

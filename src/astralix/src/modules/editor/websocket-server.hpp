@@ -4,7 +4,10 @@
 #include "events/event-scheduler.hpp"
 #include "events/key-codes.hpp"
 #include "events/key-event.hpp"
+#include "events/keyboard.hpp"
 #include "events/mouse-event.hpp"
+#include "events/mouse.hpp"
+#include "log.hpp"
 #include "uwebsockets/App.h"
 #include "window.hpp"
 #include "json/json.h"
@@ -16,6 +19,8 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <uwebsockets/PerMessageDeflate.h>
+#include <uwebsockets/WebSocketProtocol.h>
 #include <vector>
 
 namespace astralix {
@@ -40,20 +45,20 @@ public:
         ->ws<PerSocketData>(
             "/*",
             {/* Settings */
-             .compression = uWS::SHARED_COMPRESSOR,
-             .maxPayloadLength = 16 * 1024 * 1024,
-             .idleTimeout = 16,
-             .maxBackpressure = 1 * 1024 * 1024,
+             .compression = uWS::DISABLED,
+             .maxPayloadLength = 64 * 1920 * 1080,
+             .idleTimeout = 8,
+             .maxBackpressure = 5 * 1024 * 1024,
              .closeOnBackpressureLimit = false,
-             .resetIdleTimeoutOnSend = false,
-             .sendPingsAutomatically = true,
+             .resetIdleTimeoutOnSend = true,
+             .sendPingsAutomatically = false,
              /* Handlers */
-             .upgrade = nullptr,
              .open =
                  [](auto *ws) {
                    /* Open event here, you may access ws->getUserData() which
                     * points to a PerSocketData struct */
-                   ws->subscribe("broadcast");
+                   ws->subscribe("framebuffer");
+                   ws->subscribe("scene");
                  },
              .message =
                  [](auto * /*ws*/, std::string_view message,
@@ -64,52 +69,56 @@ public:
 
                    rbuilder["collectComments"] = false;
 
-                   std::stringstream ss;
-                   ss.write(message.data(), message.size());
-
+                   std::unique_ptr<Json::CharReader> reader(
+                       rbuilder.newCharReader());
                    std::string errs;
-                   bool ok = Json::parseFromStream(rbuilder, ss, &root, &errs);
 
-                   auto type = root["type"].asString();
-                   auto action = root["action"].asString();
+                   bool ok = reader->parse(message.data(),
+                                           message.data() + message.size(),
+                                           &root, &errs);
+
+                   const auto &type = root["type"].asString();
+                   const auto &action = root["action"].asString();
 
                    auto scheduler = EventScheduler::get();
+
+                   auto mouse = Mouse::get();
 
                    if (type == "keyboard") {
                      auto keyCode = root["keyCode"].as<int>();
 
+                     auto keyboard = Keyboard::get();
+
                      if (action == "press") {
-                       std::cout << "KeyPressed " << keyCode << "\n";
                        auto event = KeyCode(keyCode);
 
                        auto scheduler_id = scheduler->schedule<KeyPressedEvent>(
                            SchedulerType::POST_FRAME, event);
 
-                       //                      Window::get()->attach_key(keyCode,
-                       //                      scheduler_id);
+                       keyboard->attach_key(
+                           event, Keyboard::KeyState{
+                                      .event = Keyboard::KeyEvent::KeyDown,
+                                      .scheduler_id = scheduler_id});
                        return;
                      }
 
-                     std::cout << "KeyReleased " << keyCode << "\n";
-                     auto keycode = KeyReleasedEvent(KeyCode(keyCode));
+                     auto keycode = KeyCode(keyCode);
 
-                     auto window = Window::get();
-                     // auto scheduler_id =
-                     // window->get_key_scheduler_id(keyCode);
-                     // scheduler->destroy(scheduler_id);
-                     // window->destroy_key(keyCode);
+                     keyboard->release_key(keycode);
 
-                     EventDispatcher::get()->dispatch(&keycode);
                      return;
                    }
 
-                   auto x = root["x"].as<int>();
-                   auto y = root["y"].as<int>();
+                   const auto &current_x = root["x"].as<double>();
+                   const auto &current_y = root["y"].as<double>();
 
-                   std::cout << "MouseEvent x " << x << "\n";
-                   std::cout << "MouseEvent y " << y << "\n";
+                   LOG_DEBUG(current_y);
+                   LOG_DEBUG(current_x);
 
-                   EventDispatcher::get()->dispatch(new MouseEvent(x, y));
+                   auto position =
+                       Mouse::Position{.x = current_x, .y = current_y};
+
+                   Mouse::get()->apply_delta(position);
                  },
              .drain =
                  [](auto * /*ws*/) {
@@ -141,11 +150,42 @@ public:
   static WebsocketServer *get() { return m_instance; }
 
   void publish(std::string_view topic, std::string_view message,
-               uWS::OpCode opCode, bool compress = false) {
+               uWS::OpCode opCode, bool compress = true) {
+
+    if (opCode == uWS::OpCode::BINARY) {
+
+      m_app->publish(topic, message, opCode, compress);
+
+      return;
+    }
+
     m_app->publish(topic, message, opCode, compress);
   }
 
   uWS::SSLApp *get_app() { return m_app; }
+
+  void publish(std::string topic, std::string message) {
+    m_app->publish(topic, build_message(topic, message), uWS::OpCode::BINARY,
+                   false);
+  };
+
+  std::string build_message(std::string topic, std::string message) {
+    uint32_t topic_size = topic.size();
+
+    char topic_size_bytes[4];
+    topic_size_bytes[0] = (topic_size >> 24) & 0xFF; // Significant Byte
+    topic_size_bytes[1] = (topic_size >> 16) & 0xFF;
+    topic_size_bytes[2] = (topic_size >> 8) & 0xFF;
+    topic_size_bytes[3] = topic_size & 0xFF; // Less Significant Byte
+
+    std::string result;
+
+    result.append(topic_size_bytes, 4);
+    result.append(topic);
+    result.append(message);
+
+    return result;
+  }
 
   struct us_timer_t *get_timer() {
     struct us_loop_t *loop = (struct us_loop_t *)uWS::Loop::get();
@@ -165,6 +205,5 @@ private:
   uWS::SSLApp *m_app = nullptr;
 
   static WebsocketServer *m_instance;
-  std::vector<std::thread> m_thread_pool;
 };
 } // namespace astralix
