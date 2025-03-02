@@ -15,7 +15,7 @@ namespace astralix {
 
 LightComponent::LightComponent(COMPONENT_INIT_PARAMS,
                                Scope<LightStrategy> strategy, EntityID camera)
-    : COMPONENT_INIT(LightComponent, "Light", true,
+    : COMPONENT_INIT(LightComponent, "light", true,
                      create_ref<LightComponentSerializer>(this)),
       m_camera(camera), m_strategy(std::move(strategy)) {};
 

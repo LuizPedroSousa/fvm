@@ -10,7 +10,7 @@
 namespace astralix {
 
 CameraComponent::CameraComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(CameraComponent, "Camera", true,
+    : COMPONENT_INIT(CameraComponent, "camera", true,
                      create_ref<CameraComponentSerializer>(this)),
       m_is_orthographic(false) {
 

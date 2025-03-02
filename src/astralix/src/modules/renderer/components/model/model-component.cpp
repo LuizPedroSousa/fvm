@@ -9,7 +9,7 @@
 namespace astralix {
 
 ModelComponent::ModelComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(ModelComponent, "Model Renderer", true,
+    : COMPONENT_INIT(ModelComponent, "model", true,
                      create_ref<ModelComponentSerializer>(this)) {}
 
 Model *ModelComponent::attach_model(ResourceID id) {

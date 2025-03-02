@@ -10,7 +10,7 @@
 namespace astralix {
 
 MeshComponent::MeshComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(MeshComponent, "Mesh Renderer", true,
+    : COMPONENT_INIT(MeshComponent, "mesh", true,
                      create_ref<MeshComponentSerializer>(this)),
       m_draw_type(VertexBuffer::DrawType::Static) {
 

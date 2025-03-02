@@ -9,7 +9,7 @@
 namespace astralix {
 
 PostProcessingComponent::PostProcessingComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(PostProcessingComponent, "Post Processing", true,
+    : COMPONENT_INIT(PostProcessingComponent, "post-processing", true,
                      create_ref<PostProcessingComponentSerializer>(this)) {}
 
 void PostProcessingComponent::start() {

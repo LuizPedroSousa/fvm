@@ -7,7 +7,7 @@
 namespace astralix {
 
 MaterialComponent::MaterialComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(MaterialComponent, "Material", true,
+    : COMPONENT_INIT(MaterialComponent, "material", true,
                      create_ref<MaterialComponentSerializer>(this)) {};
 
 void MaterialComponent::reset_material() {}
