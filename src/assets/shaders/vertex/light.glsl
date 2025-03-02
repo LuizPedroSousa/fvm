@@ -1,9 +1,13 @@
-#version 330 core
+#version 450 core
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texture_coordinates;
 layout(location = 3) in vec3 tangent;
+
+layout(std430, binding = 0) buffer InstanceBuffer {
+    mat4 models[];
+};
 
 out OBJECT_COORDINATES {
     vec2 texture;
@@ -19,7 +23,7 @@ obj_coordinates;
 
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 model;
+//uniform mat4 model;
 uniform mat4 light_space_matrix;
 uniform vec3 view_position;
 
@@ -38,6 +42,8 @@ struct DirectionalLight {
 uniform DirectionalLight directional_light;
 
 void main() {
+    mat4 model = models[gl_InstanceID];
+
     mat4 normalMatrix = transpose(inverse(model));
 
     vec3 T = normalize(normalMatrix * vec4(tangent, 0.)).xyz;
