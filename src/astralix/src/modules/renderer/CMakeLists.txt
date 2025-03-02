@@ -13,8 +13,11 @@ include_directories(${PROJECT_SOURCE_DIR}/external)
 target_include_directories(renderer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
                                            ${ASSIMP_INCLUDE_DIRS})
 
+# add_definitions(-DTRACY_ENABLE)
+
 target_link_libraries(
   renderer
+  glad::glad
   ${OPENGL_LIBRARIES}
   ${GLFW_LIBRARIES}
   assimp
@@ -25,7 +28,6 @@ target_link_libraries(
   glm
   stb_image
   shared
-  glad
   imgui::imgui
   imgui_impl
   Freetype::Freetype)

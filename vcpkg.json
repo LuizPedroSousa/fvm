@@ -2,6 +2,8 @@
   "name": "fvm",
   "version": "1.0",
   "dependencies": [
+    "freetype",
+    "glad",
     "glfw3",
     {
       "name": "imgui",
@@ -14,7 +16,7 @@
     },
     "imguizmo",
     "jsoncpp",
-    "uwebsockets",
-    "freetype"
+    "tracy",
+    "uwebsockets"
   ]
 }

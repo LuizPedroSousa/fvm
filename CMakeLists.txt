@@ -16,13 +16,14 @@ set(EXPORT_COMPILE_COMMANDS TRUE)
 # "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING
 # "Vcpkg toolchain file")
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fopenmp")
 
 add_compile_options(-fPIC)
 
-# add_definitions(-DASTRA_EDITOR)
+add_definitions(-DASTRA_EDITOR)
 add_definitions(-DENABLE_LOGS)
 add_definitions(-DLOG_TO_CONSOLE)
+# add_definitions(-DASTRA_TRACE)
 
 find_package(OpenGL REQUIRED)
 find_package(assimp REQUIRED)
@@ -34,10 +35,16 @@ set(imgui_DIR "${VCPKG_INSTALLED_ROOT}/share/imgui")
 set(imguizmo_DIR "${VCPKG_INSTALLED_ROOT}/share/imguizmo")
 set(glfw3_DIR "${VCPKG_INSTALLED_ROOT}/share/glfw3")
 set(uwebsockets_DIR "${VCPKG_INSTALLED_ROOT}/share/unofficial-uwebsockets")
+set(glad_DIR "${VCPKG_INSTALLED_ROOT}/share/glad")
 
 # find_path(UWEBSOCKETS_INCLUDE_DIRS
 # "${VCPKG_INSTALLED_ROOT}/include/uwebsockets/App.h")
 find_path(USOCKET_LIB_A "${VCPKG_INSTALLED_ROOT}/lib/libuSockets.a")
+find_path(GLAD_LIB_A "${VCPKG_INSTALLED_ROOT}/lib/libglad.a")
+find_package(glad CONFIG REQUIRED)
+
+find_package(OpenMP REQUIRED)
+
 find_package(ZLIB REQUIRED)
 
 # set(boost_DIR "${VCPKG_INSTALLED_ROOT}/share/boost")
@@ -108,12 +115,12 @@ include_directories(
 
 link_directories(external/PhysX/physx/bin/linux.x86_64/release)
 
-add_library(glad "external/glad/glad.c")
+# add_library(glad "external/glad/glad.c")
 add_library(glm "external/glm/detail/glm.cpp")
 add_library(stb_image "external/stb_image/stb_image.cpp")
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/external/imgui/impl)
-set(LIBS ${LIBS} glad)
+set(LIBS ${LIBS})
 
 set(LIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external
                     ${VCPKG_INSTALLED_ROOT}/include)
@@ -132,13 +139,20 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/game)
 include_directories(${LIB_INCLUDE_DIR})
 link_directories(${VCPKG_INSTALLED_ROOT}/lib)
 
+if(OpenMP_CXX_FOUND)
+  set_target_properties(fvm PROPERTIES COMPILE_FLAGS "${OpenMP_CXX_FLAGS}"
+                                       LINK_FLAGS "${OpenMP_CXX_FLAGS}")
+endif()
+
 target_link_libraries(
   fvm
   PRIVATE
     game
     editor
     application
-    "${VCPKG_INSTALLED_ROOT}/lib/libuSockets.a"
     ZLIB::ZLIB
+    "${VCPKG_INSTALLED_ROOT}/lib/libglad.a"
+    "${VCPKG_INSTALLED_ROOT}/lib/libTracyClient.a"
+    "${VCPKG_INSTALLED_ROOT}/lib/libuSockets.a"
     ${PROJECT_SOURCE_DIR}/external/PhysX/physx/bin/linux.x86_64/release/libPhysXFoundation_static_64.a
-)
+    OpenMP::OpenMP_CXX)

@@ -6,4 +6,12 @@ add_library(engine STATIC ${ENGINE_SRC} ${ENGINE_HEADERS})
 include_directories(${CMAKE_SOURCE_DIR}/external)
 
 target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(engine ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} imgui::imgui imgui_impl shared physics renderer application)
+target_link_libraries(
+  engine
+  glad::glad
+  imgui::imgui
+  imgui_impl
+  shared
+  physics
+  renderer
+  application)
