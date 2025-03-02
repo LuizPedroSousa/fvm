@@ -5,6 +5,7 @@
 #include "events/event-scheduler.hpp"
 #include "glad/glad.h"
 #include "time.hpp"
+#include "trace.hpp"
 #include "window.hpp"
 
 namespace astralix {

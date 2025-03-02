@@ -52,22 +52,9 @@ public:
 
   void destroy_key(KeyCode keycode) { m_key_events.erase(keycode); }
 
-  void destroy_release_keys() {
-    auto it = m_key_events.begin();
-    auto scheduler = EventScheduler::get();
+  void release_key(KeyCode key);
 
-    for (; it != m_key_events.end();) {
-      if (it->second.event == KeyEvent::KeyReleased) {
-        if (scheduler->has_schedulers()) {
-          scheduler->destroy(it->second.scheduler_id);
-        }
-
-        it = m_key_events.erase(it);
-      } else {
-        it++;
-      }
-    }
-  }
+  void destroy_release_keys();
 
 private:
   std::unordered_map<KeyCode, KeyState> m_key_events;

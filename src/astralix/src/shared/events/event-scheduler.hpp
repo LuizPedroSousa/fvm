@@ -4,6 +4,7 @@
 #include "ecs/guid.hpp"
 #include "events/event-dispatcher.hpp"
 #include "events/event.hpp"
+#include "log.hpp"
 #include "vector"
 
 #include "unordered_map"
@@ -11,16 +12,16 @@
 namespace astralix {
 
 enum SchedulerType {
-  FRAME,      // Executes once per frame (classic update loop)
-  TICK,       // Executes at a fixed timestep (good for physics updates)
-  REALTIME,   // Executes based on real-world clock time
-  INTERVAL,   // Executes every X milliseconds
-  DEFERRED,   // Executes at the end of the frame
-  IMMEDIATE,  // Executes instantly when scheduled
-  BACKGROUND, // Runs at a lower priority, for non-essential tasks
-  POST_FRAME, // Executes after rendering but before swap
-  PRE_FRAME,  // Executes before the frame starts
-  IDLE,       // Executes when there’s nothing else to do
+  FRAME = 0,      // Executes once per frame (classic update loop)
+  TICK = 1,       // Executes at a fixed timestep (good for physics updates)
+  REALTIME = 2,   // Executes based on real-world clock time
+  INTERVAL = 3,   // Executes every X milliseconds
+  DEFERRED = 4,   // Executes at the end of the frame
+  IMMEDIATE = 4,  // Executes instantly when scheduled
+  BACKGROUND = 5, // Runs at a lower priority, for non-essential tasks
+  POST_FRAME = 6, // Executes after rendering but before swap
+  PRE_FRAME = 7,  // Executes before the frame starts
+  IDLE = 8,       // Executes when there’s nothing else to do
 };
 
 struct Scheduler {
@@ -89,12 +90,9 @@ public:
     for (const auto &schedule_id : type_scheduler->second) {
       auto id_scheduler = m_schedulers.find(schedule_id);
 
-      if (id_scheduler == m_schedulers.end()) {
-        continue;
+      if (id_scheduler != m_schedulers.end()) {
+        dispatcher->dispatch(id_scheduler->second.event.get());
       }
-
-      auto scheduler = id_scheduler->second;
-      dispatcher->dispatch(scheduler.event.get());
     }
   }
 

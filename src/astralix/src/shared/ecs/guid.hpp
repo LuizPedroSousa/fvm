@@ -1,6 +1,7 @@
 #pragma once
 #include "cstddef"
 #include "string"
+#include <cstddef>
 #include <stdint.h>
 
 namespace astralix {
@@ -34,6 +35,8 @@ using SystemTypeID = TypeID;
 using ResourceID = std::string;
 using ProjectID = Guid;
 using ListenerId = Guid;
+using MeshID = std::size_t;
+using MeshBatchID = std::size_t;
 
 template <typename T> class FamilyTypeID {
 private:

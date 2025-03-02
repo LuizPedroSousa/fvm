@@ -46,6 +46,13 @@ public:
     m_changed = true;
   }
 
+  void apply_delta(Position &position) {
+    m_current.x += position.x;
+    m_current.y += position.y;
+
+    m_changed = true;
+  }
+
   void reset_delta() {
     m_current = {.x = 0, .y = 0};
     m_changed = false;

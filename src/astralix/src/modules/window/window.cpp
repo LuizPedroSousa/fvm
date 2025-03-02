@@ -77,7 +77,11 @@ void Window::open(const char *title, int width, int height, bool offscreen) {
   if (window == NULL) {
     glfwTerminate();
 
-    ASTRA_EXCEPTION(true, "Couldn't create window for OpenGL");
+    const char *description;
+    int errorCode = glfwGetError(&description);
+
+    ASTRA_EXCEPTION(true, std::string("Couldn't create window for OpenGL. ") +
+                              description);
   }
 
   glfwMakeContextCurrent(m_value);
@@ -147,7 +151,8 @@ void Window::key_callback(GLFWwindow *window, int key, int scancode, int action,
 void Window::update() {
   glfwPollEvents();
 
-  Keyboard::get()->release_keys();
+  if (!m_offscreen)
+    Keyboard::get()->release_keys();
 }
 
 void Window::swap() {

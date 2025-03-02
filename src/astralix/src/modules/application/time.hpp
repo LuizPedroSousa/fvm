@@ -9,8 +9,8 @@ public:
 
   void end() { delete m_instance; }
 
-  void update() {
-    m_current_frame = glfwGetTime();
+  void update(float time = glfwGetTime()) {
+    m_current_frame = time;
     m_deltatime = m_current_frame - m_last_frame;
     m_last_frame = m_current_frame;
   };

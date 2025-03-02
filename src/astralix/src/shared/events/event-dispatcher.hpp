@@ -9,112 +9,113 @@
 #include "unordered_map"
 
 namespace astralix {
-  class EventDispatcher {
-  public:
-    static void init();
+class EventDispatcher {
+public:
+  static void init();
 
-    static EventDispatcher* get();
+  static EventDispatcher *get();
 
-    template <typename L, typename E> void attach() {
-      Ref<L> listener = create_ref<L>();
-      auto listener_id = listener->get_id();
-      auto emplaced_listener =
+  template <typename L, typename E> void attach() {
+    Ref<L> listener = create_ref<L>();
+    auto listener_id = listener->get_id();
+    auto emplaced_listener =
         m_listeners.emplace(listener_id, std::move(listener));
-      ASTRA_EXCEPTION(!emplaced_listener.second,
+    ASTRA_EXCEPTION(!emplaced_listener.second,
 
-        "Error creating new Listener!");
-      auto type = E::get_static_type();
+                    "Error creating new Listener!");
+    auto type = E::get_static_type();
 
-      auto it = m_event_listeners.find(type);
+    auto it = m_event_listeners.find(type);
 
-      if (it != m_event_listeners.end()) {
-        auto event = it->second;
-        it->second.push_back(listener_id);
-        return;
-      }
-
-      std::vector<ListenerId> listeners{ listener_id };
-
-      auto emplaced_event = m_event_listeners.emplace(type, listeners);
-
-      ASTRA_EXCEPTION(!emplaced_event.second,
-        "Error creating new Event Listener!");
+    if (it != m_event_listeners.end()) {
+      auto event = it->second;
+      it->second.push_back(listener_id);
+      return;
     }
 
-    // L -> listener
-    // E -> an event
-    // F -> callback function deduced by the compiler
-    template <typename L, typename E, typename F> void attach(F callback) {
-      auto typed_callback = [callback](Event* event) {
-        // Ensure the event is of the expected type
-        E* typed_event = dynamic_cast<E*>(event);
-        if (typed_event) {
-          callback(typed_event);
-        }
-        else {
-          ASTRA_EXCEPTION(true, "Event type mismatch! Expected: " +
-            std::string(typeid(E).name()));
-        }
-        };
+    std::vector<ListenerId> listeners{listener_id};
 
-      Ref<L> listener = create_ref<L>(typed_callback);
-      auto listener_id = listener->get_id();
-      auto emplaced_listener =
+    auto emplaced_event = m_event_listeners.emplace(type, listeners);
+
+    ASTRA_EXCEPTION(!emplaced_event.second,
+                    "Error creating new Event Listener!");
+  }
+
+  // L -> listener
+  // E -> an event
+  // F -> callback function deduced by the compiler
+  template <typename L, typename E, typename F> void attach(F callback) {
+    auto typed_callback = [callback](Event *event) {
+      // Ensure the event is of the expected type
+      E *typed_event = static_cast<E *>(event);
+      if (typed_event) {
+        callback(typed_event);
+      } else {
+        ASTRA_EXCEPTION(true, "Event type mismatch! Expected: " +
+                                  std::string(typeid(E).name()));
+      }
+    };
+
+    Ref<L> listener = create_ref<L>(typed_callback);
+    auto listener_id = listener->get_id();
+    auto emplaced_listener =
         m_listeners.emplace(listener_id, std::move(listener));
-      ASTRA_EXCEPTION(!emplaced_listener.second,
+    ASTRA_EXCEPTION(!emplaced_listener.second,
 
-        "Error creating new Listener!");
-      auto type = E::get_static_type();
+                    "Error creating new Listener!");
+    auto type = E::get_static_type();
 
-      auto it = m_event_listeners.find(type);
+    auto it = m_event_listeners.find(type);
 
-      if (it != m_event_listeners.end()) {
-        auto event = it->second;
-        it->second.push_back(listener_id);
-        return;
-      }
-
-      std::vector<ListenerId> listeners{ listener_id };
-
-      auto emplaced_event = m_event_listeners.emplace(type, listeners);
-
-      ASTRA_EXCEPTION(!emplaced_event.second,
-        "Error creating new Event Listener!");
+    if (it != m_event_listeners.end()) {
+      auto event = it->second;
+      it->second.push_back(listener_id);
+      return;
     }
 
-    template <typename E> void dispatch(E* event) {
-      auto type = event->get_event_type();
+    std::vector<ListenerId> listeners{listener_id};
 
-      auto it = m_event_listeners.find(type);
+    auto emplaced_event = m_event_listeners.emplace(type, listeners);
 
-      if (it != m_event_listeners.end()) {
-        auto event_listeners = it->second;
+    ASTRA_EXCEPTION(!emplaced_event.second,
+                    "Error creating new Event Listener!");
+  }
 
-        for (auto& listener_id : event_listeners) {
-          auto listener = m_listeners.at(listener_id);
-          listener->dispatch(event);
-        }
+  template <typename E> void dispatch(E *event) {
+    auto type = event->get_event_type();
+
+    auto it = m_event_listeners.find(type);
+
+    if (it != m_event_listeners.end()) {
+      auto event_listeners = it->second;
+
+#pragma omp parallel for
+      for (auto &listener_id : event_listeners) {
+        auto listener = m_listeners.at(listener_id);
+        listener->dispatch(event);
       }
     }
+  }
 
-    template <typename E> void dispatch(EventType type, E* event) {
-      auto it = m_event_listeners.find(type);
+  template <typename E> void dispatch(EventType type, E *event) {
+    auto it = m_event_listeners.find(type);
 
-      if (it != m_event_listeners.end()) {
-        auto event_listeners = it->second;
+    if (it != m_event_listeners.end()) {
+      auto event_listeners = it->second;
 
-        for (auto& listener_id : event_listeners) {
-          auto listener = m_listeners.at(listener_id);
-          listener->dispatch(event);
-        }
+#pragma omp parallel for
+      for (auto &listener_id : event_listeners) {
+        auto listener = m_listeners.at(listener_id);
+        listener->dispatch(event);
       }
     }
+  }
 
-    std::unordered_map<ListenerId, Ref<BaseListener>> m_listeners;
-    std::unordered_map<EventType, std::vector<ListenerId>> m_event_listeners;
+  std::unordered_map<ListenerId, Ref<BaseListener>> m_listeners;
+  std::unordered_map<EventType, std::vector<ListenerId>> m_event_listeners;
 
-  private:
-    EventDispatcher() {};
-    static EventDispatcher* m_instance;
-  };
+private:
+  EventDispatcher() {};
+  static EventDispatcher *m_instance;
+};
 } // namespace astralix
