@@ -36,9 +36,9 @@ void Skybox::update() {
   CHECK_ACTIVE(this);
   auto entity_manager = EntityManager::get();
 
-  if (!entity_manager->has_entity_with_component<CameraComponent>()) {
-    return;
-  }
+  // if (!entity_manager->has_entity_with_component<CameraComponent>()) {
+  //   return;
+  // }
 
   auto resource = get_component<ResourceComponent>();
   auto mesh = get_component<MeshComponent>();

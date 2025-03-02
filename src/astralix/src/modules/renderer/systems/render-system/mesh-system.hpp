@@ -32,6 +32,3 @@ private:
 };
 
 } // namespace astralix
-
-// object ->mesh ids -> MeshBatch -> IDS -> update
-// ids -> update

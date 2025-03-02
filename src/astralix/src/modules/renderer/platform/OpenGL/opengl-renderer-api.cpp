@@ -32,11 +32,11 @@ void OpenGLRendererAPI::clear_buffers() {
 }
 
 uint32_t
-OpenGLRendererAPI::map_draw_primitive_type(DrawPrimitiveType primitive_type) {
+OpenGLRendererAPI::map_draw_primitive_type(DrawPrimitive primitive_type) {
   switch (primitive_type) {
-  case DrawPrimitiveType::POINTS:
+  case DrawPrimitive::POINTS:
     return GL_POINTS;
-  case DrawPrimitiveType::LINES:
+  case DrawPrimitive::LINES:
     return GL_LINES;
   default:
     return GL_TRIANGLES;
@@ -44,7 +44,7 @@ OpenGLRendererAPI::map_draw_primitive_type(DrawPrimitiveType primitive_type) {
 }
 
 void OpenGLRendererAPI::draw_indexed(const Ref<VertexArray> &vertex_array,
-                                     DrawPrimitiveType primitive_type,
+                                     DrawPrimitive primitive_type,
                                      uint32_t index_count) {
   vertex_array->bind();
 
@@ -56,6 +56,13 @@ void OpenGLRendererAPI::draw_indexed(const Ref<VertexArray> &vertex_array,
                  GL_UNSIGNED_INT, 0);
 
   vertex_array->unbind();
+}
+
+void OpenGLRendererAPI::draw_instanced_indexed(DrawPrimitive primitive_type,
+                                               uint32_t index_count,
+                                               uint32_t instance_count) {
+  glDrawElementsInstanced(map_draw_primitive_type(primitive_type), index_count,
+                          GL_UNSIGNED_INT, 0, instance_count);
 }
 
 void OpenGLRendererAPI::draw_lines(const Ref<VertexArray> &vertex_array,

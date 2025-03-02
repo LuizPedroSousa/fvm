@@ -38,6 +38,8 @@ void ShadowMappingSystem::start() {
 void ShadowMappingSystem::bind_depth(Object *object) {
   CHECK_ACTIVE(this);
 
+  ZoneScopedN("ShadowMappingSystem bind_depth");
+
   auto resource = object->get_component<ResourceComponent>();
 
   if (resource == nullptr || !resource->has_shader()) {
@@ -67,6 +69,8 @@ void ShadowMappingSystem::fixed_update(double fixed_dt) {}
 
 void ShadowMappingSystem::update(double dt) {
   CHECK_ACTIVE(this);
+
+  ZoneScopedN("ShadowMappingSystem Update");
 
   auto engine = Engine::get();
 

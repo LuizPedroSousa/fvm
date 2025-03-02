@@ -21,7 +21,7 @@ RigidBodyComponent::RigidBodyComponent(COMPONENT_INIT_PARAMS,
                                        RigidType rigid_type, float velocity,
                                        float gravity, float acceleration,
                                        float drag, float mass)
-    : COMPONENT_INIT(RigidBodyComponent, "RigidBody", true,
+    : COMPONENT_INIT(RigidBodyComponent, "rigid-body", true,
                      create_ref<RigidBodyComponentSerializer>(this)),
       m_rigid_type(rigid_type), velocity(velocity), gravity(gravity),
       acceleration(acceleration), drag(drag), mass(mass) {

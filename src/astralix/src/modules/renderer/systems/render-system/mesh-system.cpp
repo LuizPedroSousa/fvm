@@ -33,8 +33,6 @@ void MeshSystem::start() {
   m_storage_buffer = StorageBuffer::create(1000 * 1000 * sizeof(glm::mat4));
 }
 
-#define GET_ENTITY(T) m_entity_manager->get_entity<T>();
-
 void MeshSystem::update(double dt) {
   CHECK_ACTIVE(this);
   ASTRA_PROFILE_N("MeshSystem Update");

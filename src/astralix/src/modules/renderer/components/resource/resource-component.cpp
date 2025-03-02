@@ -7,7 +7,7 @@
 namespace astralix {
 
 ResourceComponent::ResourceComponent(COMPONENT_INIT_PARAMS)
-    : COMPONENT_INIT(ResourceComponent, "Resource Renderer", false,
+    : COMPONENT_INIT(ResourceComponent, "resource", false,
                      create_ref<ResourceComponentSerializer>(this)) {};
 
 void ResourceComponent::start() {

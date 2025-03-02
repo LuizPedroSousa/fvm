@@ -67,8 +67,6 @@ void Camera::update() {
     auto mouse = MOUSE_DELTA();
 
     if (mouse.x != 0 || mouse.y != 0) {
-      LOG_DEBUG(mouse.x, " ", mouse.y);
-
       m_yaw += mouse.x * m_sensitivity;
       m_pitch -= mouse.y * m_sensitivity;
 
@@ -77,10 +75,6 @@ void Camera::update() {
         m_pitch = 89.0f;
       if (m_pitch < -89.0f)
         m_pitch = -89.0f;
-
-      LOG_DEBUG("PITCH ", m_pitch, " ", "YAW ", m_yaw);
-
-      LOG_DEBUG(camera->direction.x);
 
       camera->direction.x =
           cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));

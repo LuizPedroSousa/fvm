@@ -3,11 +3,13 @@
 #include "components/light/serializers/light-component-serializer.hpp"
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
+#include "ecs/entities/ientity.hpp"
 #include "engine.hpp"
 #include "iostream"
 #include "log.hpp"
 #include "memory"
 #include "resources/shader.hpp"
+#include <cmath>
 
 namespace astralix {
 
@@ -19,13 +21,11 @@ LightComponent::LightComponent(COMPONENT_INIT_PARAMS,
 
 void LightComponent::start() {}
 
-void LightComponent::update(Object *object) {
+void LightComponent::update(IEntity *source, Object *object) {
   auto resource = object->get_component<ResourceComponent>();
 
-  auto camera_entity = EntityManager::get()->get_entity<Object>(m_camera);
-
   if (resource != nullptr && resource->has_shader()) {
-    m_strategy->update(get_owner<Object>(), object, camera_entity);
+    m_strategy->update(source, object, m_camera);
   }
 }
 

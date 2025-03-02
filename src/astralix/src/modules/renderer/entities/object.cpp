@@ -6,20 +6,19 @@
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
 #include "ecs/entities/ientity.hpp"
+#include "ecs/managers/component-manager.hpp"
+#include <string>
 
 namespace astralix {
+
 Object::Object(ENTITY_INIT_PARAMS, glm::vec3 position, glm::vec3 scale)
     : ENTITY_INIT() {
   add_component<ResourceComponent>();
   add_component<TransformComponent>(position, scale);
 }
 
-Object::Object(ObjectDTO dto) : ENTITY_INIT_DTO(dto) {
-  add_component<ResourceComponent>();
-  add_component<TransformComponent>(dto.position, dto.scale);
-}
-
 void Object::start() {
+
   CHECK_ACTIVE(this);
 
   auto resource = get_component<ResourceComponent>();
@@ -48,9 +47,6 @@ void Object::pre_update() {}
 void Object::update() {
   CHECK_ACTIVE(this);
 
-  auto entity_manager = EntityManager::get();
-  auto component_manager = ComponentManager::get();
-
   auto resource = get_component<ResourceComponent>();
   auto mesh = get_component<MeshComponent>();
   auto transform = get_component<TransformComponent>();
@@ -59,27 +55,30 @@ void Object::update() {
 
   resource->update();
 
-  if (entity_manager->has_entity_with_component<LightComponent>()) {
-    component_manager->get_component<LightComponent>()->update(this);
-  }
+  // if (m_entity_manager->has_entity_with_component<LightComponent>()) {
+  //   m_component_manager->get_component<LightComponent>()->update(this);
+  // }
 
-  if (entity_manager->has_entity_with_component<CameraComponent>() &&
-      resource->has_shader()) {
-    auto shader = resource->get_shader();
-    auto camera = component_manager->get_component<CameraComponent>();
+  // if ( : _entity_manager->has_entity_with_component<CameraComponent>() &&
+  //
+  //      resource->has_shader()) {
+  //
+  //   auto shader = resource->get_shader();
+  //   auto camera = m_component_manager->get_component<CameraComponent>();
+  //
+  //   camera->update(shader);
+  // }
 
-    camera->update(shader);
-  }
-
-  if (transform != nullptr && transform->is_active())
+  if (transform != nullptr && transform->is_active()) {
     transform->update();
+  }
 
   if (material != nullptr && material->is_active()) {
     material->update();
   }
 
   if (mesh != nullptr && mesh->is_active()) {
-    mesh->update();
+    // mesh->update();
   }
 }
 

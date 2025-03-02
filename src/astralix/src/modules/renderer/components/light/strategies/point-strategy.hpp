@@ -3,12 +3,12 @@
 
 namespace astralix {
 
-class PointStrategy : public LightStrategy {
-public:
-  PointStrategy(){
+  class PointStrategy : public LightStrategy {
+  public:
+    PointStrategy() {
       //
+    };
+    void update(IEntity* source, Object* object, EntityID& camera_id) override;
   };
-  void update(Object *source, Object *object, Object *camera) override;
-};
 
 } // namespace astralix

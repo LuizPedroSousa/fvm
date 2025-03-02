@@ -5,6 +5,7 @@
 #include "renderer-api.hpp"
 #include "vector"
 #include "vertex-array.hpp"
+#include <cstddef>
 
 namespace astralix {
 
@@ -24,6 +25,8 @@ public:
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
 
+  MeshID id;
+
   static Mesh capsule(float radius = 0.5f, float height = 1.0f,
                       int segments = 16, int rings = 8);
 
@@ -32,17 +35,38 @@ public:
   static Mesh quad(float size = 1.0f);
   static Mesh sphere();
 
-  RendererAPI::DrawPrimitiveType draw_type =
-      RendererAPI::DrawPrimitiveType::TRIANGLES;
+  RendererAPI::DrawPrimitive draw_type = RendererAPI::DrawPrimitive::TRIANGLES;
 
   Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     this->vertices = vertices;
     this->indices = indices;
 
     calculate_tanget_and_bitangents();
+
+    id = generate_hash_id();
   };
 
   ~Mesh() = default;
+
+  std::size_t generate_hash_id() {
+    std::size_t seed = 0;
+
+    for (const auto &vertex : vertices) {
+      seed ^= std::hash<float>{}(vertex.position.x) + 0x9e3779b9 + (seed << 6) +
+              (seed >> 2);
+      seed ^= std::hash<float>{}(vertex.position.y) + 0x9e3779b9 + (seed << 6) +
+              (seed >> 2);
+      seed ^= std::hash<float>{}(vertex.position.z) + 0x9e3779b9 + (seed << 6) +
+              (seed >> 2);
+    }
+
+    for (const auto &index : indices) {
+      seed ^= std::hash<unsigned int>{}(index) + 0x9e3779b9 + (seed << 6) +
+              (seed >> 2);
+    }
+
+    return seed;
+  }
 
   void calculate_tanget_and_bitangents() {
     for (size_t i = 0; i < indices.size(); i += 3) {

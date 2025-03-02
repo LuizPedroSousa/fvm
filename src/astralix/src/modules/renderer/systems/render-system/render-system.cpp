@@ -1,18 +1,14 @@
 #include "render-system.hpp"
 #include "components/camera/camera-component.hpp"
 #include "components/light/light-component.hpp"
-#include "components/mesh/mesh-component.hpp"
 #include "components/post-processing/post-processing-component.hpp"
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
-#include "ecs/entities/entity.hpp"
 #include "ecs/entities/ientity.hpp"
+#include "ecs/managers/component-manager.hpp"
 #include "ecs/managers/entity-manager.hpp"
 #include "entities/camera.hpp"
-#include "events/event-dispatcher.hpp"
 #include "events/event-scheduler.hpp"
-#include "events/key-codes.hpp"
-#include "events/key-event.hpp"
 #include "framebuffer.hpp"
 #include "glad/glad.h"
 
@@ -22,15 +18,11 @@
 #include "entities/post-processing.hpp"
 #include "entities/skybox.hpp"
 #include "entities/text.hpp"
-#include "iostream"
-#include "log.hpp"
-#include "managers/resource-manager.hpp"
 #include "renderer-api.hpp"
-#include "resources/shader.hpp"
+#include "systems/render-system/light-system.hpp"
+#include "systems/render-system/mesh-system.hpp"
 #include "systems/render-system/shadow-mapping-system.hpp"
-#include "window.hpp"
-#include <iostream>
-#include <iterator>
+#include "trace.hpp"
 #include <sys/mman.h>
 
 namespace astralix {
@@ -51,9 +43,13 @@ void RenderSystem::start() {
 
   add_subsystem<ShadowMappingSystem>()->start();
   add_subsystem<DebugSystem>()->start();
+  add_subsystem<LightSystem>()->start();
+  add_subsystem<MeshSystem>()->start();
 }
 
 void RenderSystem::fixed_update(double fixed_dt) {
+  ASTRA_PROFILE_N("RenderSystem FixedUpdate");
+
   auto entity_manager = EntityManager::get();
 
   entity_manager->for_each<Object>(
@@ -61,6 +57,8 @@ void RenderSystem::fixed_update(double fixed_dt) {
 };
 
 void RenderSystem::pre_update(double dt) {
+  ASTRA_PROFILE_N("RenderSystem PreUpdate");
+
   auto engine = Engine::get();
 
   auto entity_manager = EntityManager::get();
@@ -100,10 +98,14 @@ void RenderSystem::pre_update(double dt) {
 };
 
 void RenderSystem::update(double dt) {
+  ASTRA_PROFILE_N("RenderSystem Update");
+
   auto entity_manager = EntityManager::get();
 
   auto shadow_mapping = get_subsystem<ShadowMappingSystem>();
   auto debug = get_subsystem<DebugSystem>();
+  auto mesh = get_subsystem<MeshSystem>();
+  auto light = get_subsystem<LightSystem>();
 
   if (shadow_mapping != nullptr) {
     shadow_mapping->update(dt);
@@ -112,24 +114,16 @@ void RenderSystem::update(double dt) {
   EntityManager::get()->for_each<Skybox>(
       [&](Skybox *skybox) { skybox->update(); });
 
-  entity_manager->for_each<Camera>([&](Camera *object) { object->update(); });
-
-  entity_manager->for_each<Object>([&](Object *object) {
-    if (shadow_mapping != nullptr) {
-      shadow_mapping->bind_depth(object);
-    }
-
-    object->update();
-  });
+  light->update(dt);
 
   entity_manager->for_each<Text>([&](Text *text) { text->update(); });
+
+  mesh->update(dt);
 
   auto scheduler = EventScheduler::get();
 
   if (debug != nullptr)
     debug->update(dt);
-
-  scheduler->bind(SchedulerType::REALTIME);
 
   Engine::get()->framebuffer->unbind();
 
@@ -141,6 +135,8 @@ void RenderSystem::update(double dt) {
 
   entity_manager->for_each<PostProcessing>(
       [&](PostProcessing *post_processing) { post_processing->post_update(); });
+
+  scheduler->bind(SchedulerType::REALTIME);
 };
 
 RenderSystem::~RenderSystem() {}
