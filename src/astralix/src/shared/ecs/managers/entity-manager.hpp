@@ -95,7 +95,7 @@ public:
     for (const auto &pair : m_entity_table) {
       const Scope<IEntity> &entity = pair.second;
       if (entity->get_entity_type_id() == type_id) {
-        return dynamic_cast<T *>(entity.get());
+        return static_cast<T *>(entity.get());
       }
     }
 
@@ -103,7 +103,7 @@ public:
   }
 
   template <typename T> T *get_entity(const EntityID &entity_id) {
-    return dynamic_cast<T *>(get_entity(entity_id));
+    return static_cast<T *>(get_entity(entity_id));
   }
 
   void for_each(std::function<void(IEntity *)> fn) {
@@ -119,14 +119,17 @@ public:
 
     auto entity_type = m_type_entity_table.find(type_id);
 
-    if (entity_type == nullptr) {
+    if (entity_type == m_type_entity_table.end()) {
       return;
     }
 
+    // #pragma omp parallel for if (entity_type->second.size() > 100)
     for (EntityID entity_id : entity_type->second) {
-      auto &entity = m_entity_table.at(entity_id);
+      auto it = m_entity_table.find(entity_id);
 
-      fn(dynamic_cast<T *>(entity.get()));
+      if (it != m_entity_table.end()) {
+        fn(static_cast<T *>(it->second.get()));
+      }
     }
   }
 
@@ -143,7 +146,7 @@ public:
     for (EntityID entity_id : entity_type->second) {
       auto &entity = m_entity_table.at(entity_id);
 
-      result.push_back(dynamic_cast<T *>(entity.get()));
+      result.push_back(static_cast<T *>(entity.get()));
     }
 
     return result;
@@ -165,6 +168,8 @@ public:
 private:
   std::unordered_map<EntityID, Scope<IEntity>> m_entity_table;
   std::unordered_map<EntityTypeID, std::vector<EntityID>> m_type_entity_table;
+  std::unordered_map<std::string, EntityID, std::hash<std::string_view>>
+      m_name_index;
 };
 
 }; // namespace astralix

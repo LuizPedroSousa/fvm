@@ -128,7 +128,7 @@ public:
     auto system = m_system_table.find(system_id);
 
     return system != m_system_table.end()
-               ? dynamic_cast<SubSystem_ *>(system->second.get())
+               ? static_cast<SubSystem_ *>(system->second.get())
                : nullptr;
   }
 

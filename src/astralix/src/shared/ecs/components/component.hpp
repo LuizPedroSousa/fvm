@@ -32,7 +32,7 @@ public:
   }
 
   template <typename E> E *get_owner() {
-    return dynamic_cast<E *>((IEntity *)get_owner());
+    return static_cast<E *>((IEntity *)get_owner());
   }
 
   Component() {}

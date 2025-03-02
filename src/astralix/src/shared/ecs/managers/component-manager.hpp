@@ -9,117 +9,125 @@
 #include "unordered_map"
 #include "vector"
 
+#include <tracy/Tracy.hpp>
+
 namespace astralix {
 
-  class IEntity;
+class IEntity;
 
-  class ComponentManager : public BaseManager<ComponentManager> {
+struct EntityComponent {
+  ComponentID id;
+  ComponentTypeID type;
+};
 
-  public:
-    ~ComponentManager() = default;
+class ComponentManager : public BaseManager<ComponentManager> {
 
-    template <typename T, typename... Args>
-    T* add_component(const EntityID& entity_id, Args &&...params) {
-      ComponentID component_id = FamilyObjectID<IComponent>::get();
+public:
+  ~ComponentManager() = default;
 
-      Scope<T> component_ptr =
+  template <typename T, typename... Args>
+  T *add_component(const EntityID &entity_id, Args &&...params) {
+    ZoneScopedN("ComponentManager add_component");
+
+    ComponentID component_id = FamilyObjectID<IComponent>::get();
+
+    Scope<T> component_ptr =
         create_scope<T>(entity_id, component_id, std::forward<Args>(params)...);
 
-      const ComponentTypeID component_type_id = T::component_type_id();
+    const ComponentTypeID component_type_id = T::component_type_id();
 
-      m_entity_component_table[entity_id][component_type_id] = component_id;
+    m_entity_component_table[entity_id][component_type_id] = component_id;
 
-      auto created_component =
+    auto created_component =
         m_component_table.emplace(component_id, std::move(component_ptr));
 
-      ASTRA_EXCEPTION(!created_component.second,
-        "Can't create a new Component !");
+    ASTRA_EXCEPTION(!created_component.second,
+                    "Can't create a new Component !");
 
-      return dynamic_cast<T*>(m_component_table[component_id].get());
-    }
+    m_type_component_table[component_type_id] = component_id;
 
-    template <typename T> void remove_component(const EntityID& entity_id) {
+    return static_cast<T *>(m_component_table[component_id].get());
+  }
 
-      const ComponentTypeID type_id = T::component_type_id();
-      const ComponentID component_id =
-        this->m_entity_component_table.at(entity_id).at(type_id);
+  template <typename T> void remove_component(const EntityID &entity_id) {
+    ZoneScopedN("ComponentManager remove_component");
 
-      m_component_table.erase(component_id);
-      m_entity_component_table.at(entity_id).erase(type_id);
-    }
+    const ComponentTypeID type_id = T::component_type_id();
+    auto component_id = this->m_entity_component_table[entity_id][type_id];
 
-    void clean_components(const EntityID entity_id);
+    m_component_table.erase(component_id);
+    m_type_component_table[type_id];
+  }
 
-    template <typename T> std::vector<T*> get_components() {
-      const ComponentTypeID type_id = T::component_type_id();
+  void clean_components(const EntityID entity_id);
 
-      std::vector<T*> components;
-      for (const auto& pair : m_component_table) {
-        Scope<IComponent>& component = pair.second;
-        if (component != nullptr) {
-          components.push_back(dynamic_cast<T*>(component.get()));
-        }
+  template <typename T> std::vector<T *> get_components() {
+
+    ZoneScopedN("ComponentManager get_components");
+
+    const ComponentTypeID type_id = T::component_type_id();
+
+    std::vector<T *> components;
+    for (const auto &pair : m_component_table) {
+      Scope<IComponent> &component = pair.second;
+      if (component != nullptr) {
+        components.push_back(static_cast<T *>(component.get()));
       }
-
-      return components;
     }
 
-    template <typename T> T* get_component() {
-      const ComponentTypeID type_id = T::component_type_id();
+    return components;
+  }
 
-      for (const auto& pair : m_component_table) {
-        const Scope<IComponent>& component = pair.second;
+  template <typename T> T *get_component() {
+    const ComponentTypeID type_id = T::component_type_id();
 
-        if (component->get_component_type_id() == type_id) {
-          return dynamic_cast<T*>(component.get());
-        }
-      }
+    auto component_type = m_type_component_table.find(type_id);
 
+    if (component_type == m_type_component_table.end()) {
       return nullptr;
     }
 
-    template <typename T, typename... Args>
-    T* get_or_add_component(const EntityID& entity_id, Args &&...params) {
-      T* component_exists = get_component<T>(entity_id);
+    auto component = m_component_table.find(component_type->second);
 
-      if (component_exists == nullptr) {
-        return add_component<T>(entity_id, std::forward<Args>(params)...);
-      }
+    return static_cast<T *>(component->second.get());
+  }
 
-      return component_exists;
+  template <typename T, typename... Args>
+  T *get_or_add_component(const EntityID &entity_id, Args &&...params) {
+    ZoneScopedN("ComponentManager get_or_add_component");
+    T *component_exists = get_component<T>(entity_id);
+
+    if (component_exists == nullptr) {
+      return add_component<T>(entity_id, std::forward<Args>(params)...);
     }
 
-    template <typename T> T* get_component(const EntityID entity_id) {
+    return component_exists;
+  }
+
+  template <typename T> T *get_component(const EntityID entity_id) {
+    try {
+      ZoneScopedN("ComponentManager get_component");
+
       const ComponentTypeID type_id = T::component_type_id();
-      try {
-        const ComponentID component_id =
-          this->m_entity_component_table.at(entity_id).at(type_id);
-        return dynamic_cast<T*>(m_component_table[component_id].get());
-      }
-      catch (std::out_of_range) {
-        return nullptr;
-      }
+
+      auto component_id = this->m_entity_component_table[entity_id][type_id];
+
+      return static_cast<T *>(m_component_table[component_id].get());
+    } catch (std::out_of_range) {
+      return nullptr;
     }
+  }
 
-    // template <typename T> T *get_component(const EntityID entity_id) {
-    //   const ComponentTypeID type_id = T::component_type_id();
-    //   try {
-    //     const ComponentID component_id =
-    //         this->m_entity_component_table.at(entity_id).at(type_id);
-    //     return dynamic_cast<T *>(m_component_table[component_id].get());
-    //   } catch (std::out_of_range) {
-    //     return nullptr;
-    //   }
-    // }
+  ComponentManager() = default;
 
-    ComponentManager() = default;
+  friend IEntity;
 
-    friend IEntity;
+private:
+  std::unordered_map<ComponentID, Scope<IComponent>> m_component_table;
+  std::unordered_map<ComponentTypeID, ComponentID> m_type_component_table;
 
-  private:
-    std::unordered_map<ComponentID, Scope<IComponent>> m_component_table;
-    std::unordered_map<EntityID, std::unordered_map<ComponentTypeID, ComponentID>>
+  std::unordered_map<EntityID, std::unordered_map<ComponentTypeID, ComponentID>>
       m_entity_component_table;
-  };
+};
 
 }; // namespace astralix
