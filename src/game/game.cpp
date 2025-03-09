@@ -10,13 +10,17 @@ void Game::start() {
 
   auto dir = std::filesystem::current_path().parent_path().append("src").append(
       "game");
-\
-  astralix::ProjectManager::get()->add_project(astralix::Project::create(
+
+  auto project = astralix::Project::create(
       {.name = "Game",
        .directory = dir,
        .resources = {.directory = dir.append("assets")}
 
-      }));
+      });
+  // project->save();
+  // project->load();
+
+  astralix::ProjectManager::get()->add_project(project);
 
   astralix::SceneManager::get()->add_scene<Prologue>();
 }

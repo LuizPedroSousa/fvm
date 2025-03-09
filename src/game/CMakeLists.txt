@@ -11,10 +11,9 @@ target_link_libraries(
   glad::glad
   ${GLFW_LIBRARIES}
   physics
-  application
   engine
   renderer
   window
-  shared
-  glm
+  shared::foundation
+  glm::glm
   project)
