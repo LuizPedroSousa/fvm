@@ -5,6 +5,10 @@
     "freetype",
     "glad",
     "glfw3",
+    "imguizmo",
+    "jsoncpp",
+    "uwebsockets",
+    "glm",
     {
       "name": "imgui",
       "features": [
@@ -13,10 +17,15 @@
         "opengl3-binding"
       ],
       "platform": "linux"
-    },
-    "imguizmo",
-    "jsoncpp",
-    "tracy",
-    "uwebsockets"
-  ]
+    }
+  ],
+  "features": {
+    "dev": {
+      "description": "Development dependencies (e.g., testing tools)",
+      "dependencies": [
+        "gtest",
+        "tracy"
+      ]
+    }
+  }
 }
