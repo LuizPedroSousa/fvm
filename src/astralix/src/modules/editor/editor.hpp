@@ -1,4 +1,5 @@
 #pragma once
+#include "arena.hpp"
 #include "base.hpp"
 #include "layouts/layout.hpp"
 
@@ -20,5 +21,7 @@ private:
   ~Editor() = default;
   Ref<Layout> m_current_layout = nullptr;
   static Editor *m_instance;
+
+  ElasticArena m_arena;
 };
 } // namespace astralix

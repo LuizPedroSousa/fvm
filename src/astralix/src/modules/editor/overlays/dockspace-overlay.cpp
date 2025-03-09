@@ -8,7 +8,6 @@
 #include "imgui.h"
 
 #include "UI/imgui-widgets.hpp"
-#include "application.hpp"
 #include "managers/scene-manager.hpp"
 #include "window.hpp"
 
@@ -136,7 +135,6 @@ void DockspaceOverlay::draw_menu_bar() {
       }
 
       if (ImGui::MenuItem("Exit")) {
-        Application::get()->end();
       }
       ImGui::EndMenu();
     }

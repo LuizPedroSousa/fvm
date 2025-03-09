@@ -1,29 +1,24 @@
 #pragma once
 
-#include "base.hpp"
-#include "events/event-scheduler.hpp"
+#include "arena.hpp"
+#include "event-scheduler.hpp"
 #include "events/key-codes.hpp"
 #include "events/key-event.hpp"
 #include "events/keyboard.hpp"
-#include "events/mouse-event.hpp"
 #include "events/mouse.hpp"
 #include "log.hpp"
 #include "uwebsockets/App.h"
-#include "window.hpp"
-#include "json/json.h"
-#include <algorithm>
 #include <cstdlib>
-#include <functional>
+#include <cstring>
 #include <iostream>
 #include <json/reader.h>
 #include <memory>
 #include <string>
-#include <thread>
 #include <uwebsockets/PerMessageDeflate.h>
 #include <uwebsockets/WebSocketProtocol.h>
-#include <vector>
 
 namespace astralix {
+
 class WebsocketServer {
 public:
   WebsocketServer();
@@ -46,7 +41,7 @@ public:
             "/*",
             {/* Settings */
              .compression = uWS::DISABLED,
-             .maxPayloadLength = 64 * 1920 * 1080,
+             .maxPayloadLength = 64 * 1024 * 1024,
              .idleTimeout = 8,
              .maxBackpressure = 5 * 1024 * 1024,
              .closeOnBackpressureLimit = false,
@@ -112,9 +107,6 @@ public:
                    const auto &current_x = root["x"].as<double>();
                    const auto &current_y = root["y"].as<double>();
 
-                   LOG_DEBUG(current_y);
-                   LOG_DEBUG(current_x);
-
                    auto position =
                        Mouse::Position{.x = current_x, .y = current_y};
 
@@ -164,13 +156,13 @@ public:
 
   uWS::SSLApp *get_app() { return m_app; }
 
-  void publish(std::string topic, std::string message) {
+  void publish(const char *topic, const char *message) {
     m_app->publish(topic, build_message(topic, message), uWS::OpCode::BINARY,
                    false);
   };
 
-  std::string build_message(std::string topic, std::string message) {
-    uint32_t topic_size = topic.size();
+  inline std::string build_message(const char *topic, const char *message) {
+    uint32_t topic_size = std::strlen(topic);
 
     char topic_size_bytes[4];
     topic_size_bytes[0] = (topic_size >> 24) & 0xFF; // Significant Byte
@@ -181,8 +173,8 @@ public:
     std::string result;
 
     result.append(topic_size_bytes, 4);
-    result.append(topic);
-    result.append(message);
+    result += topic;
+    result += message;
 
     return result;
   }

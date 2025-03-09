@@ -1,14 +1,14 @@
-#include "events/event-dispatcher.hpp"
-#include "events/event-scheduler.hpp"
+#include "event-dispatcher.hpp"
+#include "event-scheduler.hpp"
 #include "events/mouse.hpp"
 #include "glad/glad.h"
 
 #include "editor.hpp"
 
-#include "ecs/managers/system-manager.hpp"
 #include "editor.hpp"
 #include "engine.hpp"
 #include "events/viewport-event.hpp"
+#include "managers/system-manager.hpp"
 #include "time.hpp"
 #include "websocket-server.hpp"
 #include "window.hpp"
@@ -26,7 +26,7 @@ Editor *Editor::init() {
 
 void Editor::end() { delete m_instance; }
 
-Editor::Editor() {
+Editor::Editor() : m_arena(KB(1)) {
   EventDispatcher::init();
   EventScheduler::init();
   WebsocketServer::init();
@@ -45,7 +45,7 @@ void Editor::start() {
   auto scheduler = EventScheduler::get();
   auto dispatcher = EventDispatcher::get();
   scheduler->schedule<ViewportEvent>(SchedulerType::REALTIME);
-  dispatcher->attach<ViewportEventListener, ViewportEvent>();
+  dispatcher->subscribe<ViewportEventListener, ViewportEvent>(m_arena);
 }
 
 void Editor::run() {

@@ -1,18 +1,22 @@
 #pragma once
-#include "ecs/managers/entity-manager.hpp"
-#include "events/event.hpp"
-#include "events/listener.hpp"
+#include "arena.hpp"
+#include "event.hpp"
+#include "glad/glad.h"
+#include "listener.hpp"
+#include "log.hpp"
 #include "managers/scene-manager.hpp"
 #include "trace.hpp"
 #include "websocket-server.hpp"
-#include <cstdint>
-#include <string>
 
 namespace astralix {
 
 #define WIDTH 1920
 #define HEIGHT 1080
 #define PIXEL_SIZE 4 // RGBA
+
+#define FRAMEBUFFER_SIZE WIDTH *HEIGHT *PIXEL_SIZE
+
+#define SCENE_SIZE 1024
 
 class ViewportEvent : public Event {
 public:
@@ -23,33 +27,37 @@ public:
 
 class ViewportEventListener : public BaseListener {
 public:
-  ViewportEventListener() : m_framebuffer(WIDTH * HEIGHT * PIXEL_SIZE) {}
+  ViewportEventListener(ElasticArena &arena) : m_arena(arena) {}
+  ~ViewportEventListener() {}
 
   void dispatch(Event *event) override {
     ASTRA_PROFILE_N("Viewport listener");
 
+    auto framebuffer = m_arena.allocate(FRAMEBUFFER_SIZE);
+
     glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE,
-                 m_framebuffer.data());
+                 framebuffer->data);
 
     auto socket = WebsocketServer::get();
+    socket->publish("framebuffer", (const char *)framebuffer->data);
 
-    socket->publish("framebuffer", std::string(reinterpret_cast<const char *>(
-                                                   m_framebuffer.data()),
-                                               m_framebuffer.size()));
+    auto serializer = SceneManager::get()->get_active_scene()->get_serializer();
 
-    auto scene = SceneManager::get()->get_active_scene()->serialize();
+    serializer->serialize();
 
-    Json::StreamWriterBuilder writer;
+    auto ctx = serializer->get_ctx();
+    auto scene = ctx->to_buffer(m_arena);
 
-    std::string json_string = Json::writeString(writer, scene);
+    socket->publish("scene", (const char *)scene->data);
 
-    socket->publish("scene", json_string);
+    m_arena.release(framebuffer);
+    m_arena.release(scene);
   }
 
   LISTENER_CLASS_TYPE(ViewportListener)
 
 private:
-  std::vector<uint8_t> m_framebuffer;
+  ElasticArena &m_arena;
 };
 
 } // namespace astralix

@@ -1,5 +1,5 @@
 #pragma once
-#include "ecs/systems/system.hpp"
+#include "systems/system.hpp"
 
 namespace astralix {
 
