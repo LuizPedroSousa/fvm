@@ -1,6 +1,6 @@
 #pragma once
 #include "assimp/scene.h"
-#include "ecs/components/component.hpp"
+#include "components/component.hpp"
 #include "filesystem"
 #include "resources/model.hpp"
 #include "vector"

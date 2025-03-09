@@ -1,6 +1,6 @@
 #include "font.hpp"
 #include "assert.hpp"
-#include "ecs/guid.hpp"
+#include "guid.hpp"
 #include "managers/project-manager.hpp"
 #include "managers/resource-manager.hpp"
 #include "resources/texture.hpp"

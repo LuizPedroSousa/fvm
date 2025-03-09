@@ -1,12 +1,12 @@
 #pragma once
 #include "assert.hpp"
 #include "base.hpp"
-#include "events/event.hpp"
-#include "functional"
+#include "event.hpp"
 #include "listener.hpp"
 #include "vector"
 
 #include "unordered_map"
+#include <utility>
 
 namespace astralix {
 class EventDispatcher {
@@ -15,8 +15,10 @@ public:
 
   static EventDispatcher *get();
 
-  template <typename L, typename E> void attach() {
-    Ref<L> listener = create_ref<L>();
+  template <typename L, typename E, typename... Args>
+  void subscribe(Args &&...args) {
+    Ref<L> listener = create_ref<L>(std::forward<Args>(args)...);
+
     auto listener_id = listener->get_id();
     auto emplaced_listener =
         m_listeners.emplace(listener_id, std::move(listener));

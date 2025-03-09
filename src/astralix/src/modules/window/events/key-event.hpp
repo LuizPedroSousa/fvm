@@ -1,8 +1,8 @@
 #pragma once
-#include "events/event.hpp"
-#include "events/listener.hpp"
+#include "event.hpp"
 #include "functional"
 #include "key-codes.hpp"
+#include "listener.hpp"
 
 #define BASE_FIELDS KeyCode key_code;
 

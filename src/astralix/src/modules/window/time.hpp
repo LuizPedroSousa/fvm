@@ -1,6 +1,8 @@
 #pragma once
 #include "GLFW/glfw3.h"
 
+namespace astralix {
+
 class Time {
 public:
   static void init();
@@ -25,3 +27,5 @@ private:
 
   static Time *m_instance;
 };
+
+} // namespace astralix

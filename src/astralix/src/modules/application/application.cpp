@@ -1,9 +1,11 @@
 #include "application.hpp"
-#include "ecs/managers/system-manager.hpp"
+#include "arena.hpp"
 #include "engine.hpp"
-#include "events/event-dispatcher.hpp"
-#include "events/event-scheduler.hpp"
-#include "glad/glad.h"
+#include "event-dispatcher.hpp"
+#include "event-scheduler.hpp"
+#include "framebuffer.hpp"
+#include "log.hpp"
+#include "managers/system-manager.hpp"
 #include "time.hpp"
 #include "trace.hpp"
 #include "window.hpp"
@@ -23,6 +25,8 @@ Application *Application::init() {
 
   return m_instance;
 }
+
+#define SIZE 1920 * 1080 * 4;
 
 void Application::start() {
   Window::get()->open("FVM Editor", 1920, 1080);

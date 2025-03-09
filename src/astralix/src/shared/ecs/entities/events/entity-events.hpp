@@ -1,6 +1,6 @@
 #pragma once
-#include "ecs/entities/ientity.hpp"
-#include "events/event.hpp"
+#include "entities/ientity.hpp"
+#include "event.hpp"
 
 namespace astralix {
 struct EntityCreatedEvent : public Event {

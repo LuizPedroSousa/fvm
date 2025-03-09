@@ -1,79 +1,79 @@
 #pragma once
 #include "log.hpp"
 
-#include "ecs/guid.hpp"
+#include "guid.hpp"
 #include "events/key-codes.hpp"
 #include <unordered_map>
 
 namespace astralix {
 
-class Mouse {
-public:
-  struct Position {
-    double x;
-    double y;
+  class Mouse {
+  public:
+    struct Position {
+      double x;
+      double y;
 
-    void operator*=(float factor) {
-      x *= factor;
-      y *= factor;
-    }
-  };
-
-  static void init();
-  static Mouse *get() { return m_instance; };
-
-  Position delta() {
-    return Position{
-        m_current.x,
-        m_current.y,
+      void operator*=(float factor) {
+        x *= factor;
+        y *= factor;
+      }
     };
-  };
 
-  void set_position(Position position) {
-    if (m_is_first_recalculation) {
+    static void init();
+    static Mouse* get() { return m_instance; };
+
+    Position delta() {
+      return Position{
+          m_current.x,
+          m_current.y,
+      };
+    };
+
+    void set_position(Position position) {
+      if (m_is_first_recalculation) {
+        m_last = position;
+        m_is_first_recalculation = false;
+      }
+
+      double dx = position.x - m_last.x;
+      double dy = position.y - m_last.y;
+
+      m_current.x += dx;
+      m_current.y += dy;
+
       m_last = position;
-      m_is_first_recalculation = false;
+
+      m_changed = true;
     }
 
-    double dx = position.x - m_last.x;
-    double dy = position.y - m_last.y;
+    void apply_delta(Position& position) {
+      m_current.x += position.x;
+      m_current.y += position.y;
 
-    m_current.x += dx;
-    m_current.y += dy;
+      m_changed = true;
+    }
 
-    m_last = position;
+    void reset_delta() {
+      m_current = { .x = 0, .y = 0 };
+      m_changed = false;
+    }
 
-    m_changed = true;
-  }
+    bool has_moved() { return m_changed; }
 
-  void apply_delta(Position &position) {
-    m_current.x += position.x;
-    m_current.y += position.y;
+    friend class Window;
 
-    m_changed = true;
-  }
+    Mouse();
+    ~Mouse();
 
-  void reset_delta() {
-    m_current = {.x = 0, .y = 0};
-    m_changed = false;
-  }
+  private:
+    Position m_current;
+    Position m_last;
 
-  bool has_moved() { return m_changed; }
+    bool m_is_first_recalculation = true;
+    bool m_changed = false;
 
-  friend class Window;
-
-  Mouse();
-  ~Mouse();
-
-private:
-  Position m_current;
-  Position m_last;
-
-  bool m_is_first_recalculation = true;
-  bool m_changed = false;
-
-  static Mouse *m_instance;
-};
+    static Mouse* m_instance;
+  };
 
 #define MOUSE_DELTA() Mouse::get()->delta()
 

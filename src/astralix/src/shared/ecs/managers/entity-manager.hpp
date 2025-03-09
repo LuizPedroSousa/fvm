@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ecs/entities/events/entity-events.hpp"
-#include "ecs/entities/ientity.hpp"
-#include "ecs/guid.hpp"
-#include "ecs/managers/component-manager.hpp"
-#include "events/event-dispatcher.hpp"
+#include "entities/events/entity-events.hpp"
+#include "entities/ientity.hpp"
+#include "event-dispatcher.hpp"
 #include "functional"
+#include "guid.hpp"
+#include "managers/component-manager.hpp"
 #include "unordered_map"
 
 #include "base-manager.hpp"

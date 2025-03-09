@@ -1,9 +1,9 @@
 #pragma once
-#include "ecs/managers/entity-manager.hpp"
 #include "either.hpp"
+#include "managers/entity-manager.hpp"
 
-#include "ecs/guid.hpp"
 #include "exceptions/base-exception.hpp"
+#include "guid.hpp"
 #include "serializers/scene-serializer.hpp"
 #include "string"
 #include <utility>
@@ -19,8 +19,9 @@ public:
   virtual void start() = 0;
   virtual void update() = 0;
 
-  Json::Value serialize();
+  void serialize();
 
+  SceneSerializer *get_serializer() { return m_serializer.get(); };
   void save();
   void load();
 

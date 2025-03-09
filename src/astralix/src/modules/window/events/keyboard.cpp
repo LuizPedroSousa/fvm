@@ -1,7 +1,7 @@
 #include "keyboard.hpp"
 
-#include "events/event-scheduler.hpp"
-#include "events/key-codes.hpp"
+#include "event-scheduler.hpp"
+#include "key-codes.hpp"
 #include "log.hpp"
 #include "window.hpp"
 

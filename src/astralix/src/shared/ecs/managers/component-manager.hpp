@@ -2,14 +2,12 @@
 #include "assert.hpp"
 #include "base-manager.hpp"
 #include "base.hpp"
-#include "ecs/components/icomponent.hpp"
-#include "ecs/guid.hpp"
+#include "components/icomponent.hpp"
+#include "guid.hpp"
 #include "iostream"
 #include "memory"
 #include "unordered_map"
 #include "vector"
-
-#include <tracy/Tracy.hpp>
 
 namespace astralix {
 
@@ -27,7 +25,6 @@ public:
 
   template <typename T, typename... Args>
   T *add_component(const EntityID &entity_id, Args &&...params) {
-    ZoneScopedN("ComponentManager add_component");
 
     ComponentID component_id = FamilyObjectID<IComponent>::get();
 
@@ -50,7 +47,6 @@ public:
   }
 
   template <typename T> void remove_component(const EntityID &entity_id) {
-    ZoneScopedN("ComponentManager remove_component");
 
     const ComponentTypeID type_id = T::component_type_id();
     auto component_id = this->m_entity_component_table[entity_id][type_id];
@@ -62,9 +58,6 @@ public:
   void clean_components(const EntityID entity_id);
 
   template <typename T> std::vector<T *> get_components() {
-
-    ZoneScopedN("ComponentManager get_components");
-
     const ComponentTypeID type_id = T::component_type_id();
 
     std::vector<T *> components;
@@ -94,7 +87,6 @@ public:
 
   template <typename T, typename... Args>
   T *get_or_add_component(const EntityID &entity_id, Args &&...params) {
-    ZoneScopedN("ComponentManager get_or_add_component");
     T *component_exists = get_component<T>(entity_id);
 
     if (component_exists == nullptr) {
@@ -106,7 +98,6 @@ public:
 
   template <typename T> T *get_component(const EntityID entity_id) {
     try {
-      ZoneScopedN("ComponentManager get_component");
 
       const ComponentTypeID type_id = T::component_type_id();
 

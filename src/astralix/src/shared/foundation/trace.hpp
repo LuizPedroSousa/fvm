@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef ASTRA_TRACE
+#define TRACY_ENABLE
 #include <tracy/Tracy.hpp>
 #include <tracy/TracyC.h>
 #endif

@@ -3,8 +3,12 @@
 #include "string"
 #include <cstddef>
 #include <stdint.h>
+#include <variant>
 
 namespace astralix {
+
+using SerializableValue = std::variant<int, float, std::string, bool>;
+using SerializableKey = std::variant<int, float, std::string, bool>;
 
 class Guid {
 public:

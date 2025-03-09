@@ -1,16 +1,15 @@
 #include "component-serializer.hpp"
-#include "ecs/components/icomponent.hpp"
+#include "components/icomponent.hpp"
+#include "serialization-context.hpp"
 
 namespace astralix {
-  Json::Value ComponentSerializer::serialize() {
-    Json::Value root;
+  void ComponentSerializer::serialize() {
+    SerializationContext& ctx = *m_ctx.get();
 
-    root["name"] = m_component->name;
-    root["owner_id"] = (std::string)m_component->m_owner_id;
-    root["active"] = m_component->m_active;
-    root["component_id"] = (std::string)m_component->m_component_id;
-
-    return root;
+    ctx["id"] = (std::string)m_component->m_component_id;
+    ctx["name"] = m_component->name;
+    ctx["owner_id"] = (std::string)m_component->m_owner_id;
+    ctx["active"] = m_component->m_active;
   }
 
 } // namespace astralix

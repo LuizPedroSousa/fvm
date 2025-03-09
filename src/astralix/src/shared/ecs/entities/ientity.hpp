@@ -1,6 +1,6 @@
 #pragma once
-#include "ecs/guid.hpp"
-#include "ecs/managers/component-manager.hpp"
+#include "guid.hpp"
+#include "managers/component-manager.hpp"
 #include "string"
 
 #define ENTITY_PARAMS                                                          \

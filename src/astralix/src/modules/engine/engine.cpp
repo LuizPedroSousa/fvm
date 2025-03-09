@@ -1,5 +1,5 @@
 #include "engine.hpp"
-#include "ecs/managers/entity-manager.hpp"
+#include "managers/entity-manager.hpp"
 #include "managers/project-manager.hpp"
 #include "managers/resource-manager.hpp"
 #include "managers/scene-manager.hpp"

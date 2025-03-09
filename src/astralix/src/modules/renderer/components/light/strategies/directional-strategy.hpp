@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs/guid.hpp"
+#include "guid.hpp"
 #include "strategy.hpp"
 
 namespace astralix {

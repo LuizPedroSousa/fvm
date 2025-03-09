@@ -8,4 +8,4 @@ include_directories(${PROJECT_SOURCE_DIR}/external)
 
 target_include_directories(window PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(window PRIVATE application glad::glad shared glfw)
+target_link_libraries(window PRIVATE glad::glad glfw shared::foundation engine)

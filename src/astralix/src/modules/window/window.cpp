@@ -1,7 +1,7 @@
 #include "assert.hpp"
-#include "ecs/guid.hpp"
 #include "events/event-scheduler.hpp"
 #include "events/keyboard.hpp"
+#include "guid.hpp"
 
 #include "events/key-codes.hpp"
 #include "events/mouse.hpp"
@@ -9,7 +9,7 @@
 
 #include "base.hpp"
 #include "engine.hpp"
-#include "events/event-dispatcher.hpp"
+#include "event-dispatcher.hpp"
 #include "events/key-event.hpp"
 #include "events/mouse-event.hpp"
 #include "iostream"

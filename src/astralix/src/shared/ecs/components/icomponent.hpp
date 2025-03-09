@@ -1,8 +1,7 @@
 #pragma once
 #include "base.hpp"
-#include "ecs/components/serializers/component-serializer.hpp"
-#include "ecs/guid.hpp"
-#include "serializer.hpp"
+#include "guid.hpp"
+#include "components/serializers/component-serializer.hpp"
 
 namespace astralix {
   class ComponentSerializer;

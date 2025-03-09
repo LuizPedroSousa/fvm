@@ -2,12 +2,12 @@
 #include "base.hpp"
 #include "serializer.hpp"
 
-#include "ecs/components/icomponent.hpp"
+#include "components/icomponent.hpp"
 namespace astralix {
   class IComponent;
   class ComponentSerializer : public Serializer {
   public:
-    Json::Value virtual serialize();
+    void serialize() override;
 
     ComponentSerializer(IComponent* component) : m_component(component) {}
     ComponentSerializer() = default;

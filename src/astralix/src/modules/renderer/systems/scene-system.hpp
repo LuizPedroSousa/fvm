@@ -1,6 +1,6 @@
 #pragma once
-#include "ecs/entities/ientity.hpp"
-#include "ecs/systems/system.hpp"
+#include "entities/ientity.hpp"
+#include "systems/system.hpp"
 #include "entities/scene.hpp"
 
 namespace astralix {

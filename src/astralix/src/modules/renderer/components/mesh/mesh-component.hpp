@@ -1,7 +1,7 @@
 #pragma once
 #include "assimp/scene.h"
-#include "ecs/components/component.hpp"
-#include "ecs/guid.hpp"
+#include "components/component.hpp"
+#include "guid.hpp"
 #include "functional"
 #include "glm/glm.hpp"
 #include "renderer-api.hpp"

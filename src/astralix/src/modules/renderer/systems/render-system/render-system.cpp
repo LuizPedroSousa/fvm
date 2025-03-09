@@ -4,9 +4,9 @@
 #include "components/post-processing/post-processing-component.hpp"
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
-#include "ecs/entities/ientity.hpp"
-#include "ecs/managers/component-manager.hpp"
-#include "ecs/managers/entity-manager.hpp"
+#include "entities/ientity.hpp"
+#include "managers/component-manager.hpp"
+#include "managers/entity-manager.hpp"
 #include "entities/camera.hpp"
 #include "events/event-scheduler.hpp"
 #include "framebuffer.hpp"
@@ -26,119 +26,120 @@
 #include <sys/mman.h>
 
 namespace astralix {
-RenderSystem::RenderSystem() {};
+  RenderSystem::RenderSystem() {};
 
-void RenderSystem::start() {
-  Engine::get()->renderer_api->init();
+  void RenderSystem::start() {
+    Engine::get()->renderer_api->init();
 
-  auto entity_manager = EntityManager::get();
+    auto entity_manager = EntityManager::get();
 
-  EntityManager::get()->for_each<Skybox>(
-      [&](Skybox *skybox) { skybox->start(); });
-  entity_manager->for_each<Object>([](Object *object) { object->start(); });
-  entity_manager->for_each<PostProcessing>(
-      [](PostProcessing *post_processing) { post_processing->start(); });
+    EntityManager::get()->for_each<Skybox>(
+      [&](Skybox* skybox) { skybox->start(); });
+    entity_manager->for_each<Object>([](Object* object) { object->start(); });
+    entity_manager->for_each<PostProcessing>(
+      [](PostProcessing* post_processing) { post_processing->start(); });
 
-  entity_manager->for_each<Text>([&](Text *text) { text->start(); });
+    entity_manager->for_each<Text>([&](Text* text) { text->start(); });
 
-  add_subsystem<ShadowMappingSystem>()->start();
-  add_subsystem<DebugSystem>()->start();
-  add_subsystem<LightSystem>()->start();
-  add_subsystem<MeshSystem>()->start();
-}
+    add_subsystem<ShadowMappingSystem>()->start();
+    add_subsystem<DebugSystem>()->start();
+    add_subsystem<LightSystem>()->start();
+    add_subsystem<MeshSystem>()->start();
+  }
 
-void RenderSystem::fixed_update(double fixed_dt) {
-  ASTRA_PROFILE_N("RenderSystem FixedUpdate");
+  void RenderSystem::fixed_update(double fixed_dt) {
+    ASTRA_PROFILE_N("RenderSystem FixedUpdate");
 
-  auto entity_manager = EntityManager::get();
+    auto entity_manager = EntityManager::get();
 
-  entity_manager->for_each<Object>(
-      [&](Object *object) { object->fixed_update(fixed_dt); });
-};
+    entity_manager->for_each<Object>(
+      [&](Object* object) { object->fixed_update(fixed_dt); });
+  };
 
-void RenderSystem::pre_update(double dt) {
-  ASTRA_PROFILE_N("RenderSystem PreUpdate");
+  void RenderSystem::pre_update(double dt) {
+    ASTRA_PROFILE_N("RenderSystem PreUpdate");
 
-  auto engine = Engine::get();
+    auto engine = Engine::get();
 
-  auto entity_manager = EntityManager::get();
+    auto entity_manager = EntityManager::get();
 
-  auto post_processings = entity_manager->get_entities<PostProcessing>();
+    auto post_processings = entity_manager->get_entities<PostProcessing>();
 
-  bool has_post_processing = false;
+    bool has_post_processing = false;
 
-  for (auto post_processing : post_processings) {
-    if (!post_processing->is_active()) {
-      continue;
+    for (auto post_processing : post_processings) {
+      if (!post_processing->is_active()) {
+        continue;
+      }
+
+      auto comp = post_processing->get_component<PostProcessingComponent>();
+      if (comp != nullptr && comp->is_active()) {
+        has_post_processing = true;
+        break;
+      }
     }
 
-    auto comp = post_processing->get_component<PostProcessingComponent>();
-    if (comp != nullptr && comp->is_active()) {
-      has_post_processing = true;
-      break;
+    if (has_post_processing) {
+      engine->framebuffer->bind();
     }
-  }
+    else {
+      engine->framebuffer->bind(FramebufferBindType::Default, 0);
+    }
 
-  if (has_post_processing) {
-    engine->framebuffer->bind();
-  } else {
-    engine->framebuffer->bind(FramebufferBindType::Default, 0);
-  }
+    engine->renderer_api->enable_buffer_testing();
+    engine->renderer_api->clear_color();
+    engine->renderer_api->clear_buffers();
+    engine->framebuffer->clear_attachment(1, -1);
 
-  engine->renderer_api->enable_buffer_testing();
-  engine->renderer_api->clear_color();
-  engine->renderer_api->clear_buffers();
-  engine->framebuffer->clear_attachment(1, -1);
+    EntityManager::get()->for_each<Object>(
+      [&](Object* object) { object->pre_update(); });
 
-  EntityManager::get()->for_each<Object>(
-      [&](Object *object) { object->pre_update(); });
+    EntityManager::get()->for_each<Skybox>(
+      [&](Skybox* skybox) { skybox->pre_update(); });
+  };
 
-  EntityManager::get()->for_each<Skybox>(
-      [&](Skybox *skybox) { skybox->pre_update(); });
-};
+  void RenderSystem::update(double dt) {
+    ASTRA_PROFILE_N("RenderSystem Update");
 
-void RenderSystem::update(double dt) {
-  ASTRA_PROFILE_N("RenderSystem Update");
+    auto entity_manager = EntityManager::get();
 
-  auto entity_manager = EntityManager::get();
+    auto shadow_mapping = get_subsystem<ShadowMappingSystem>();
+    auto debug = get_subsystem<DebugSystem>();
+    auto mesh = get_subsystem<MeshSystem>();
+    auto light = get_subsystem<LightSystem>();
 
-  auto shadow_mapping = get_subsystem<ShadowMappingSystem>();
-  auto debug = get_subsystem<DebugSystem>();
-  auto mesh = get_subsystem<MeshSystem>();
-  auto light = get_subsystem<LightSystem>();
+    if (shadow_mapping != nullptr) {
+      shadow_mapping->update(dt);
+    }
 
-  if (shadow_mapping != nullptr) {
-    shadow_mapping->update(dt);
-  }
+    EntityManager::get()->for_each<Skybox>(
+      [&](Skybox* skybox) { skybox->update(); });
 
-  EntityManager::get()->for_each<Skybox>(
-      [&](Skybox *skybox) { skybox->update(); });
+    light->update(dt);
 
-  light->update(dt);
+    entity_manager->for_each<Text>([&](Text* text) { text->update(); });
 
-  entity_manager->for_each<Text>([&](Text *text) { text->update(); });
+    mesh->update(dt);
 
-  mesh->update(dt);
+    auto scheduler = EventScheduler::get();
 
-  auto scheduler = EventScheduler::get();
+    if (debug != nullptr)
+      debug->update(dt);
 
-  if (debug != nullptr)
-    debug->update(dt);
+    Engine::get()->framebuffer->unbind();
 
-  Engine::get()->framebuffer->unbind();
+    entity_manager->for_each<Skybox>(
+      [&](Skybox* skybox) { skybox->post_update(); });
 
-  entity_manager->for_each<Skybox>(
-      [&](Skybox *skybox) { skybox->post_update(); });
+    entity_manager->for_each<Object>(
+      [&](Object* object) { object->post_update(); });
 
-  entity_manager->for_each<Object>(
-      [&](Object *object) { object->post_update(); });
+    entity_manager->for_each<PostProcessing>(
+      [&](PostProcessing* post_processing) { post_processing->post_update(); });
 
-  entity_manager->for_each<PostProcessing>(
-      [&](PostProcessing *post_processing) { post_processing->post_update(); });
+    scheduler->bind(SchedulerType::REALTIME);
+  };
 
-  scheduler->bind(SchedulerType::REALTIME);
-};
-
-RenderSystem::~RenderSystem() {}
+  RenderSystem::~RenderSystem() {}
 
 } // namespace astralix

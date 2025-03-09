@@ -9,44 +9,44 @@
 
 namespace astralix {
 
-MeshComponent::MeshComponent(COMPONENT_INIT_PARAMS)
+  MeshComponent::MeshComponent(COMPONENT_INIT_PARAMS)
     : COMPONENT_INIT(MeshComponent, "mesh", true,
-                     create_ref<MeshComponentSerializer>(this)),
-      m_draw_type(VertexBuffer::DrawType::Static) {
+      create_ref<MeshComponentSerializer>(this)),
+    m_draw_type(VertexBuffer::DrawType::Static) {
 
-      };
+  };
 
-void MeshComponent::start() {
-  for (auto &mesh : m_meshes) {
-    mesh.vertex_array = VertexArray::create();
+  void MeshComponent::start() {
+    for (auto& mesh : m_meshes) {
+      mesh.vertex_array = VertexArray::create();
 
-    Ref<VertexBuffer> vertex_buffer = VertexBuffer::create(
+      Ref<VertexBuffer> vertex_buffer = VertexBuffer::create(
         &mesh.vertices[0], mesh.vertices.size() * sizeof(Vertex), m_draw_type);
 
-    BufferLayout layout(
-        {BufferElement(ShaderDataType::Float3, "position"),
+      BufferLayout layout(
+        { BufferElement(ShaderDataType::Float3, "position"),
          BufferElement(ShaderDataType::Float3, "normal"),
          BufferElement(ShaderDataType::Float2, "texture_coordinates"),
-         BufferElement(ShaderDataType::Float3, "tangent")}
+         BufferElement(ShaderDataType::Float3, "tangent") }
 
-    );
+      );
 
-    vertex_buffer->set_layout(layout);
+      vertex_buffer->set_layout(layout);
 
-    mesh.vertex_array->add_vertex_buffer(vertex_buffer);
+      mesh.vertex_array->add_vertex_buffer(vertex_buffer);
 
-    mesh.vertex_array->set_index_buffer(
+      mesh.vertex_array->set_index_buffer(
         IndexBuffer::create(&mesh.indices[0], mesh.indices.size()));
 
-    mesh.vertex_array->unbind();
+      mesh.vertex_array->unbind();
+    }
   }
-}
 
-void MeshComponent::update() {
-  for (auto mesh : m_meshes) {
-    Engine::get()->renderer_api->draw_indexed(mesh.vertex_array,
-                                              mesh.draw_type);
-  }
-};
+  void MeshComponent::update() {
+    for (auto mesh : m_meshes) {
+      Engine::get()->renderer_api->draw_indexed(mesh.vertex_array,
+        mesh.draw_type);
+    }
+  };
 
 } // namespace astralix

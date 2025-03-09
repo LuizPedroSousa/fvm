@@ -1,7 +1,7 @@
 #include "point-strategy.hpp"
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
-#include "ecs/guid.hpp"
+#include "guid.hpp"
 
 namespace astralix {
 

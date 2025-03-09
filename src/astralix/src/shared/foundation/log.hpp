@@ -75,8 +75,14 @@ public:
 
   template <typename... Args> std::string build_message(Args &&...args) {
     std::ostringstream message_stream;
-    (message_stream << ... << std::forward<Args>(args));
-    return message_stream.str();
+    ((message_stream << std::forward<Args>(args) << " "), ...);
+    std::string result = message_stream.str();
+
+    if (!result.empty()) {
+      result.pop_back(); // Remove the trailing space
+    }
+
+    return result;
   }
 
 private:

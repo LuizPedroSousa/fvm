@@ -1,9 +1,9 @@
 #pragma once
 #include "assert.hpp"
 #include "base.hpp"
-#include "ecs/guid.hpp"
-#include "events/event-dispatcher.hpp"
-#include "events/event.hpp"
+#include "event-dispatcher.hpp"
+#include "event.hpp"
+#include "guid.hpp"
 #include "log.hpp"
 #include "vector"
 

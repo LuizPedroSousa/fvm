@@ -1,7 +1,6 @@
 #pragma once
-#include "events/event.hpp"
-
-#include "ecs/guid.hpp"
+#include "event.hpp"
+#include "guid.hpp"
 
 namespace astralix {
 enum ListenerType { Keyboard, Mouse, EntityListener, ViewportListener };
