@@ -4,7 +4,7 @@
 #include "json/json.h"
 
 #include "components/transform/transform-component.hpp"
-#include "ecs/components/serializers/component-serializer.hpp"
+#include "components/serializers/component-serializer.hpp"
 
 namespace astralix {
   class TransformComponent;
@@ -14,8 +14,7 @@ namespace astralix {
     TransformComponentSerializer(TransformComponent* transform_component);
     TransformComponentSerializer();
 
-    Json::Value serialize() override;
-    void save() override;
+    void serialize() override;
     void deserialize() override;
   };
 } // namespace astralix

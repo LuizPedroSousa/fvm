@@ -5,7 +5,7 @@
 
 #include "components/post-processing/post-processing-component.hpp"
 
-#include "ecs/components/serializers/component-serializer.hpp"
+#include "components/serializers/component-serializer.hpp"
 
 namespace astralix {
   class PostProcessingComponent;
@@ -16,8 +16,7 @@ namespace astralix {
       PostProcessingComponent* post_processing_component);
     PostProcessingComponentSerializer();
 
-    Json::Value serialize() override;
-    void save() override;
+    void serialize() override;
     void deserialize() override;
   };
 } // namespace astralix

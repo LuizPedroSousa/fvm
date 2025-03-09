@@ -4,22 +4,16 @@
 
 namespace astralix {
 
-  CameraComponentSerializer::CameraComponentSerializer(CameraComponent* rigidbody_component)
-    : ComponentSerializer(rigidbody_component) {
-  }
+CameraComponentSerializer::CameraComponentSerializer(
+    CameraComponent *rigidbody_component)
+    : ComponentSerializer(rigidbody_component) {}
 
-  CameraComponentSerializer::CameraComponentSerializer() {}
+CameraComponentSerializer::CameraComponentSerializer() {}
 
-  Json::Value CameraComponentSerializer::serialize() {
-    ComponentSerializer::serialize();
+void CameraComponentSerializer::serialize() {
+  ComponentSerializer::serialize();
+}
 
-    Json::Value root = ComponentSerializer::serialize();
-
-    return root;
-  }
-
-  void CameraComponentSerializer::save() {}
-
-  void CameraComponentSerializer::deserialize() {}
+void CameraComponentSerializer::deserialize() {}
 
 } // namespace astralix

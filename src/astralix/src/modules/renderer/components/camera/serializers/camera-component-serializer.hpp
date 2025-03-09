@@ -5,7 +5,7 @@
 
 #include "components/camera/camera-component.hpp"
 
-#include "ecs/components/serializers/component-serializer.hpp"
+#include "components/serializers/component-serializer.hpp"
 
 namespace astralix {
   class CameraComponent;
@@ -15,8 +15,7 @@ namespace astralix {
     CameraComponentSerializer(CameraComponent* camera_component);
     CameraComponentSerializer();
 
-    Json::Value serialize() override;
-    void save() override;
+    void serialize() override;
     void deserialize() override;
   };
 } // namespace astralix

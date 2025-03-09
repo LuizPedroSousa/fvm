@@ -12,8 +12,7 @@ public:
   SceneSerializer(Ref<Scene> scene);
   SceneSerializer();
 
-  void save() override;
-  Json::Value serialize() override;
+  void serialize() override;
   void deserialize() override;
 
 private:

@@ -13,8 +13,6 @@ include_directories(${PROJECT_SOURCE_DIR}/external)
 target_include_directories(renderer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
                                            ${ASSIMP_INCLUDE_DIRS})
 
-# add_definitions(-DTRACY_ENABLE)
-
 target_link_libraries(
   renderer
   glad::glad
@@ -23,11 +21,11 @@ target_link_libraries(
   assimp
   engine
   window
-  application
   project
-  glm
+  glm::glm
   stb_image
-  shared
+  shared::foundation
   imgui::imgui
-  imgui_impl
-  Freetype::Freetype)
+  # imgui_impl
+  Freetype::Freetype
+  streams)

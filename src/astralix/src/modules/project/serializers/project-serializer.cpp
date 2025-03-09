@@ -1,45 +1,36 @@
-#include "project-serializer.hpp"
-#include "filesystem"
-#include "json/json.h"
+#include "serializers/project-serializer.hpp"
+#include "log.hpp"
+#include "serialization-context.hpp"
+#include "serializer.hpp"
 
 namespace astralix {
 
-ProjectSerializer::ProjectSerializer(Ref<Project> project)
-    : m_project(project) {}
+  ProjectSerializer::ProjectSerializer(Ref<Project> project,
+    Ref<SerializationContext> ctx)
+    : Serializer(std::move(ctx)), m_project(project) {
+  }
 
-ProjectSerializer::ProjectSerializer() {}
+  ProjectSerializer::ProjectSerializer() {}
 
-void ProjectSerializer::save() {
-  Json::Value root = serialize();
+  void ProjectSerializer::serialize() {
+    SerializationContext& ctx = *m_ctx.get();
 
-  auto &config = m_project->get_config();
+    auto& config = m_project->get_config();
 
-  auto path =
-      std::filesystem::path(config.directory).append("project_meta.json");
+    ctx["config"]["name"] = config.name;
+    ctx["config"]["directory"] = config.directory;
+    ctx["config"]["resources"]["directory"] = config.resources.directory;
+  }
 
-  write(path, root);
-}
+  void ProjectSerializer::deserialize() {
+    auto& config = m_project->get_config();
 
-Json::Value ProjectSerializer::serialize() {
-  Json::Value root;
+    SerializationContext& ctx = *m_ctx.get();
 
-  auto &config = m_project->get_config();
-  root["config"]["name"] = config.name;
-  root["config"]["directory"] = config.directory;
-  root["config"]["resources"]["directory"] = config.resources.directory;
-
-  return root;
-}
-
-void ProjectSerializer::deserialize() {
-  auto &config = m_project->get_config();
-
-  auto data = read(config.directory);
-
-  config.name = data["config"]["name"].as<std::string>();
-  config.directory = data["config"]["directory"].as<std::string>();
-  config.resources.directory =
-      data["config"]["resourcess"]["directory"].as<std::string>();
-}
+    config.name = ctx["config"]["name"].as<std::string>();
+    config.directory = ctx["config"]["directory"].as<std::string>();
+    config.resources.directory =
+      ctx["config"]["resources"]["directory"].as<std::string>();
+  }
 
 } // namespace astralix

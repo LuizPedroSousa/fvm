@@ -5,7 +5,7 @@
 
 #include "components/material/material-component.hpp"
 
-#include "ecs/components/serializers/component-serializer.hpp"
+#include "components/serializers/component-serializer.hpp"
 
 namespace astralix {
   class ModelComponent;
@@ -15,8 +15,7 @@ namespace astralix {
     ModelComponentSerializer(ModelComponent* model_component);
     ModelComponentSerializer();
 
-    Json::Value serialize() override;
-    void save() override;
+    void serialize() override;
     void deserialize() override;
   };
 } // namespace astralix

@@ -5,22 +5,17 @@
 
 namespace astralix {
 
-  MeshCollisionComponentSerializer::MeshCollisionComponentSerializer(
-    MeshCollisionComponent* mesh_collision_component)
-    : ComponentSerializer(mesh_collision_component) {
-  }
+MeshCollisionComponentSerializer::MeshCollisionComponentSerializer(
+    MeshCollisionComponent *mesh_collision_component)
+    : ComponentSerializer(mesh_collision_component) {}
 
-  MeshCollisionComponentSerializer::MeshCollisionComponentSerializer() {}
+MeshCollisionComponentSerializer::MeshCollisionComponentSerializer() {}
 
-  Json::Value MeshCollisionComponentSerializer::serialize() {
-    ComponentSerializer::serialize();
-    Json::Value root = ComponentSerializer::serialize();
+void MeshCollisionComponentSerializer::serialize() {
+  ComponentSerializer::serialize();
+  SerializationContext &ctx = *m_ctx.get();
+}
 
-    return root;
-  }
-
-  void MeshCollisionComponentSerializer::save() {}
-
-  void MeshCollisionComponentSerializer::deserialize() {}
+void MeshCollisionComponentSerializer::deserialize() {}
 
 } // namespace astralix

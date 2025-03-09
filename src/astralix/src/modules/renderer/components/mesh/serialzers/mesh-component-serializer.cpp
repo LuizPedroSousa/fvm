@@ -1,25 +1,17 @@
 #include "mesh-component-serializer.hpp"
+#include "components/mesh/mesh-component.hpp"
 #include "filesystem"
 #include "json/json.h"
-#include "components/mesh/mesh-component.hpp"
 
 namespace astralix {
 
-  MeshComponentSerializer::MeshComponentSerializer(
-    MeshComponent* mesh_component) : ComponentSerializer(mesh_component)
-  {
-  }
+MeshComponentSerializer::MeshComponentSerializer(MeshComponent *mesh_component)
+    : ComponentSerializer(mesh_component) {}
 
-  MeshComponentSerializer::MeshComponentSerializer() {}
+MeshComponentSerializer::MeshComponentSerializer() {}
 
-  Json::Value MeshComponentSerializer::serialize() {
-    Json::Value root = ComponentSerializer::serialize();
+void MeshComponentSerializer::serialize() {}
 
-    return root;
-  }
-
-  void MeshComponentSerializer::save() {}
-
-  void MeshComponentSerializer::deserialize() {}
+void MeshComponentSerializer::deserialize() {}
 
 } // namespace astralix

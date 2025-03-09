@@ -5,23 +5,16 @@
 
 namespace astralix {
 
-  PostProcessingComponentSerializer::PostProcessingComponentSerializer(
-    PostProcessingComponent* post_processing_component)
-    : ComponentSerializer(post_processing_component) {
-  }
+PostProcessingComponentSerializer::PostProcessingComponentSerializer(
+    PostProcessingComponent *post_processing_component)
+    : ComponentSerializer(post_processing_component) {}
 
-  PostProcessingComponentSerializer::PostProcessingComponentSerializer() {}
+PostProcessingComponentSerializer::PostProcessingComponentSerializer() {}
 
-  Json::Value PostProcessingComponentSerializer::serialize() {
-    ComponentSerializer::serialize();
+void PostProcessingComponentSerializer::serialize() {
+  ComponentSerializer::serialize();
+}
 
-    Json::Value root = ComponentSerializer::serialize();
-
-    return root;
-  }
-
-  void PostProcessingComponentSerializer::save() {}
-
-  void PostProcessingComponentSerializer::deserialize() {}
+void PostProcessingComponentSerializer::deserialize() {}
 
 } // namespace astralix

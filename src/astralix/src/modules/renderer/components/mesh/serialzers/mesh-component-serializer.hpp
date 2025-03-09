@@ -1,7 +1,7 @@
 #pragma once
 #include "json/json.h"
 
-#include "ecs/components/serializers/component-serializer.hpp"
+#include "components/serializers/component-serializer.hpp"
 #include "serializer.hpp"
 
 namespace astralix {
@@ -13,8 +13,7 @@ namespace astralix {
 
     MeshComponentSerializer();
 
-    Json::Value serialize() override;
-    void save() override;
+    void serialize() override;
     void deserialize() override;
   };
 } // namespace astralix

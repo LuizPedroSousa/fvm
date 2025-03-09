@@ -5,23 +5,16 @@
 
 namespace astralix {
 
-  ResourceComponentSerializer::ResourceComponentSerializer(
-    ResourceComponent* resource_component)
-    : ComponentSerializer(resource_component) {
-  }
+ResourceComponentSerializer::ResourceComponentSerializer(
+    ResourceComponent *resource_component)
+    : ComponentSerializer(resource_component) {}
 
-  ResourceComponentSerializer::ResourceComponentSerializer() {}
+ResourceComponentSerializer::ResourceComponentSerializer() {}
 
-  Json::Value ResourceComponentSerializer::serialize() {
-    ComponentSerializer::serialize();
+void ResourceComponentSerializer::serialize() {
+  ComponentSerializer::serialize();
+}
 
-    Json::Value root = ComponentSerializer::serialize();
-
-    return root;
-  }
-
-  void ResourceComponentSerializer::save() {}
-
-  void ResourceComponentSerializer::deserialize() {}
+void ResourceComponentSerializer::deserialize() {}
 
 } // namespace astralix

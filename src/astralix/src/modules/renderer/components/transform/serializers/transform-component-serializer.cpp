@@ -5,23 +5,18 @@
 
 namespace astralix {
 
-  TransformComponentSerializer::TransformComponentSerializer(
-    TransformComponent* transform_component)
-    : ComponentSerializer(transform_component) {
-  }
+TransformComponentSerializer::TransformComponentSerializer(
+    TransformComponent *transform_component)
+    : ComponentSerializer(transform_component) {}
 
-  TransformComponentSerializer::TransformComponentSerializer() {}
+TransformComponentSerializer::TransformComponentSerializer() {}
 
-  Json::Value TransformComponentSerializer::serialize() {
-    ComponentSerializer::serialize();
+void TransformComponentSerializer::serialize() {
+  ComponentSerializer::serialize();
 
-    Json::Value root = ComponentSerializer::serialize();
+  auto component = (TransformComponent *)m_component;
+}
 
-    return root;
-  }
-
-  void TransformComponentSerializer::save() {}
-
-  void TransformComponentSerializer::deserialize() {}
+void TransformComponentSerializer::deserialize() {}
 
 } // namespace astralix

@@ -5,23 +5,20 @@
 
 namespace astralix {
 
-  LightComponentSerializer::LightComponentSerializer(
-    LightComponent* light_component)
-    : ComponentSerializer(light_component) {
-  }
+LightComponentSerializer::LightComponentSerializer(
+    LightComponent *light_component)
+    : ComponentSerializer(light_component) {}
 
-  LightComponentSerializer::LightComponentSerializer() {}
+LightComponentSerializer::LightComponentSerializer() {}
 
-  Json::Value LightComponentSerializer::serialize() {
-    ComponentSerializer::serialize();
+void LightComponentSerializer::serialize() {
+  ComponentSerializer::serialize();
 
-    Json::Value root = ComponentSerializer::serialize();
+  //
 
-    return root;
-  }
+  //
+}
 
-  void LightComponentSerializer::save() {}
-
-  void LightComponentSerializer::deserialize() {}
+void LightComponentSerializer::deserialize() {}
 
 } // namespace astralix
