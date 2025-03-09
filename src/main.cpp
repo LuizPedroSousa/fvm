@@ -3,7 +3,7 @@
 #else
 #include "astralix/src/modules/application/application.hpp"
 #endif
-#include "astralix/src/shared/exceptions/base-exception.hpp"
+#include "astralix/src/shared/foundation/exceptions/base-exception.hpp"
 #include "game/game.hpp"
 #include "iostream"
 
