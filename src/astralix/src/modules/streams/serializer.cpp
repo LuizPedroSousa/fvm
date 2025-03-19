@@ -9,7 +9,6 @@ namespace astralix {
 
 Serializer::Serializer() {
   if (m_ctx == nullptr) {
-
     auto active_project = ProjectManager::get()->get_active_project();
     m_ctx = SerializationContext::create(
         active_project->get_config().serialization.format);

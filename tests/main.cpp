@@ -6,7 +6,6 @@ int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
 
   for (int i = 0; i < REPEAT; i++) {
-    // Run all tests each iteration
     int result = RUN_ALL_TESTS();
 
     if (result != 0) {

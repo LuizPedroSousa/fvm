@@ -1,29 +1,33 @@
 #pragma once
 #include "base.hpp"
 #include "components/camera/camera-component.hpp"
-#include "entities/ientity.hpp"
-#include "guid.hpp"
 #include "either.hpp"
+#include "entities/ientity.hpp"
 #include "entities/object.hpp"
 #include "glm/glm.hpp"
+#include "guid.hpp"
 #include "light-component.hpp"
 #include "strategies/strategy.hpp"
 
 namespace astralix {
 
-  class SceneSystem;
+class SceneSystem;
 
-  class LightComponent : public Component<LightComponent> {
-  public:
-    LightComponent(COMPONENT_INIT_PARAMS, Scope<LightStrategy> strategy,
-      EntityID camera);
+class LightComponent : public Component<LightComponent> {
+public:
+  LightComponent(COMPONENT_INIT_PARAMS, EntityID camera);
 
-    void start();
-    void update(IEntity* source, Object* object);
+  void start();
+  void update(Object *object, size_t &index);
 
-  private:
-    EntityID m_camera;
+  LightComponent *strategy(Scope<LightStrategy> strategy) {
+    m_strategy = std::move(strategy);
+    return this;
+  }
 
-    Scope<LightStrategy> m_strategy;
-  };
+private:
+  EntityID m_camera;
+
+  Scope<LightStrategy> m_strategy;
+};
 } // namespace astralix

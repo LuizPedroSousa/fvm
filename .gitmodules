@@ -10,3 +10,7 @@
 	path = external/imgui
 	url = https://github.com/LuizPedroSousa/imgui
 	branch = docking
+[submodule "external/PhysX"]
+	path = external/PhysX
+	url = https://github.com/NVIDIA-Omniverse/PhysX
+	branch = main

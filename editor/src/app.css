@@ -46,7 +46,16 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+
   }
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
  
   .dark {
     --background:  #151718;
@@ -88,6 +97,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-cinder-500 text-foreground;
+    @apply bg-bunker-500 text-foreground;
   }
 }

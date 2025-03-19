@@ -54,6 +54,7 @@ public:
                     * points to a PerSocketData struct */
                    ws->subscribe("framebuffer");
                    ws->subscribe("scene");
+                   ws->subscribe("logs");
                  },
              .message =
                  [](auto * /*ws*/, std::string_view message,

@@ -8,7 +8,6 @@ Makefile
 vcpkg
 vcpkg_installed
 
-external/PhysX
 editor/build
 editor/dist-electron
 # Compiled binary files

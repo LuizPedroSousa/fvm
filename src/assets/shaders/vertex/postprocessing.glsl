@@ -1,12 +1,13 @@
-#version 330 core
+#version 440 core
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 texture_cord;
+layout(location = 2) in vec2 texture_coordinates;
 
 out vec2 _texture_cord;
 
 void main() {
-  _texture_cord = texture_cord;
-  gl_Position   = vec4(position.x, position.y, 0, 1.);
+    _texture_cord = texture_coordinates;
+    gl_Position = vec4(position.x, position.y, 0, 1.);
 }
+

@@ -1,18 +1,19 @@
 <script lang="ts">
   import { onMount, setContext } from "svelte";
   import { writable } from "svelte/store";
-  import type { EngineContext, Entity } from "./engine.context";
+  import type { EngineContext, Entity, Log, PaneId } from "./engine.context";
   import type { SocketEvent } from "./engine.context";
 
   let ws: WebSocket;
-  let socket = writable<WebSocket | null>(null);
-  let socket_event = writable<SocketEvent | null>(null);
+  let socket = writable<WebSocket>();
+  let socket_event = writable<SocketEvent>();
   let scene = writable({ entities: {} });
+  let activePaneId = writable<PaneId>();
 
-  let selected_entity_id = writable<string | null>(null);
+  let selected_entity_id = writable<string>();
+  let logs = writable<Log[]>([]);
 
   onMount(() => {
-    // Set up WebSocket connection
     ws = new WebSocket("ws://localhost:9001");
 
     ws.binaryType = "arraybuffer";
@@ -51,7 +52,7 @@
 
             const entities: Record<string, Entity> = {};
 
-            if (_scene?.entities.length > 0) {
+            if (_scene?.entities?.length > 0) {
               for (let entity of _scene.entities) {
                 entities[entity.id] = entity;
               }
@@ -61,6 +62,11 @@
               ..._scene,
               entities,
             });
+          },
+          logs: () => {
+            const _logs = JSON.parse(decoder.decode(payload.content));
+
+            logs.set(_logs);
           },
         };
 
@@ -91,7 +97,10 @@
 
   const set_selected_entity = (id: string) => {
     selected_entity_id.set(id);
-    console.log($scene?.entities[$selected_entity_id]);
+  };
+
+  const setActivePaneId = (id: PaneId) => {
+    activePaneId.set(id);
   };
 
   setContext("engine", {
@@ -101,6 +110,9 @@
     send_event,
     set_selected_entity,
     scene,
+    activePaneId,
+    setActivePaneId,
+    logs,
   } as EngineContext);
 </script>
 

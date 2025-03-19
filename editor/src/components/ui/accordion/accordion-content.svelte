@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Accordion as AccordionPrimitive } from "bits-ui";
 	import { slide } from "svelte/transition";
-	import { cn } from "$helpers/.js";
+	import { cn } from "$helpers/styling";
 
 	type $$Props = AccordionPrimitive.ContentProps;
 

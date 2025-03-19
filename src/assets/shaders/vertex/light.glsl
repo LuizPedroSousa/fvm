@@ -14,6 +14,7 @@ out OBJECT_COORDINATES {
     vec3 fragment;
     mat4 model;
     vec4 fragment_light_space;
+    vec4 tangent_fragment_light_space;
     vec3 tangent_fragment;
     vec3 tangent_light_position;
     vec3 tangent_view_position;
@@ -23,8 +24,10 @@ obj_coordinates;
 
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 g_model;
 uniform mat4 light_space_matrix;
 uniform vec3 view_position;
+uniform bool use_instacing = false;
 
 struct LightExposure {
     vec3 ambient;
@@ -41,7 +44,7 @@ struct DirectionalLight {
 uniform DirectionalLight directional_light;
 
 void main() {
-    mat4 model = models[gl_InstanceID];
+    mat4 model = use_instacing ? models[gl_InstanceID] : g_model;
 
     mat4 normalMatrix = transpose(inverse(model));
 
@@ -64,6 +67,7 @@ void main() {
 
     obj_coordinates.texture = texture_coordinates;
     obj_coordinates.fragment_light_space = light_space_matrix * vec4(obj_coordinates.fragment, 1.0);
+    obj_coordinates.tangent_fragment_light_space = light_space_matrix * vec4(obj_coordinates.tangent_fragment, 1.0);
 
     obj_coordinates.normal = transpose(inverse(mat3(model))) * normal;
 

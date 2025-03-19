@@ -1,5 +1,6 @@
 #include "light-component.hpp"
 #include "components/light/serializers/light-component-serializer.hpp"
+#include "components/light/strategies/point-strategy.hpp"
 #include "components/resource/resource-component.hpp"
 #include "entities/ientity.hpp"
 #include "memory"
@@ -7,21 +8,21 @@
 
 namespace astralix {
 
-  LightComponent::LightComponent(COMPONENT_INIT_PARAMS,
-    Scope<LightStrategy> strategy, EntityID camera)
+LightComponent::LightComponent(COMPONENT_INIT_PARAMS, EntityID camera)
     : COMPONENT_INIT(LightComponent, "light", true,
-      create_ref<LightComponentSerializer>(this)),
-    m_camera(camera), m_strategy(std::move(strategy)) {
-  };
+                     create_ref<LightComponentSerializer>(this)),
+      m_camera(camera) {};
 
-  void LightComponent::start() {}
+void LightComponent::start() {}
 
-  void LightComponent::update(IEntity* source, Object* object) {
-    auto resource = object->get_component<ResourceComponent>();
+void LightComponent::update(Object *object, size_t &index) {
+  auto resource = object->get_component<ResourceComponent>();
 
-    if (resource != nullptr && resource->has_shader()) {
-      m_strategy->update(source, object, m_camera);
-    }
+  if (resource != nullptr && resource->has_shader()) {
+    auto owner = get_owner();
+
+    m_strategy->update(owner, object, m_camera, index);
   }
+}
 
 } // namespace astralix

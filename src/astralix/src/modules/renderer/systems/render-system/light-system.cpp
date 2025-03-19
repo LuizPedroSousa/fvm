@@ -3,13 +3,17 @@
 #include "base.hpp"
 #include "components/camera/camera-component.hpp"
 #include "components/light/light-component.hpp"
+#include "components/material/material-component.hpp"
+#include "components/mesh/mesh-component.hpp"
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
-#include "managers/entity-manager.hpp"
 #include "entities/camera.hpp"
 #include "entities/object.hpp"
 #include "events/event.hpp"
 #include "glad//glad.h"
+#include "log.hpp"
+#include "managers/component-manager.hpp"
+#include "managers/entity-manager.hpp"
 #include "managers/resource-manager.hpp"
 #include "systems/render-system/shadow-mapping-system.hpp"
 #include "trace.hpp"
@@ -17,75 +21,78 @@
 
 namespace astralix {
 
-  LightSystem::LightSystem() {}
+LightSystem::LightSystem() {}
 
-  void LightSystem::pre_update(double dt) {}
+void LightSystem::pre_update(double dt) {}
 
-  void LightSystem::fixed_update(double fixed_dt) {}
+void LightSystem::fixed_update(double fixed_dt) {}
 
-  void LightSystem::start() { auto resource_manager = ResourceManager::get(); }
+void LightSystem::start() { auto resource_manager = ResourceManager::get(); }
 
-  void LightSystem::update(double dt) {
-    CHECK_ACTIVE(this);
-    ASTRA_PROFILE_N("LightSystem Update");
+void LightSystem::update(double dt) {
+  CHECK_ACTIVE(this);
+  ASTRA_PROFILE_N("LightSystem Update");
 
-    auto entity_manager = EntityManager::get();
+  auto entity_manager = EntityManager::get();
+  auto component_manager = ComponentManager::get();
 
-    auto objects = entity_manager->get_entities<Object>();
+  auto objects = entity_manager->get_entities<Object>();
 
-    entity_manager->for_each<Camera>([&](Camera* object) {
-      object->update();
+  entity_manager->for_each<Camera>([&](Camera *target) {
+    target->update();
 
-      auto camera = object->get_component<CameraComponent>();
+    auto camera = target->get_component<CameraComponent>();
 
-      camera->recalculate_projection_matrix();
-      camera->recalculate_view_matrix();
-      });
+    camera->recalculate_projection_matrix();
+    camera->recalculate_view_matrix();
+  });
 
-    auto system_manager = SystemManager::get();
+  auto system_manager = SystemManager::get();
 
-    auto shadow_mapping = system_manager->get_system<ShadowMappingSystem>();
+  auto shadow_mapping = system_manager->get_system<ShadowMappingSystem>();
 
-    LightComponent* light_component;
+  auto light_components = component_manager->get_components<LightComponent>();
 
-    auto light = entity_manager->get_entity_with_component<LightComponent>();
+  auto camera = entity_manager->get_entity_with_component<CameraComponent>()
+                    ->get_component<CameraComponent>();
 
-    if (light != nullptr) {
-      light_component = light->get_component<LightComponent>();
+  entity_manager->for_each<Object>([&](Object *object) {
+    ASTRA_PROFILE_N("LightSystem Object Loop");
+
+    auto transform = object->get_component<TransformComponent>();
+    auto material = object->get_component<MaterialComponent>();
+    auto resource = object->get_component<ResourceComponent>();
+
+    if (!resource->has_shader()) {
+      return;
     }
 
-    auto camera = entity_manager->get_entity_with_component<CameraComponent>()
-      ->get_component<CameraComponent>();
+    if (transform != nullptr) {
+      transform->update();
+    }
 
-    entity_manager->for_each<Object>([&](Object* object) {
-      ASTRA_PROFILE_N("LightSystem Object Loop");
+    resource->update();
 
-      if (shadow_mapping != nullptr) {
-        shadow_mapping->bind_depth(object);
-      }
+    if (material != nullptr) {
+      material->update();
+    }
 
-      object->update();
+    if (shadow_mapping != nullptr) {
+      shadow_mapping->bind_depth(object);
+    }
 
-      if (light_component != nullptr) {
-        light_component->update(light, object);
-      }
+    for (size_t i = 0; i < light_components.size(); i++) {
+      light_components[i]->update(object, i);
+    }
 
-      auto resource = object->get_component<ResourceComponent>();
+    auto shader = resource->get_shader();
 
-      if (!resource->has_shader()) {
-        return;
-      }
+    shader->set_matrix("view", camera->get_view_matrix());
+    shader->set_vec3("view_position", transform->position);
+    shader->set_matrix("projection", camera->get_projection_matrix());
+  });
+}
 
-      auto shader = resource->get_shader();
-
-      auto transform = object->get_component<TransformComponent>();
-
-      shader->set_matrix("view", camera->get_view_matrix());
-      shader->set_vec3("view_position", transform->position);
-      shader->set_matrix("projection", camera->get_projection_matrix());
-      });
-  }
-
-  LightSystem::~LightSystem() {}
+LightSystem::~LightSystem() {}
 
 } // namespace astralix

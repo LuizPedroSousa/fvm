@@ -1,25 +1,43 @@
 <script module lang="ts">
+  export interface Pane {
+    id: PaneId;
+    name: string;
+    icon: string;
+  }
+
   export type LayerProps = Partial<PaneProps> & {
-    title?: string | undefined;
+    panes?: Pane[];
+    default_pane?: PaneId;
   };
 </script>
 
 <script lang="ts">
-  import { Pane, type PaneProps } from "paneforge";
+  import * as Tabs from "$components/ui/tabs";
 
-  export let title: LayerProps["title"];
+  import { Pane as PaneForge, type PaneProps } from "paneforge";
+  import type { PaneId } from "../../contexts/engine.context";
+
+  const { panes, default_pane, ...props }: LayerProps = $props();
+
+  let active_tab = $state(
+    default_pane ?? (panes?.length > 0 ? panes[0].id : undefined),
+  );
+
+  const changeActiveTab = (value: PaneId) => {
+    active_tab = value;
+  };
 </script>
 
-<Pane
-  class="bg-cinder-950 flex flex-col w-full h-full relative overflow-hidden"
-  {...$$restProps}
+<PaneForge
+  class="bg-bunker-950 flex flex-col w-full h-full relative overflow-scroll-y rounded-r-md"
+  {...props}
 >
-  {#if title}
-    <div class="w-full py-1 pl-1 flex items-start border border-handle">
-      <strong class="text-gray font-medium text-sm">
-        {title}
-      </strong>
-    </div>
+  {#if !!panes && panes?.length > 0}
+    <Tabs.Root bind:value={active_tab}>
+      <Tabs.PaneHeader {panes} {active_tab} {changeActiveTab} />
+      <slot />
+    </Tabs.Root>
+  {:else}
+    <slot />
   {/if}
-  <slot />
-</Pane>
+</PaneForge>

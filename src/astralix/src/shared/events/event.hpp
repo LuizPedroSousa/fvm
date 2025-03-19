@@ -9,7 +9,8 @@ enum EventType {
 
   /* ENTITY */
   EntityCreated = 3,
-  Viewport = 4
+  Viewport = 4,
+  Logs = 5
 };
 
 class Event {

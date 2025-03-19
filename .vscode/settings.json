@@ -96,7 +96,9 @@
     "slist": "cpp",
     "ranges": "cpp",
     "scoped_allocator": "cpp",
-    "filesystem": "cpp"
+    "filesystem": "cpp",
+    "stack": "cpp",
+    "ios": "cpp"
   },
   "cSpell.words": [
     "Unkown"
