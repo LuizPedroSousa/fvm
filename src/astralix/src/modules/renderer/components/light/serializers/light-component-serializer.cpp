@@ -14,9 +14,7 @@ LightComponentSerializer::LightComponentSerializer() {}
 void LightComponentSerializer::serialize() {
   ComponentSerializer::serialize();
 
-  //
-
-  //
+  SerializationContext &ctx = *m_ctx.get();
 }
 
 void LightComponentSerializer::deserialize() {}

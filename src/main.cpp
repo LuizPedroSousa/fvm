@@ -1,7 +1,7 @@
+#include "application.hpp"
 #ifdef ASTRA_EDITOR
 #include "astralix/src/modules/editor/editor.hpp"
 #else
-#include "astralix/src/modules/application/application.hpp"
 #endif
 #include "astralix/src/shared/foundation/exceptions/base-exception.hpp"
 #include "game/game.hpp"

@@ -3,8 +3,8 @@
 #include "event.hpp"
 #include "glad/glad.h"
 #include "listener.hpp"
-#include "log.hpp"
 #include "managers/scene-manager.hpp"
+#include "serializers/log-serializer.hpp"
 #include "trace.hpp"
 #include "websocket-server.hpp"
 
@@ -50,14 +50,21 @@ public:
 
     socket->publish("scene", (const char *)scene->data);
 
+    m_log_serializer.serialize();
+
     m_arena.release(framebuffer);
     m_arena.release(scene);
+
+    // auto logs = m_log_serializer.get_ctx()->to_buffer(m_arena);
+    // socket->publish("logs", (const char *)logs->data);
+    // m_arena.release(logs);
   }
 
   LISTENER_CLASS_TYPE(ViewportListener)
 
 private:
   ElasticArena &m_arena;
+  LogSerializer m_log_serializer;
 };
 
 } // namespace astralix

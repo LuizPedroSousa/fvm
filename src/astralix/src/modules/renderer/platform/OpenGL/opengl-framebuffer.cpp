@@ -34,12 +34,6 @@ static void attach_color_texture(uint32_t id, int samples,
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format,
                  GL_UNSIGNED_BYTE, NULL);
 
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    //
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
@@ -213,6 +207,16 @@ void OpenGLFramebuffer::invalidate() {
         utils::attach_color_texture(
             m_color_attachments[i], m_specification.samples, GL_RGBA8, GL_RGBA,
             m_specification.width, m_specification.height, i);
+        break;
+      case FramebufferTextureFormat::RGBA16F:
+        utils::attach_color_texture(
+            m_color_attachments[i], m_specification.samples, GL_RGBA16F,
+            GL_RGBA, m_specification.width, m_specification.height, i);
+        break;
+      case FramebufferTextureFormat::RGBA32F:
+        utils::attach_color_texture(
+            m_color_attachments[i], m_specification.samples, GL_RGBA32F,
+            GL_RGBA, m_specification.width, m_specification.height, i);
         break;
       case FramebufferTextureFormat::RED_INTEGER:
         utils::attach_color_texture(

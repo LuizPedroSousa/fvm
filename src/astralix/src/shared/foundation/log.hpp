@@ -21,7 +21,7 @@
 
 namespace astralix {
 
-enum class LogLevel { INFO, WARNING, ERROR, DEBUG };
+enum class LogLevel { INFO = 0, WARNING = 1, ERROR = 2, DEBUG = 3 };
 
 class Logger {
 public:
@@ -69,9 +69,17 @@ public:
       m_log_map[msg_hash] = log;
     }
 
+    if (m_logs.size() > 100) {
+      m_logs.clear();
+    }
+
+    m_logs.push_back(log);
+
     render_log(log);
 #endif
   }
+
+  std::vector<Log *> logs() const { return m_logs; }
 
   template <typename... Args> std::string build_message(Args &&...args) {
     std::ostringstream message_stream;
@@ -118,6 +126,7 @@ private:
 #endif
   }
 
+private:
   std::string extract_filename(const char *file) {
     std::string file_path(file);
     size_t pos = file_path.find_last_of("/\\");
@@ -126,6 +135,8 @@ private:
     }
     return file_path;
   }
+
+  std::vector<Log *> m_logs;
 };
 
 #ifdef ENABLE_LOGS

@@ -13,12 +13,14 @@ add_compile_options(-fPIC)
 
 add_definitions(-DENABLE_LOGS)
 add_definitions(-DLOG_TO_CONSOLE)
-set(ASTRA_EDITOR true)
+set(ASTRA_EDITOR false)
+set(ASTRA_EDITOR_USOCKET true)
 set(ASTRA_ENABLE_TESTS false)
 set(ASTRA_TRACE false)
 
 if(ASTRA_EDITOR)
   add_definitions(-DASTRA_EDITOR)
+  add_definitions(-DASTRA_EDITOR_USOCKET)
 endif()
 
 if(ASTRA_TRACE)
@@ -133,7 +135,6 @@ if(ASTRA_ENABLE_TESTS)
   include(GoogleTest)
   gtest_discover_tests(fvm)
 else()
-
   target_link_libraries(
     fvm
     PRIVATE

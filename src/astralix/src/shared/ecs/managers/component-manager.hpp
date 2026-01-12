@@ -8,6 +8,7 @@
 #include "memory"
 #include "unordered_map"
 #include "vector"
+#include <algorithm>
 
 namespace astralix {
 
@@ -41,7 +42,13 @@ public:
     ASTRA_EXCEPTION(!created_component.second,
                     "Can't create a new Component !");
 
-    m_type_component_table[component_type_id] = component_id;
+    auto components_by_type = m_type_component_table.find(component_type_id);
+
+    if (components_by_type == m_type_component_table.end()) {
+      m_type_component_table[component_type_id] = {component_id};
+    } else {
+      components_by_type->second.push_back(component_id);
+    }
 
     return static_cast<T *>(m_component_table[component_id].get());
   }
@@ -52,7 +59,16 @@ public:
     auto component_id = this->m_entity_component_table[entity_id][type_id];
 
     m_component_table.erase(component_id);
-    m_type_component_table[type_id];
+
+    auto components_by_type = m_type_component_table.find(type_id);
+
+    if (components_by_type != m_type_component_table.end()) {
+      components_by_type->second.erase(
+          std::remove_if(components_by_type->second.begin(),
+                         components_by_type->second.end(),
+                         [&](ComponentID id) { return id == component_id; }),
+          components_by_type->second.end());
+    }
   }
 
   void clean_components(const EntityID entity_id);
@@ -61,29 +77,39 @@ public:
     const ComponentTypeID type_id = T::component_type_id();
 
     std::vector<T *> components;
-    for (const auto &pair : m_component_table) {
-      Scope<IComponent> &component = pair.second;
-      if (component != nullptr) {
-        components.push_back(static_cast<T *>(component.get()));
-      }
+
+    auto component_ids_by_type = m_type_component_table.find(type_id);
+
+    if (component_ids_by_type == m_type_component_table.end())
+      return components;
+
+    for (const auto id : component_ids_by_type->second) {
+
+      auto component = m_component_table.find(id);
+
+      if (component == m_component_table.end())
+        continue;
+
+      components.push_back(static_cast<T *>(component->second.get()));
     }
 
     return components;
   }
 
-  template <typename T> T *get_component() {
-    const ComponentTypeID type_id = T::component_type_id();
-
-    auto component_type = m_type_component_table.find(type_id);
-
-    if (component_type == m_type_component_table.end()) {
-      return nullptr;
-    }
-
-    auto component = m_component_table.find(component_type->second);
-
-    return static_cast<T *>(component->second.get());
-  }
+  // template <typename T> T *get_component() {
+  //   const ComponentTypeID type_id = T::component_type_id();
+  //
+  //   auto component_type = m_type_component_table.find(type_id);
+  //
+  //   if (component_type == m_type_component_table.end()) {
+  //     return nullptr;
+  //   }
+  //
+  //
+  //   auto component = m_component_table.find(component_type->second);
+  //
+  //   return static_cast<T *>(component->second.get());
+  // }
 
   template <typename T, typename... Args>
   T *get_or_add_component(const EntityID &entity_id, Args &&...params) {
@@ -115,7 +141,8 @@ public:
 
 private:
   std::unordered_map<ComponentID, Scope<IComponent>> m_component_table;
-  std::unordered_map<ComponentTypeID, ComponentID> m_type_component_table;
+  std::unordered_map<ComponentTypeID, std::vector<ComponentID>>
+      m_type_component_table;
 
   std::unordered_map<EntityID, std::unordered_map<ComponentTypeID, ComponentID>>
       m_entity_component_table;

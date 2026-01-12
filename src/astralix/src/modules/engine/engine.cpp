@@ -33,9 +33,9 @@ Engine::Engine() {
 
 void Engine::start() {
   FramebufferSpecification framebuffer_spec;
-  framebuffer_spec.attachments = {FramebufferTextureFormat::RGBA8,
-                                  FramebufferTextureFormat::RED_INTEGER,
-                                  FramebufferTextureFormat::Depth};
+  framebuffer_spec.attachments = {
+      FramebufferTextureFormat::RGBA32F, FramebufferTextureFormat::RGBA32F,
+      FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
   framebuffer_spec.width = 1920;
   framebuffer_spec.height = 1080;
   framebuffer = std::move(Framebuffer::create(framebuffer_spec));

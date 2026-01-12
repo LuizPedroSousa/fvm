@@ -40,7 +40,7 @@ using ResourceID = std::string;
 using ProjectID = Guid;
 using ListenerId = Guid;
 using MeshID = std::size_t;
-using MeshBatchID = std::size_t;
+using MeshGroupID = std::size_t;
 
 template <typename T> class FamilyTypeID {
 private:

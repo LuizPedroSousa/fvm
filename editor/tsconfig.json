@@ -10,11 +10,25 @@
     "sourceMap": true,
     "strict": true,
     "moduleResolution": "bundler",
-      "paths": {
-      "$components": ["./src/components"],
-      "$components/*": ["./src/components/*"],
-      "$helpers": ["./src/helpers"],
-      "$helpers/*": ["./src/helpers/*"]
+    "paths": {
+      "$components": [
+        "./src/components"
+      ],
+      "$components/*": [
+        "./src/components/*"
+      ],
+      "$templates": [
+        "./src/templates"
+      ],
+      "$templates/*": [
+        "./src/templates/*"
+      ],
+      "$helpers": [
+        "./src/helpers"
+      ],
+      "$helpers/*": [
+        "./src/helpers/*"
+      ]
     }
   }
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias

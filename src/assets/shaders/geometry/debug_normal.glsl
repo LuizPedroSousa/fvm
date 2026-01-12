@@ -1,23 +1,24 @@
-#version 330 core
+#version 450 core
 layout(points) in;
 layout(line_strip, max_vertices = 2) out;
 
 uniform float length = 1.0;
 
 uniform mat4 projection;
-uniform mat4 model;
 uniform mat4 view;
 
 out vec3 vertex_color;
 
 in OBJECT_COORDINATES {
     vec3 normal;
+    mat4 model;
 }
 
 obj_coordinates[];
 
 void main() {
     vec3 normal = obj_coordinates[0].normal;
+    mat4 model = obj_coordinates[0].model;
 
     vertex_color = abs(normal);
 

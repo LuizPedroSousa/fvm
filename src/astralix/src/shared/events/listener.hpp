@@ -3,7 +3,13 @@
 #include "guid.hpp"
 
 namespace astralix {
-enum ListenerType { Keyboard, Mouse, EntityListener, ViewportListener };
+enum ListenerType {
+  Keyboard,
+  Mouse,
+  EntityListener,
+  ViewportListener,
+  LogsListener
+};
 
 #define LISTENER_CLASS_TYPE(type)                                              \
   static ListenerType get_static_type() { return ListenerType::type; }         \

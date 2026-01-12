@@ -2,23 +2,43 @@
 #include "components/resource/resource-component.hpp"
 #include "components/transform/transform-component.hpp"
 #include "guid.hpp"
+#include "log.hpp"
 
 namespace astralix {
 
-  void PointStrategy::update(IEntity* source, Object* object,
-    EntityID& camera_id) {
-    auto resource = object->get_component<ResourceComponent>();
-    auto transform = source->get_component<TransformComponent>();
+inline std::string get_name(const char *name, const char *prefix, int count) {
+  std::string result =
+      std::string(name + std::string("[") + std::to_string(count) +
+                  std::string("]") + "." + prefix);
 
-    auto shader = resource->get_shader();
+  return result;
+}
 
-    shader->set_float("point_lights[0].attenuation.constant", 1.0f);
-    shader->set_float("point_lights[0].attenuation.linear", 0.045f);
-    shader->set_float("point_lights[0].attenuation.quadratic", 0.0075f);
-    shader->set_vec3("point_lights[0].exposure.ambient", glm::vec3(5.0f));
-    shader->set_vec3("point_lights[0].exposure.diffuse", glm::vec3(2.0f));
-    shader->set_vec3("point_lights[0].exposure.specular", glm::vec3(1.0f));
-    shader->set_vec3("point_lights[0].position", transform->position);
-  }
+void PointStrategy::update(IEntity *source, Object *object, EntityID &camera_id,
+                           size_t &index) {
+  auto resource = object->get_component<ResourceComponent>();
+  auto transform = source->get_component<TransformComponent>();
+
+  auto shader = resource->get_shader();
+
+  shader->set_int("light_type", 1);
+  shader->set_float(get_name("point_lights", "attenuation.constant", index),
+                    m_point.attenuation.constant);
+  shader->set_float(get_name("point_lights", "attenuation.linear", index),
+                    m_point.attenuation.linear);
+  shader->set_float(get_name("point_lights", "attenuation.quadratic", index),
+                    m_point.attenuation.quadratic);
+
+  shader->set_vec3(get_name("point_lights", "exposure.ambient", index),
+                   m_point.exposure.ambient);
+
+  shader->set_vec3(get_name("point_lights", "exposure.diffuse", index),
+                   m_point.exposure.diffuse);
+  shader->set_vec3(get_name("point_lights", "exposure.specular", index),
+                   m_point.exposure.specular);
+
+  shader->set_vec3(get_name("point_lights", "position", index),
+                   transform->position);
+}
 
 } // namespace astralix

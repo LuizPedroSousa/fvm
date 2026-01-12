@@ -1,8 +1,9 @@
 #include "prologue.hpp"
+
 #include "base.hpp"
-#include "components/camera/camera-component.hpp"
 #include "components/light/light-component.hpp"
 #include "components/light/strategies/directional-strategy.hpp"
+#include "components/light/strategies/point-strategy.hpp"
 #include "components/material/material-component.hpp"
 #include "components/mesh-collision/mesh-collision-component.hpp"
 #include "components/mesh/mesh-component.hpp"
@@ -15,7 +16,6 @@
 #include "entities/skybox.hpp"
 #include "entities/text.hpp"
 #include "events/key-codes.hpp"
-#include "events/key-event.hpp"
 #include "events/keyboard.hpp"
 #include "glad/glad.h"
 #include "glm/fwd.hpp"
@@ -23,7 +23,7 @@
 #include "managers/resource-manager.hpp"
 #include "omp.h"
 #include "resources/material.hpp"
-#include "resources/model.hpp"
+#include "gtest/gtest.h"
 #include <glm/gtx/string_cast.hpp>
 
 Prologue::Prologue() : Scene("prologue") {}
@@ -96,17 +96,16 @@ void Prologue::load_resources() {
 
   manager->load_shaders(
       ///
-      {
-          Shader::create("shaders::post_processing",
-                         "fragment/postprocessing.glsl",
-                         "vertex/postprocessing.glsl"),
-          Shader::create("shaders::lighting", "fragment/light.glsl",
-                         "vertex/light.glsl"),
-          Shader::create("shaders::skybox", "fragment/skybox.glsl",
-                         "vertex/skybox.glsl"),
-          Shader::create("shaders::glyph", "fragment/glyph.glsl",
-                         "vertex/glyph.glsl")
-          ///
+      {Shader::create("shaders::post_processing ",
+                      "fragment/postprocessing.glsl",
+                      "vertex/postprocessing.glsl"),
+       Shader::create("shaders::lighting", "fragment/light.glsl",
+                      "vertex/light.glsl"),
+       Shader::create("shaders::skybox", "fragment/skybox.glsl",
+                      "vertex/skybox.glsl"),
+       Shader::create("shaders::glyph", "fragment/glyph.glsl",
+                      "vertex/glyph.glsl")
+
       }
 
   );
@@ -165,28 +164,39 @@ void Prologue::load_scene_components() {
   auto camera = add_entity<Camera>("camera", CameraMode::Free,
                                    glm::vec3(0.0f, 4.0f, 0.0f));
 
-  // auto camera = add_entity<Object>("camera", glm::vec3(0.0f, 4.0f, 0.0f));
-  // camera->add_component<CameraComponent>();
-
-  auto strategy = create_scope<DirectionalStrategy>();
-
-  auto light =
+  auto directional_light =
       add_entity<astralix::Object>("Light", glm::vec3(-2.0f, 4.0f, -1.0f));
 
-  // auto light =
-  //     add_entity<astralix::Object>("Light", glm::vec3(0.0, 4.0f, 0.3f));
+  directional_light->add_component<LightComponent>(camera->get_entity_id())
+      ->strategy(create_scope<DirectionalStrategy>());
 
-  light->add_component<LightComponent>(std::move(strategy),
-                                       camera->get_entity_id());
+  std::vector<glm::vec3> lightColors;
+  lightColors.push_back(glm::vec3(0.5f, 0.0f, 0.0f));
+  lightColors.push_back(glm::vec3(0.0f, 0.0f, 0.5f));
+  lightColors.push_back(glm::vec3(0.0f, 0.5f, 0.0f));
+
+  for (int i = 0; i < lightColors.size(); i++) {
+    auto point_light = add_entity<astralix::Object>(
+        "Light", glm::vec3(i * 2.0f - 0.5f, 2.0f, i * 2.0f));
+
+    point_light->get_component<ResourceComponent>()->set_shader(
+        "shaders::lighting");
+
+    point_light->add_component<MeshComponent>()->attach_mesh(Mesh::cube(1.0f));
+
+    // point_light->add_component<LightComponent>(camera->get_entity_id())
+    //     ->strategy(create_scope<PointStrategy>(PointStrategy::Point{
+    //         .exposure = PointStrategy::Exposure{.ambient = lightColors[i],
+    //                                             .diffuse = lightColors[i],
+    //                                             .specular =
+    //                                             lightColors[i]}}));
+  }
 
   add_entity<Skybox>("skybox", "cubemaps::skybox", "shaders::skybox");
 
-  create_tile_grid(2, 2, 1.0f, RigidType::Static);
-  create_tile_grid(8, 8, 0.025f, RigidType::Dynamic, 20.0f, glm::vec3(0.025f));
-
-  // add_entity<Text>("text", "Text", glm::vec2(540.0f, 570.0f), 5.0f,
-  //                  glm::vec3(0.3, 0.7f, 0.9f));
-  // add_entity<PostProcessing>("Post Processing", "shaders::post_processing");
+  create_tile_grid(16, 16, 1.0f, RigidType::Static);
+  create_tile_grid(12, 12, 0.025f, RigidType::Dynamic, 20.0f,
+                   glm::vec3(0.025f));
 }
 
 void Prologue::start() {

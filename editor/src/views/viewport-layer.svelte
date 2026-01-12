@@ -19,7 +19,15 @@
     layer: LayerProps | undefined;
   }
 
-  export const layer: ViewportLayerProps["layer"] = { title: "Viewport" };
+  export const layer: ViewportLayerProps["layer"] = {
+    panes: [
+      {
+        id: "viewport",
+        name: "Viewport",
+        icon: "tabler:video-filled",
+      },
+    ],
+  };
 
   let engine = getContext<EngineContext>("engine");
 
@@ -132,19 +140,6 @@
   function renderFrame() {
     if (!latestFramebufferBinary) return;
 
-    if (
-      latestFramebufferBinary.length !==
-      framebuffer.width * framebuffer.height * 4
-    ) {
-      console.error(
-        "Invalid framebuffer data length:",
-        latestFramebufferBinary.length,
-      );
-      latestFramebufferBinary = null;
-      newFrameAvailable = false;
-      return;
-    }
-
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(
       gl.TEXTURE_2D,
@@ -232,6 +227,9 @@
   };
 
   const handleKeyup = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && isCanvasActive) {
+      isCanvasActive = false;
+    }
     if (!isCanvasActive) return;
 
     const key = key_events?.[event.keyCode];
@@ -264,10 +262,15 @@
   window.addEventListener("keydown", handleKeydown);
   window.addEventListener("keyup", handleKeyup);
 
+  $effect(() => {
+    if (isCanvasActive) {
+      engine.setActivePaneId("viewport");
+    }
+  });
   const handleActivateCanvas = async () => {
     isCanvasActive = true;
 
-    canvas.requestPointerLock({});
+    canvas.requestPointerLock();
   };
 </script>
 

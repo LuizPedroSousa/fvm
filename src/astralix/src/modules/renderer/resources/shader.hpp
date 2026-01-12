@@ -19,6 +19,7 @@ public:
   virtual void set_matrix(const std::string &name, glm::mat4 matrix) const = 0;
   virtual void set_float(const std::string &name, float value) const = 0;
   virtual void set_vec3(const std::string &name, glm::vec3 value) const = 0;
+  virtual uint32_t get_id() const = 0;
 
   static Ref<Shader> create(const ResourceID &resource_id,
                             const std::string &fragment_path,

@@ -13,6 +13,8 @@ MaterialComponentSerializer::MaterialComponentSerializer() {}
 
 void MaterialComponentSerializer::serialize() {
   ComponentSerializer::serialize();
+
+  SerializationContext &ctx = *m_ctx.get();
 }
 
 void MaterialComponentSerializer::deserialize() {}

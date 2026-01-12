@@ -21,6 +21,7 @@ public:
   void set_matrix(const std::string &name, glm::mat4 matrix) const override;
   void set_float(const std::string &name, float value) const override;
   void set_vec3(const std::string &name, glm::vec3 value) const override;
+  uint32_t get_id() const override { return m_renderer_id; };
 
 private:
   uint32_t compile(const std::string &path, uint32_t type);

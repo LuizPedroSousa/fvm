@@ -41,20 +41,5 @@ void SceneSerializer::serialize() {
   }
 }
 
-// void SceneSerializer::save() {
-//   auto project_manager = ProjectManager::get();
-//
-//   auto active_project = project_manager->get_active_project();
-//
-//   auto out_path =
-//   std::filesystem::path(active_project->get_config().directory)
-//                       .append("scenes")
-//                       .append((std::string)m_scene->get_name() +
-//                       "_meta.json");
-//
-//   auto root = serialize();
-//   write(out_path, root);
-// }
-
 void SceneSerializer::deserialize() {}
 } // namespace astralix

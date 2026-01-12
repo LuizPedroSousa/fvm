@@ -10,6 +10,8 @@ enum class FramebufferTextureFormat {
 
   // Color
   RGBA8,
+  RGBA16F,
+  RGBA32F,
   DEPTH_ONLY,
   RED_INTEGER,
 

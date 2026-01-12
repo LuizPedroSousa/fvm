@@ -4,11 +4,12 @@
 
 namespace astralix {
 
-  class SpotLightStrategy : public LightStrategy {
-  public:
-    SpotLightStrategy();
+class SpotLightStrategy : public LightStrategy {
+public:
+  SpotLightStrategy();
 
-    void update(IEntity* source, Object* object, EntityID& camera_id) override;
-  };
+  void update(IEntity *source, Object *object, EntityID &camera_id,
+              size_t &index) override;
+};
 
 } // namespace astralix
