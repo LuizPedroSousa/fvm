@@ -1,25 +1,30 @@
 {
-  "version": 2,
+  "version": 6,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 20,
+    "minor": 21,
     "patch": 0
   },
   "configurePresets": [
     {
-      "name": "default",
-      "displayName": "Default Config",
-      "description": "Default build using Make",
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build"
+      "name": "debug",
+      "displayName": "Debug (fast iteration)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/builds/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_CXX_STANDARD": "20",
+        "CMAKE_INSTALL_PREFIX": "./install"
+      }
     }
   ],
   "buildPresets": [
     {
-      "name": "default",
-      "configurePreset": "default",
-      "description": "Build with parallel jobs",
-      "jobs": 32
+      "name": "debug",
+      "displayName": "Build Debug",
+      "configurePreset": "debug",
+      "jobs": 0
     }
   ]
 }

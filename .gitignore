@@ -1,6 +1,5 @@
 # CMake-generated files
-build/*
-!build/
+build
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
@@ -28,3 +27,6 @@ editor/dist-electron
 .cache
 
 .compile_commands.json
+compile_commands.json
+install
+builds

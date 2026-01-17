@@ -1,0 +1,16 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+
+find_dependency(OpenGL)
+find_dependency(glfw3 CONFIG)
+find_dependency(glad CONFIG)
+find_dependency(glm CONFIG)
+find_dependency(assimp)
+find_dependency(freetype CONFIG)
+find_dependency(imgui CONFIG)
+find_dependency(jsoncpp CONFIG)
+find_dependency(ZLIB)
+find_dependency(OpenMP)
+find_dependency(X11)
+
+include("${CMAKE_CURRENT_LIST_DIR}/astralixTargets.cmake")
