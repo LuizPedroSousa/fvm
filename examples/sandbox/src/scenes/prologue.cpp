@@ -1,29 +1,28 @@
 #include "prologue.hpp"
 
+#include "astralix/modules/physics/components/mesh-collision/mesh-collision-component.hpp"
+#include "astralix/modules/physics/components/rigidbody/rigidbody-component.hpp"
+#include "astralix/modules/project/path.hpp"
+#include "astralix/modules/renderer/components/light/light-component.hpp"
+#include "astralix/modules/renderer/components/light/strategies/directional-strategy.hpp"
+#include "astralix/modules/renderer/components/material/material-component.hpp"
+#include "astralix/modules/renderer/components/mesh/mesh-component.hpp"
+#include "astralix/modules/renderer/components/resource/resource-component.hpp"
+#include "astralix/modules/renderer/components/transform/transform-component.hpp"
+#include "astralix/modules/renderer/entities/camera.hpp"
+#include "astralix/modules/renderer/entities/object.hpp"
+#include "astralix/modules/renderer/entities/serializers/scene-serializer.hpp"
+#include "astralix/modules/renderer/entities/skybox.hpp"
+#include "astralix/modules/renderer/entities/text.hpp"
+#include "astralix/modules/window/events/key-codes.hpp"
+#include "astralix/modules/window/events/keyboard.hpp"
 #include "base.hpp"
-#include "components/light/light-component.hpp"
-#include "components/light/strategies/directional-strategy.hpp"
-#include "components/light/strategies/point-strategy.hpp"
-#include "components/material/material-component.hpp"
-#include "components/mesh-collision/mesh-collision-component.hpp"
-#include "components/mesh/mesh-component.hpp"
-#include "components/resource/resource-component.hpp"
-#include "components/rigidbody/rigidbody-component.hpp"
-#include "components/transform/transform-component.hpp"
-#include "entities/camera.hpp"
-#include "entities/object.hpp"
-#include "entities/serializers/scene-serializer.hpp"
-#include "entities/skybox.hpp"
-#include "entities/text.hpp"
-#include "events/key-codes.hpp"
-#include "events/keyboard.hpp"
 #include "glad/glad.h"
 #include "glm/fwd.hpp"
 #include "log.hpp"
 #include "managers/resource-manager.hpp"
 #include "omp.h"
 #include "resources/material.hpp"
-#include "gtest/gtest.h"
 #include <glm/gtx/string_cast.hpp>
 
 Prologue::Prologue() : Scene("prologue") {}
@@ -41,16 +40,16 @@ void Prologue::load_resources() {
   manager->load_textures(
       {Texture3D::create("cubemaps::skybox",
                          {
-                             "textures/skybox/right.jpg",
-                             "textures/skybox/left.jpg",
-                             "textures/skybox/top.jpg",
-                             "textures/skybox/bottom.jpg",
-                             "textures/skybox/front.jpg",
-                             "textures/skybox/back.jpg",
+                             "textures/skybox/right.jpg"_project,
+                             "textures/skybox/left.jpg"_project,
+                             "textures/skybox/top.jpg"_project,
+                             "textures/skybox/bottom.jpg"_project,
+                             "textures/skybox/front.jpg"_project,
+                             "textures/skybox/back.jpg"_project,
                          }),
 
        Texture2D::create(
-           "textures::wood::diffuse", "textures/wood.png", false,
+           "textures::wood::diffuse", "textures/wood.png"_project, false,
 
            {//
             {TextureParameter::WrapS, TextureValue::Linear},
@@ -65,7 +64,7 @@ void Prologue::load_resources() {
            ),
 
        Texture2D::create(
-           "textures::wood::normal", "textures/wood_normal.png", false,
+           "textures::wood::normal", "textures/wood_normal.png"_project, false,
 
            {//
             {TextureParameter::WrapS, TextureValue::Linear},
@@ -77,8 +76,8 @@ void Prologue::load_resources() {
 
            ),
        Texture2D::create(
-           "textures::wood::displacement", "textures/wood_displacement.png",
-           false,
+           "textures::wood::displacement",
+           "textures/wood_displacement.png"_project, false,
 
            {//
             {TextureParameter::WrapS, TextureValue::Linear},
@@ -95,16 +94,16 @@ void Prologue::load_resources() {
       "textures::wood::normal", "textures::wood::displacement")});
 
   manager->load_shaders(
-      ///
       {Shader::create("shaders::post_processing ",
-                      "fragment/postprocessing.glsl",
-                      "vertex/postprocessing.glsl"),
-       Shader::create("shaders::lighting", "fragment/light.glsl",
-                      "vertex/light.glsl"),
-       Shader::create("shaders::skybox", "fragment/skybox.glsl",
-                      "vertex/skybox.glsl"),
-       Shader::create("shaders::glyph", "fragment/glyph.glsl",
-                      "vertex/glyph.glsl")
+                      "shaders/fragment/postprocessing.glsl"_engine,
+
+                      "shaders/vertex/postprocessing.glsl"_engine),
+       Shader::create("shaders::lighting", "shaders/fragment/light.glsl"_engine,
+                      "shaders/vertex/light.glsl"_engine),
+       Shader::create("shaders::skybox", "shaders/fragment/skybox.glsl"_engine,
+                      "shaders/vertex/skybox.glsl"_engine),
+       Shader::create("shaders::glyph", "shaders/fragment/glyph.glsl"_engine,
+                      "shaders/vertex/glyph.glsl"_engine)
 
       }
 
@@ -183,13 +182,6 @@ void Prologue::load_scene_components() {
         "shaders::lighting");
 
     point_light->add_component<MeshComponent>()->attach_mesh(Mesh::cube(1.0f));
-
-    // point_light->add_component<LightComponent>(camera->get_entity_id())
-    //     ->strategy(create_scope<PointStrategy>(PointStrategy::Point{
-    //         .exposure = PointStrategy::Exposure{.ambient = lightColors[i],
-    //                                             .diffuse = lightColors[i],
-    //                                             .specular =
-    //                                             lightColors[i]}}));
   }
 
   add_entity<Skybox>("skybox", "cubemaps::skybox", "shaders::skybox");
@@ -205,7 +197,6 @@ void Prologue::start() {
 }
 
 void Prologue::update() {
-
   if (IS_KEY_DOWN(KeyCode::F5)) {
     for (auto tile : tiles) {
       auto transform = tile.object->get_component<TransformComponent>();
