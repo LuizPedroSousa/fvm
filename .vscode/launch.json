@@ -20,6 +20,25 @@
         }
       ],
       "preLaunchTask": "build"
+    },
+    {
+      "name": "(gdb) Launch Sandbox",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/sandbox/builds/debug/sandbox",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/examples/sandbox/builds/debug",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
     }
   ]
 }
