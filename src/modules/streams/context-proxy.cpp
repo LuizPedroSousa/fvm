@@ -19,6 +19,8 @@ void ContextProxy::operator=(Ref<SerializationContext> ctx) {
   m_serialization_ctx->set_value(ctx);
 };
 
+size_t ContextProxy::size() { return m_serialization_ctx->size(); };
+
 template <typename T> T ContextProxy::as() {
   if constexpr (std::is_same_v<T, std::string>) {
     return m_serialization_ctx->as_string();

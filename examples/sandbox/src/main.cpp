@@ -6,7 +6,7 @@
 #include "astralix/modules/project/project.hpp"
 #include "astralix/modules/renderer/managers/scene-manager.hpp"
 #include "astralix/shared/foundation/exceptions/base-exception.hpp"
-#include "iostream"
+#include "filesystem"
 #include "scenes/prologue.hpp"
 
 int handleException(astralix::BaseException exception) {
@@ -18,18 +18,13 @@ int handleException(astralix::BaseException exception) {
 #define INIT(runner)                                                           \
   auto app = astralix::runner::init();                                         \
                                                                                \
-  std::filesystem::path dir =                                                  \
-      std::filesystem::absolute(std::filesystem::path(__FILE__))               \
-          .parent_path()                                                       \
-          .parent_path() /                                                     \
-      "src";                                                                   \
-                                                                               \
-  auto project = astralix::Project::create(                                    \
-      {.name = "Sandbox",                                                      \
-       .directory = dir,                                                       \
-       .resources = {.directory = dir.parent_path().append("assets")}          \
-                                                                               \
-      });                                                                      \
+  auto directory = std::filesystem::absolute(std::filesystem::path(__FILE__))  \
+                       .parent_path()                                          \
+                       .parent_path();                                         \
+  auto project = astralix::Project::create({                                   \
+      .directory = directory,                                                  \
+      .manifest = "src/project_manifest.json",                                 \
+  });                                                                          \
                                                                                \
   astralix::ProjectManager::get()->add_project(project);                       \
                                                                                \

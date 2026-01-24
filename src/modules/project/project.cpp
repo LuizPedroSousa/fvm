@@ -3,8 +3,11 @@
 #include "adapters/file/file-stream-reader.hpp"
 #include "adapters/file/file-stream-writer.hpp"
 #include "arena.hpp"
+#include "assert.hpp"
 #include "guid.hpp"
+#include "log.hpp"
 #include "serialization-context.hpp"
+#include <filesystem>
 
 namespace astralix {
 
@@ -14,8 +17,24 @@ Project::Project(ProjectConfig config)
 Ref<Project> Project::create(ProjectConfig config) {
   auto project = create_ref<Project>(config);
 
+  ASTRA_ENSURE(config.directory.empty(), "Project path must be defined");
+
   project->m_serializer = create_scope<ProjectSerializer>(
       project, SerializationContext::create(config.serialization.format));
+
+  auto manifest_path =
+      std::filesystem::path(config.directory) / config.manifest;
+
+  if (std::filesystem::exists(manifest_path)) {
+    auto stream = FileStreamReader(manifest_path);
+    LOG_DEBUG(manifest_path);
+    stream.read();
+
+    project->m_serializer->get_ctx()->from_buffer(stream.get_buffer());
+    project->m_serializer->deserialize();
+  } else {
+    project->m_serializer->serialize();
+  }
 
   return project;
 }

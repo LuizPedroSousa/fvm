@@ -16,7 +16,7 @@ FileStreamWriter::FileStreamWriter(const std::filesystem::path &path,
 }
 
 void FileStreamWriter::write() {
-  ASTRA_EXCEPTION(!m_file.is_open(),
+  ASTRA_ENSURE(!m_file.is_open(),
                   "Canno write serialized" + std::string(m_path))
 
   m_file.write(m_buffer->data(), m_buffer->size());

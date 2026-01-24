@@ -12,7 +12,7 @@ SerializationContext::create(SerializationFormat format) {
     return create_ref<JsonSerializationContext>();
   }
 
-  ASTRA_EXCEPTION(true, "Serialization format not implemented");
+  ASTRA_EXCEPTION("Serialization format not implemented");
 }
 
 Ref<SerializationContext>
@@ -23,7 +23,7 @@ SerializationContext::create(SerializationFormat format,
     return create_ref<JsonSerializationContext>(std::move(buffer));
   }
 
-  ASTRA_EXCEPTION(true, "Serialization format not implemented");
+  ASTRA_EXCEPTION("Serialization format not implemented");
 }
 
 } // namespace astralix

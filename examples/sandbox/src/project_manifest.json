@@ -1,0 +1,17 @@
+{
+  "name": "Sandbox",
+  "resources": {
+    "directory": "assets"
+  },
+  "windows": [
+    {
+      "name": "main",
+      "title": "sandbox",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "serialization": {
+    "format": "json"
+  }
+}

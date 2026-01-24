@@ -1,10 +1,6 @@
 #pragma once
 #include "base.hpp"
-#include "filesystem"
 #include "serialization-context.hpp"
-// #include "glm/glm.hpp"
-#include "json/json.h"
-#include <json/value.h>
 
 namespace astralix {
 

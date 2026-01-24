@@ -26,9 +26,9 @@ JsonSerializationContext::operator[](const SerializableKey &key) {
         using T = std::decay_t<decltype(key)>;
 
         if constexpr (std::is_same_v<T, int>) {
-          return key; // Keep int as int
+          return key;
         } else {
-          return convert_key_to_string(key); // Convert non-int keys to string
+          return convert_key_to_string(key);
         }
       },
       key);
@@ -90,8 +90,8 @@ JsonSerializationContext::JsonSerializationContext(Scope<StreamBuffer> buffer) {
 void JsonSerializationContext::from_buffer(Scope<StreamBuffer> buffer) {
   Json::Reader reader;
 
-  ASTRA_EXCEPTION(!reader.parse(buffer->data(), m_root, false),
-                  "Failed to parse json");
+  ASTRA_ENSURE(!reader.parse(buffer->data(), m_root, false),
+               "Failed to parse json");
 
   m_current = {};
   m_current.push(&m_root);

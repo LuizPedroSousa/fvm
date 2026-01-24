@@ -10,20 +10,21 @@ std::filesystem::path
 PathManager::resolve_project_path(std::string relative_path) {
   auto project = ProjectManager::get()->get_active_project();
 
-  auto base_path =
-      std::filesystem::path(project->get_config().resources.directory)
-          .append(relative_path);
+  auto project_config = project->get_config();
+  auto resolved_path = std::filesystem::path(project_config.directory) /
+                       project_config.resources.directory / relative_path;
 
-  return base_path;
+  LOG_DEBUG(resolved_path);
+
+  return resolved_path;
 }
 
 std::filesystem::path
 PathManager::resolve_engine_path(std::string relative_path) {
+  auto resolved_path =
+      std::filesystem::path(engineAssetsDirectory) / relative_path;
 
-  auto base_path =
-      std::filesystem::path(engineAssetsDirectory).append(relative_path);
-
-  return base_path;
+  return resolved_path;
 }
 
 std::filesystem::path PathManager::resolve(Ref<Path> path) {
@@ -40,7 +41,7 @@ std::filesystem::path PathManager::resolve(Ref<Path> path) {
   }
 
   default: {
-    ASTRA_EXCEPTION(true, std::string("Can't resolve relative path basis"))
+    ASTRA_EXCEPTION(std::string("Can't resolve relative path basis"))
   }
   }
 };

@@ -22,6 +22,8 @@ public:
 
   template <typename T> T as();
 
+  size_t size();
+
 private:
   Scope<SerializationContext> m_serialization_ctx;
   std::string m_key;

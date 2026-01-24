@@ -23,6 +23,7 @@ public:
 
   virtual ElasticArena::Block *to_buffer(ElasticArena &arena) = 0;
   virtual void from_buffer(Scope<StreamBuffer> buffer) = 0;
+  virtual size_t root_size() = 0;
   virtual size_t size() = 0;
 
   virtual std::string extension() const = 0;

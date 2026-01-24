@@ -10,9 +10,14 @@ namespace astralix {
 
 struct StreamBuffer {
 public:
-  StreamBuffer(size_t capacity) : m_arena(capacity) {}
+  StreamBuffer(size_t capacity) : m_arena(capacity) {
+    m_data = m_arena.allocate(capacity);
+  }
 
-  ~StreamBuffer() {}
+  ~StreamBuffer() {
+    m_arena.reset();
+    m_data = nullptr;
+  }
 
   void write(char *src, size_t size) {
     auto block = m_arena.allocate(size);
@@ -22,7 +27,12 @@ public:
     m_data = block;
   }
 
-  void reset() { m_data = nullptr; }
+  void reset() {
+    if (m_data != nullptr) {
+      m_arena.release(m_data);
+      m_data = nullptr;
+    }
+  }
 
   char *data() { return static_cast<char *>(m_data->data); }
 

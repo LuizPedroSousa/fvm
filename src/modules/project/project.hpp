@@ -1,5 +1,6 @@
 #pragma once
 #include "arena.hpp"
+#include "assert.hpp"
 #include "base.hpp"
 #include "guid.hpp"
 #include "serialization-context.hpp"
@@ -14,15 +15,47 @@ class ProjectSerializer;
 
 struct ProjectSerializationConfig {
   SerializationFormat format;
+
+  SerializationFormat formatFromString(const std::string &format) {
+    static const std::map<std::string, SerializationFormat> formats = {
+        {"json", SerializationFormat::Json},
+    };
+
+    auto it = formats.find(format);
+
+    ASTRA_ENSURE_WITH_SUGGESTIONS(it == formats.end(), formats, format,
+                                  "serialization format",
+                                  "ProjectSerialization")
+
+    return it->second;
+  }
 };
 
 struct ProjectResourceConfig {
   std::string directory;
 };
 
+struct WindowConfig {
+  std::string title;
+  int height;
+  int width;
+};
+
+struct SystemConfig {
+  std::string title;
+  int height;
+  int width;
+};
+
 struct ProjectConfig {
   std::string name = "Untitled";
   std::string directory;
+
+  std::string manifest;
+
+  std::vector<WindowConfig> windows;
+
+  std::vector<SystemConfig> systems;
 
   ProjectResourceConfig resources;
   ProjectSerializationConfig serialization;

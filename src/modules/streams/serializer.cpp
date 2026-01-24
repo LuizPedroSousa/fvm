@@ -18,7 +18,7 @@ Serializer::Serializer() {
 // Json::Value Serializer::read(const std::filesystem::path &absolute_path) {
 //   bool file_exists = std::filesystem::exists(absolute_path);
 //
-//   ASTRA_EXCEPTION(!file_exists,
+//   ASTRA_ENSURE(!file_exists,
 //                   "File" + std::string(absolute_path) + " doesn't exists");
 //   Json::Value root;
 //
@@ -30,7 +30,7 @@ Serializer::Serializer() {
 //   std::string errs;
 //   bool ok = Json::parseFromStream(rbuilder, file, &root, &errs);
 //
-//   ASTRA_EXCEPTION(!ok, "Canno parse" + std::string(absolute_path));
+//   ASTRA_ENSURE(!ok, "Canno parse" + std::string(absolute_path));
 //
 //   //
 // }
@@ -44,7 +44,7 @@ Serializer::Serializer() {
 //                           std::filesystem::is_directory(directory);
 //
 //   if (!directory_exists) {
-//     ASTRA_EXCEPTION(!std::filesystem::create_directory(directory),
+//     ASTRA_ENSURE(!std::filesystem::create_directory(directory),
 //                     "Cannot create directory");
 //   }
 //
@@ -57,7 +57,7 @@ Serializer::Serializer() {
 //     out_file << json_string;
 //     out_file.close();
 //   } else {
-//     ASTRA_EXCEPTION(true, "Canno write serialized" +
+//     ASTRA_EXCEPTION("Canno write serialized" +
 //     std::string(absolute_path))
 //   }
 // }

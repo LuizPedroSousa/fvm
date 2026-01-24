@@ -23,7 +23,9 @@ public:
 
   std::any get_root() override { return m_root; }
 
-  size_t size() override { return m_root.size(); };
+  size_t root_size() override { return m_root.size(); };
+  size_t size() override { return m_current.top()->size(); };
+
   ElasticArena::Block *to_buffer(ElasticArena &arena) override;
 
   std::string as_string() override { return m_current.top()->asString(); };
@@ -47,7 +49,7 @@ public:
       return key ? "true" : "false"; // bool to "true" or "false"
     }
 
-    ASTRA_EXCEPTION(true, "NO SUITABLE TYPE STRING CASTING FOR KEY");
+    ASTRA_EXCEPTION("NO SUITABLE TYPE STRING CASTING FOR KEY");
   }
 
 protected:
