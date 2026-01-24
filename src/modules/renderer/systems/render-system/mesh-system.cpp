@@ -51,13 +51,13 @@ void MeshSystem::update(double dt) {
       continue;
     }
 
-    auto meshes = mesh_component->get_meshes();
-
     auto resource = object->get_component<ResourceComponent>();
 
     if (!resource->has_shader()) {
       continue;
     }
+
+    auto meshes = mesh_component->get_meshes();
 
     auto batch_id = compute_group_id(meshes, resource->get_shader()->get_id());
 

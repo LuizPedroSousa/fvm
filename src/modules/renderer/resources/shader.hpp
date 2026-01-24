@@ -28,8 +28,6 @@ public:
 
 protected:
   Shader(const ResourceID &resource_id) : Resource(resource_id) {}
-
-  static std::string get_file(const std::string &path);
 };
 
 } // namespace astralix

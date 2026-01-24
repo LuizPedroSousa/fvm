@@ -1,10 +1,13 @@
 #include "resource-manager.hpp"
+#include "assert.hpp"
 #include "glad/glad.h"
 #include "log.hpp"
 #include <numeric>
 
 namespace astralix {
 static int count = 0;
+
+#define RESOURCE_MANAGER_SUGGESTION_NAME "ResourceManager"
 
 Ref<Texture> ResourceManager::load_texture(Ref<Texture> texture) {
   LOG_DEBUG(texture->get_resource_id());
@@ -15,7 +18,7 @@ Ref<Texture> ResourceManager::load_texture(Ref<Texture> texture) {
   auto inserted_texture =
       m_texture_table.emplace(texture_id, std::move(texture));
 
-  ASTRA_EXCEPTION(!inserted_texture.second, "can't insert texture");
+  ASTRA_ENSURE(!inserted_texture.second, "can't insert texture");
 
   return m_texture_table[texture_id];
 }
@@ -36,7 +39,7 @@ Ref<Shader> ResourceManager::load_shader(Ref<Shader> shader) {
 
   auto inserted_shader = m_shader_table.emplace(shader_id, std::move(shader));
 
-  ASTRA_EXCEPTION(!inserted_shader.second, "can't insert shader");
+  ASTRA_ENSURE(!inserted_shader.second, "can't insert shader");
 
   return m_shader_table[shader_id];
 }
@@ -52,7 +55,7 @@ Ref<Model> ResourceManager::load_model(Ref<Model> model) {
 
   auto inserted_model = m_model_table.emplace(model_id, std::move(model));
 
-  ASTRA_EXCEPTION(!inserted_model.second, "can't insert model");
+  ASTRA_ENSURE(!inserted_model.second, "can't insert model");
 
   return m_model_table[model_id];
 }
@@ -75,7 +78,7 @@ Ref<Material> ResourceManager::load_material(Ref<Material> material) {
   auto inserted_material =
       m_material_table.emplace(material_id, std::move(material));
 
-  ASTRA_EXCEPTION(!inserted_material.second, "Can't insert material");
+  ASTRA_ENSURE(!inserted_material.second, "Can't insert material");
 
   return m_material_table[material_id];
 }
@@ -92,7 +95,7 @@ Ref<Font> ResourceManager::load_font(Ref<Font> font) {
 
   auto inserted_font = m_font_table.emplace(font_id, std::move(font));
 
-  ASTRA_EXCEPTION(!inserted_font.second, "Can't insert font");
+  ASTRA_ENSURE(!inserted_font.second, "Can't insert font");
 
   return m_font_table[font_id];
 }
@@ -100,8 +103,9 @@ Ref<Font> ResourceManager::load_font(Ref<Font> font) {
 Ref<Material> ResourceManager::get_material_by_id(ResourceID id) {
   auto it = m_material_table.find(id);
 
-  ASTRA_NOT_FOUND_EXCEPTION(it == m_material_table.end(), m_material_table, id,
-                            "Material");
+  ASTRA_ENSURE_WITH_SUGGESTIONS(it == m_material_table.end(), m_material_table,
+                                id, "Material",
+                                RESOURCE_MANAGER_SUGGESTION_NAME);
 
   return it->second;
 }
@@ -109,8 +113,8 @@ Ref<Material> ResourceManager::get_material_by_id(ResourceID id) {
 Ref<Shader> ResourceManager::get_shader_by_id(ResourceID id) {
   auto it = m_shader_table.find(id);
 
-  ASTRA_NOT_FOUND_EXCEPTION(it == m_shader_table.end(), m_shader_table, id,
-                            "Shader");
+  ASTRA_ENSURE_WITH_SUGGESTIONS(it == m_shader_table.end(), m_shader_table, id,
+                                "Shader", RESOURCE_MANAGER_SUGGESTION_NAME);
 
   return it->second;
 }
@@ -118,8 +122,9 @@ Ref<Shader> ResourceManager::get_shader_by_id(ResourceID id) {
 Ref<Texture> ResourceManager::get_texture_by_id(ResourceID id) {
   auto it = m_texture_table.find(id);
 
-  ASTRA_NOT_FOUND_EXCEPTION(it == m_texture_table.end(), m_texture_table, id,
-                            "Texture");
+  ASTRA_ENSURE_WITH_SUGGESTIONS(it == m_texture_table.end(), m_texture_table,
+                                id, "Texture",
+                                RESOURCE_MANAGER_SUGGESTION_NAME);
 
   return it->second;
 }
@@ -127,8 +132,8 @@ Ref<Texture> ResourceManager::get_texture_by_id(ResourceID id) {
 Model *ResourceManager::get_model_by_id(ResourceID id) {
   auto it = m_model_table.find(id);
 
-  ASTRA_NOT_FOUND_EXCEPTION(it == m_model_table.end(), m_model_table, id,
-                            "Model");
+  ASTRA_ENSURE_WITH_SUGGESTIONS(it == m_model_table.end(), m_model_table, id,
+                                "Model", RESOURCE_MANAGER_SUGGESTION_NAME);
 
   return it->second.get();
 }
@@ -136,8 +141,8 @@ Model *ResourceManager::get_model_by_id(ResourceID id) {
 Ref<Font> ResourceManager::get_font_by_id(ResourceID id) {
   auto it = m_font_table.find(id);
 
-  ASTRA_NOT_FOUND_EXCEPTION(it == m_font_table.end(), m_font_table, id,
-                            "Model");
+  ASTRA_ENSURE_WITH_SUGGESTIONS(it == m_font_table.end(), m_font_table, id,
+                                "Font", RESOURCE_MANAGER_SUGGESTION_NAME);
   return it->second;
 }
 

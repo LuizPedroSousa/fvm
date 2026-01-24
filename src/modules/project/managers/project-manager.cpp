@@ -31,7 +31,7 @@ namespace astralix {
     auto created_project =
       m_projects.emplace(project->get_project_id(), std::move(project));
 
-    ASTRA_EXCEPTION(!created_project.second, "Error creating new Project!");
+    ASTRA_ENSURE(!created_project.second, "Error creating new Project!");
 
     m_active_project_id = project_id;
 

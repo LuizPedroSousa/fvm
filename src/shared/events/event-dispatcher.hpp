@@ -22,7 +22,7 @@ public:
     auto listener_id = listener->get_id();
     auto emplaced_listener =
         m_listeners.emplace(listener_id, std::move(listener));
-    ASTRA_EXCEPTION(!emplaced_listener.second,
+    ASTRA_ENSURE(!emplaced_listener.second,
 
                     "Error creating new Listener!");
     auto type = E::get_static_type();
@@ -39,7 +39,7 @@ public:
 
     auto emplaced_event = m_event_listeners.emplace(type, listeners);
 
-    ASTRA_EXCEPTION(!emplaced_event.second,
+    ASTRA_ENSURE(!emplaced_event.second,
                     "Error creating new Event Listener!");
   }
 
@@ -53,7 +53,7 @@ public:
       if (typed_event) {
         callback(typed_event);
       } else {
-        ASTRA_EXCEPTION(true, "Event type mismatch! Expected: " +
+        ASTRA_EXCEPTION("Event type mismatch! Expected: " +
                                   std::string(typeid(E).name()));
       }
     };
@@ -62,7 +62,7 @@ public:
     auto listener_id = listener->get_id();
     auto emplaced_listener =
         m_listeners.emplace(listener_id, std::move(listener));
-    ASTRA_EXCEPTION(!emplaced_listener.second,
+    ASTRA_ENSURE(!emplaced_listener.second,
 
                     "Error creating new Listener!");
     auto type = E::get_static_type();
@@ -79,7 +79,7 @@ public:
 
     auto emplaced_event = m_event_listeners.emplace(type, listeners);
 
-    ASTRA_EXCEPTION(!emplaced_event.second,
+    ASTRA_ENSURE(!emplaced_event.second,
                     "Error creating new Event Listener!");
   }
 
@@ -91,7 +91,7 @@ public:
     if (it != m_event_listeners.end()) {
       auto event_listeners = it->second;
 
-#pragma omp parallel for
+      // #pragma omp parallel for
       for (auto &listener_id : event_listeners) {
         auto listener = m_listeners.at(listener_id);
         listener->dispatch(event);
@@ -105,7 +105,7 @@ public:
     if (it != m_event_listeners.end()) {
       auto event_listeners = it->second;
 
-#pragma omp parallel for
+      // #pragma omp parallel for
       for (auto &listener_id : event_listeners) {
         auto listener = m_listeners.at(listener_id);
         listener->dispatch(event);

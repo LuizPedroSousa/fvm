@@ -5,33 +5,34 @@
 
 namespace astralix {
 
-  class TransformComponent : public Component<TransformComponent> {
-  public:
-    TransformComponent(COMPONENT_INIT_PARAMS,
-      glm::vec3 position = glm::vec3(0.0f),
-      glm::vec3 scale = glm::vec3(1.0f),
-      glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+class TransformComponent : public Component<TransformComponent> {
+public:
+  TransformComponent(COMPONENT_INIT_PARAMS,
+                     glm::vec3 position = glm::vec3(0.0f),
+                     glm::vec3 scale = glm::vec3(1.0f),
+                     glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
 
-    void set_scale(glm::vec3 p_scale);
-    void translate(glm::vec3 p_position);
+  void set_scale(glm::vec3 p_scale);
+  void translate(glm::vec3 p_position);
 
-    void rotate(glm::vec3 axis, float degrees);
-    void rotate(glm::quat rotation);
-    void start();
-    void update();
-    void reset_transform();
+  void rotate(glm::vec3 axis, float degrees);
+  void rotate(glm::quat rotation);
 
-    glm::vec3 forward();
+  void start();
+  void update();
+  void reset_transform();
 
-    glm::vec3 position;
-    glm::vec3 scale;
-    glm::quat rotation;
-    bool m_dirty;
-    glm::mat4 matrix;
+  glm::vec3 forward();
 
-    void set_position(glm::vec3 new_pos);
+  glm::vec3 position;
+  glm::vec3 scale;
+  glm::quat rotation;
+  bool m_dirty;
+  glm::mat4 matrix;
 
-    void recalculate_transform();
-  };
+  void set_position(glm::vec3 new_pos);
+
+  void recalculate_transform();
+};
 
 } // namespace astralix

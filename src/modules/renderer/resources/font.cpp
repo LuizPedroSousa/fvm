@@ -22,7 +22,7 @@ namespace astralix {
   Ref<Font> Font::create(const ResourceID& id, const char* font_path) {
     FT_Library ft;
 
-    ASTRA_EXCEPTION(FT_Init_FreeType(&ft),
+    ASTRA_ENSURE(FT_Init_FreeType(&ft),
       "ERROR::FREETYPE: Could not init FreeType Library");
 
     FT_Face face;
@@ -33,12 +33,12 @@ namespace astralix {
       std::filesystem::path(project->get_config().resources.directory)
       .append(font_path);
 
-    ASTRA_EXCEPTION(FT_New_Face(ft, base_path.c_str(), 0, &face),
+    ASTRA_ENSURE(FT_New_Face(ft, base_path.c_str(), 0, &face),
       "ERROR::FREETYPE: Failed to load font");
 
     FT_Set_Pixel_Sizes(face, 0, 48);
 
-    ASTRA_EXCEPTION(FT_Load_Char(face, 'X', FT_LOAD_RENDER),
+    ASTRA_ENSURE(FT_Load_Char(face, 'X', FT_LOAD_RENDER),
       "ERROR::FREETYTPE: Failed to load Glyph");
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

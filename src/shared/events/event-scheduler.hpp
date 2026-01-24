@@ -53,7 +53,7 @@ public:
 
       auto emplaced_event = m_schedulers.emplace(scheduler_id, scheduler);
 
-      ASTRA_EXCEPTION(!emplaced_event.second,
+      ASTRA_ENSURE(!emplaced_event.second,
                       "Error creating new Event Scheduler! Type: " +
                           std::to_string(static_cast<int>(type)));
 
@@ -64,7 +64,7 @@ public:
 
     auto emplaced_event = m_schedulers.emplace(scheduler_id, scheduler);
 
-    ASTRA_EXCEPTION(!emplaced_event.second,
+    ASTRA_ENSURE(!emplaced_event.second,
                     "Error creating new Event Scheduler!");
 
     std::vector<SchedulerID> type_schedulers = {scheduler_id};
@@ -72,7 +72,7 @@ public:
     auto emplaced_scheduler_type =
         m_type_schedulers.emplace(type, type_schedulers);
 
-    ASTRA_EXCEPTION(!emplaced_scheduler_type.second,
+    ASTRA_ENSURE(!emplaced_scheduler_type.second,
                     "Error creating new Event Scheduler!");
 
     return scheduler_id;

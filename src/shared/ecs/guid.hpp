@@ -10,6 +10,9 @@ namespace astralix {
 using SerializableValue = std::variant<int, float, std::string, bool>;
 using SerializableKey = std::variant<int, float, std::string, bool>;
 
+using DeserializableValue = std::variant<int, float, std::string, bool>;
+using DeserializableKey = std::variant<int, float, std::string, bool>;
+
 class Guid {
 public:
   Guid();

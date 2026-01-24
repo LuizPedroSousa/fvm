@@ -1,8 +1,8 @@
 #pragma once
-
 #include "base.hpp"
 #include "exceptions/base-exception.hpp"
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 namespace astralix {
@@ -32,15 +32,16 @@ static size_t levenshtein_distance(const std::string &s1,
   return d[len1][len2];
 }
 
-#define ASTRA_NOT_FOUND_EXCEPTION(EXPRESSION, table, id, type)                 \
+#define ASTRA_ENSURE_WITH_SUGGESTIONS(EXPRESSION, option_table, item, itemKey, \
+                                      sourceKey)                               \
   if (EXPRESSION) {                                                            \
     do {                                                                       \
       std::vector<std::string> suggestions;                                    \
-      std::string id_lower = to_lower(id);                                     \
-      for (const auto &[key, _] : table) {                                     \
+      std::string item_lower = to_lower(item);                                 \
+      for (const auto &[key, _] : option_table) {                              \
         std::string key_lower = to_lower(key);                                 \
-        if (key_lower.find(id_lower) != std::string::npos ||                   \
-            levenshtein_distance(key_lower, id_lower) < 3) {                   \
+        if (key_lower.find(item_lower) != std::string::npos ||                 \
+            levenshtein_distance(key_lower, item_lower) < 3) {                 \
           suggestions.push_back(key);                                          \
         }                                                                      \
       }                                                                        \
@@ -55,8 +56,8 @@ static size_t levenshtein_distance(const std::string &s1,
                        return a.empty() ? b : a + "\n - " + b;                 \
                      }));                                                      \
                                                                                \
-      ASTRA_EXCEPTION(true, type " with ID " BOLD, "[", id, "]", RESET,        \
-                      " not found in ", BOLD, "ResourceManager", RESET,        \
+      ASTRA_EXCEPTION(itemKey " with ID " BOLD, "[", item, "]", RESET,         \
+                      " not found in ", BOLD, sourceKey, RESET,                \
                       suggestion_msg);                                         \
                                                                                \
     } while (0);                                                               \
@@ -66,7 +67,11 @@ static size_t levenshtein_distance(const std::string &s1,
   if (EXPRESSION)                                                              \
   return BaseException(__FILE__, __LINE__, MESSAGE)
 
-#define ASTRA_EXCEPTION(EXPRESSION, ...)                                       \
+#define ASTRA_EXCEPTION(...)                                                   \
+  throw BaseException(__FILE__, __FUNCTION__, __LINE__,                        \
+                      build_exception_message(__VA_ARGS__));
+
+#define ASTRA_ENSURE(EXPRESSION, ...)                                          \
   if (EXPRESSION) {                                                            \
     throw BaseException(__FILE__, __FUNCTION__, __LINE__,                      \
                         build_exception_message(__VA_ARGS__));                 \

@@ -31,7 +31,7 @@ void OpenGLShader::bind() const { glUseProgram(m_renderer_id); }
 void OpenGLShader::unbind() const { glUseProgram(0); }
 
 void OpenGLShader::attach() const {
-  ASTRA_EXCEPTION(m_renderer_id == 0, "Shader not found");
+  ASTRA_ENSURE(m_renderer_id == 0, "Shader not found");
 
   glAttachShader(m_renderer_id, m_vertex_id);
   glAttachShader(m_renderer_id, m_fragment_id);
@@ -52,7 +52,7 @@ void OpenGLShader::attach() const {
 
     glGetProgramInfoLog(m_renderer_id, 512, NULL, infoLog);
 
-    ASTRA_EXCEPTION(true, infoLog);
+    ASTRA_EXCEPTION(infoLog);
   };
 
   glDeleteShader(m_vertex_id);
@@ -119,7 +119,7 @@ uint32_t OpenGLShader::compile(Ref<Path> path, uint32_t type) {
     std::string error = "Can't load shader from " + path->get_relative_path() +
                         "\n" +
                         std::string(shader_error.begin(), shader_error.end());
-    ASTRA_EXCEPTION(true, error);
+    ASTRA_EXCEPTION(error);
   };
 
   return shader_id;

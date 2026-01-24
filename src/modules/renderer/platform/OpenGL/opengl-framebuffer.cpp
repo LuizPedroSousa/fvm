@@ -137,7 +137,7 @@ void OpenGLFramebuffer::resize(uint32_t width, uint32_t height) {
 }
 
 int OpenGLFramebuffer::read_pixel(uint32_t attachment_index, int x, int y) {
-  ASTRA_EXCEPTION(attachment_index > m_color_attachments.size(),
+  ASTRA_ENSURE(attachment_index > m_color_attachments.size(),
                   "Invalid attachment index");
 
   glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment_index);
@@ -254,7 +254,7 @@ void OpenGLFramebuffer::invalidate() {
   }
 
   if (m_color_attachments.size() > 1) {
-    ASTRA_EXCEPTION(m_color_attachments.size() > 4,
+    ASTRA_ENSURE(m_color_attachments.size() > 4,
                     "invalid color attachments");
 
     auto is_depth_only = false;
@@ -281,7 +281,7 @@ void OpenGLFramebuffer::invalidate() {
     glDrawBuffer(GL_NONE);
   }
 
-  ASTRA_EXCEPTION(glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
+  ASTRA_ENSURE(glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
                       GL_FRAMEBUFFER_COMPLETE,
                   "Can't create framebuffer");
 

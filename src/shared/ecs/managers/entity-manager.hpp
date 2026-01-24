@@ -46,7 +46,7 @@ public:
 
     auto type_id = T::entity_type_id();
 
-    ASTRA_EXCEPTION(!emplaced_entity.second, "Error creating new Entity!");
+    ASTRA_ENSURE(!emplaced_entity.second, "Error creating new Entity!");
 
     auto entity_type = m_type_entity_table.find(type_id);
 

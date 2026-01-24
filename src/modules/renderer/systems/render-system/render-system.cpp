@@ -35,6 +35,7 @@ void RenderSystem::start() {
   entity_manager->for_each<Text>([&](Text *text) { text->start(); });
 
   add_subsystem<HDRSystem>()->start();
+
   entity_manager->for_each<PostProcessing>(
       [](PostProcessing *post_processing) { post_processing->start(); });
 

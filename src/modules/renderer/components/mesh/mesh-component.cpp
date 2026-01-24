@@ -22,7 +22,6 @@ void MeshComponent::start() {
 
     Ref<VertexBuffer> vertex_buffer = VertexBuffer::create(
         &mesh.vertices[0], mesh.vertices.size() * sizeof(Vertex), m_draw_type);
-
     BufferLayout layout(
         {BufferElement(ShaderDataType::Float3, "position"),
          BufferElement(ShaderDataType::Float3, "normal"),
@@ -48,5 +47,4 @@ void MeshComponent::update() {
                                               mesh.draw_type);
   }
 };
-
 } // namespace astralix

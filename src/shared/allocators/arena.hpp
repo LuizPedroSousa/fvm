@@ -23,7 +23,7 @@ public:
   ~FixedBlockArena() { delete[] m_pool; }
 
   void *allocate() {
-    ASTRA_EXCEPTION(m_free_blocks.empty(), "Arena out of memory");
+    ASTRA_ENSURE(m_free_blocks.empty(), "Arena out of memory");
 
     void *block = m_free_blocks.back();
     m_free_blocks.pop_back();
@@ -135,7 +135,7 @@ public:
     Block *allocate(size_t block_size) {
       Block *block = m_free_blocks.front();
 
-      ASTRA_EXCEPTION(block->size < block_size, "No block large enough");
+      ASTRA_ENSURE(block->size < block_size, "No block large enough");
 
       m_free_blocks.pop_front();
 
@@ -176,7 +176,7 @@ public:
         m_max_capacity_increase(max_capacity_increase), m_allocated_memory(0),
         m_current_capacity_increased(0) {
     if (page_size == 0) {
-      ASTRA_EXCEPTION("page_size must be greater than 0");
+      ASTRA_ENSURE("page_size must be greater than 0");
     }
 
     m_pools.push_back(new BlockPool(page_size));
@@ -200,7 +200,7 @@ public:
       return block;
     }
 
-    ASTRA_EXCEPTION(m_current_capacity_increased >= m_max_capacity_increase,
+    ASTRA_ENSURE(m_current_capacity_increased >= m_max_capacity_increase,
                     "Arena out of capacity increase");
 
     size_t fixed_capacity = std::max(m_initial_page_size, block_size * 2);
@@ -228,7 +228,7 @@ public:
       }
     }
 
-    ASTRA_EXCEPTION(true, "Invalid pointer to release");
+    ASTRA_EXCEPTION("Invalid pointer to release");
   }
 
   size_t page_size() const { return m_initial_page_size; }

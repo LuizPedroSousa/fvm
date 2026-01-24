@@ -37,7 +37,7 @@ Image Texture::load_image(Ref<Path> path, bool flip_image_on_loading) {
 
   if (!data) {
     free_image(data);
-    ASTRA_EXCEPTION(true, "Cant't load image: ", path);
+    ASTRA_EXCEPTION("Cant't load image: ", path);
   }
 
   return Image{width, height, nr_channels, data};

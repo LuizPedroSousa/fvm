@@ -20,7 +20,7 @@ Ref<Model> Model::create(ResourceID id, const char *path) {
       importer.ReadFile(full_path, aiProcess_Triangulate | aiProcess_FlipUVs |
                                        aiProcess_GenNormals);
 
-  ASTRA_EXCEPTION(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE,
+  ASTRA_ENSURE(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE,
                   importer.GetErrorString());
 
   std::vector<Mesh> meshes;

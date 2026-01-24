@@ -16,7 +16,6 @@ Object::Object(ENTITY_INIT_PARAMS, glm::vec3 position, glm::vec3 scale)
 }
 
 void Object::start() {
-
   CHECK_ACTIVE(this);
 
   auto resource = get_component<ResourceComponent>();
@@ -29,7 +28,7 @@ void Object::start() {
   auto shader = resource->get_shader();
 
   if (shader != nullptr) {
-    shader->bind();
+    // shader->bind();
     shader->set_int("shadowMap", 1);
   }
 

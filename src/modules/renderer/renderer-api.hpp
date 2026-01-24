@@ -52,7 +52,7 @@ Ref<T> create_renderer_component_ref(RendererAPI::API api, Args &&...params) {
     return create_ref<O>(std::forward<Args>(params)...);
 
   default:
-    ASTRA_EXCEPTION(true, "NONE ins't a valid renderer api");
+    ASTRA_EXCEPTION("NONE ins't a valid renderer api");
   }
 }
 
@@ -64,7 +64,7 @@ Scope<T> create_renderer_component_scope(RendererAPI::API api,
     return create_scope<O>(std::forward<Args>(params)...);
 
   default:
-    ASTRA_EXCEPTION(true, "NONE ins't a valid renderer api");
+    ASTRA_EXCEPTION("NONE ins't a valid renderer api");
   }
 }
 

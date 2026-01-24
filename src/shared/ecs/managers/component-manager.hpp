@@ -39,7 +39,7 @@ public:
     auto created_component =
         m_component_table.emplace(component_id, std::move(component_ptr));
 
-    ASTRA_EXCEPTION(!created_component.second,
+    ASTRA_ENSURE(!created_component.second,
                     "Can't create a new Component !");
 
     auto components_by_type = m_type_component_table.find(component_type_id);

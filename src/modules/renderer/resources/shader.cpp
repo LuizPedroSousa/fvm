@@ -10,41 +10,6 @@
 
 namespace astralix {
 
-std::string Shader::get_file(const std::string &path) {
-  auto absolute_path = std::filesystem::current_path()
-                           .parent_path()
-                           .append("src")
-                           .append("assets")
-                           .append("shaders")
-                           .append(path);
-
-  bool file_exists = std::filesystem::exists(absolute_path);
-
-  ASTRA_EXCEPTION(!file_exists,
-                  "File" + std::string(absolute_path) + " doesn't exists");
-
-  std::string result;
-
-  std::ifstream in(absolute_path,
-                   std::ios::in |
-                       std::ios::binary); // ifstream closes itself due to RAII
-  if (in) {
-    in.seekg(0, std::ios::end);
-    size_t size = in.tellg();
-    if (size != -1) {
-      result.resize(size);
-      in.seekg(0, std::ios::beg);
-      in.read(&result[0], size);
-    } else {
-      ASTRA_EXCEPTION(true, "Could not read from file");
-    }
-  } else {
-    ASTRA_EXCEPTION(true, "Can't open file" + std::string(absolute_path) + "");
-  }
-
-  return result;
-}
-
 Ref<Shader> Shader::create(const ResourceID &resource_id,
                            Ref<Path> fragment_path, Ref<Path> vertex_path,
                            Ref<Path> geometry_path) {

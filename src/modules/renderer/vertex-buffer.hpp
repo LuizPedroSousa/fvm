@@ -48,7 +48,7 @@ namespace astralix {
       return 1;
     }
 
-    ASTRA_EXCEPTION(true, "Unknown ShaderDataType!");
+    ASTRA_EXCEPTION("Unknown ShaderDataType!");
     return 0;
   }
 
@@ -93,7 +93,7 @@ namespace astralix {
         return 1;
       }
 
-      ASTRA_EXCEPTION(false, "Unknown ShaderDataType!");
+      ASTRA_ENSURE(false, "Unknown ShaderDataType!");
       return 0;
     }
   };
