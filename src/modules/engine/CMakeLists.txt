@@ -15,6 +15,7 @@ target_link_libraries(
   engine
   PUBLIC
   glad::glad
+  window
   imgui::imgui
   # imgui_impl
   shared::ecs

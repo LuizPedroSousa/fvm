@@ -61,7 +61,7 @@ int Window::get_height() { return m_height; }
 int Window::get_width() { return m_width; }
 std::string Window::get_title() { return m_title; }
 
-void Window::open(const char *title, int width, int height, bool offscreen) {
+void Window::open(std::string &title, int width, int height, bool offscreen) {
   m_width = width;
   m_height = height;
   m_title = title;
@@ -71,7 +71,9 @@ void Window::open(const char *title, int width, int height, bool offscreen) {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   }
 
-  GLFWwindow *window = glfwCreateWindow(m_width, m_height, title, NULL, NULL);
+  GLFWwindow *window =
+      glfwCreateWindow(m_width, m_height, title.c_str(), NULL, NULL);
+
   m_value = window;
 
   if (window == NULL) {
@@ -80,14 +82,14 @@ void Window::open(const char *title, int width, int height, bool offscreen) {
     const char *description;
     int errorCode = glfwGetError(&description);
 
-    ASTRA_EXCEPTION(true, std::string("Couldn't create window for OpenGL. ") +
-                              description);
+    ASTRA_EXCEPTION(std::string("Couldn't create window for OpenGL. ") +
+                    description);
   }
 
   glfwMakeContextCurrent(m_value);
 
-  ASTRA_EXCEPTION(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
-                  "Couldn't load GLAD");
+  ASTRA_ENSURE(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress),
+               "Couldn't load GLAD");
 
   glViewport(0, 0, m_width, m_height);
 

@@ -17,6 +17,7 @@ target_link_libraries(
   PUBLIC
   glad::glad imgui::imgui
   # imgui_impl
+  project
   engine window shared::foundation
 )
 

@@ -5,6 +5,7 @@
 #include "event-scheduler.hpp"
 #include "framebuffer.hpp"
 #include "log.hpp"
+#include "managers/project-manager.hpp"
 #include "managers/system-manager.hpp"
 #include "time.hpp"
 #include "trace.hpp"
@@ -29,7 +30,13 @@ Application *Application::init() {
 #define SIZE 1920 * 1080 * 4;
 
 void Application::start() {
-  Window::get()->open("FVM Editor", 1920, 1080);
+  auto project_config =
+      ProjectManager::get()->get_active_project()->get_config();
+
+  for (auto window : project_config.windows) {
+    Window::get()->open(window.title, window.width, window.height);
+  }
+
   Engine::get()->start();
   SystemManager::get()->start();
 }

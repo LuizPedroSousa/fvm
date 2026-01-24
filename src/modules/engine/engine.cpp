@@ -6,6 +6,7 @@
 #include "systems/physics-system.hpp"
 #include "systems/render-system/render-system.hpp"
 #include "systems/scene-system.hpp"
+#include "window.hpp"
 
 namespace astralix {
 Engine *Engine::m_instance = nullptr;
@@ -36,8 +37,12 @@ void Engine::start() {
   framebuffer_spec.attachments = {
       FramebufferTextureFormat::RGBA32F, FramebufferTextureFormat::RGBA32F,
       FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
-  framebuffer_spec.width = 1920;
-  framebuffer_spec.height = 1080;
+
+  auto window = Window::get();
+
+  framebuffer_spec.width = window->get_width();
+  framebuffer_spec.height = window->get_height();
+
   framebuffer = std::move(Framebuffer::create(framebuffer_spec));
 
   auto system_manager = SystemManager::get();
